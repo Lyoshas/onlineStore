@@ -1,3 +1,5 @@
+.vscode/
 server/dist/
 server/node_modules/
 server/test.sql
+server/src/config/
