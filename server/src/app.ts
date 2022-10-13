@@ -3,9 +3,9 @@ import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import path from 'path';
 
-import authRoutes from './routes/auth';
-
 dotenv.config({ path: path.join(process.cwd(), 'src', 'config', '.env') });
+
+import authRoutes from './routes/auth';
 
 const app = express();
 
