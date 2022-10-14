@@ -1,6 +1,10 @@
-import dbPool from '../util/database';
+import bcryptjs from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
+import dbPool from '../util/database';
 import TokenEntry from '../interfaces/TokenEntry';
+import UserCredentials from '../interfaces/UserCredentials';
+import VerifiedUserInfo from '../interfaces/VerifiedUserInfo';
 
 export const signUpUser = (
     firstName: string,
@@ -50,4 +54,61 @@ export const activateAccount = (userId: number) => {
         'UPDATE users SET is_activated = true WHERE id = $1',
         [userId]
     );
+};
+
+export const getUserIdByCredentials = (
+    login: string,
+    password: string
+): Promise<number | null> => {
+    return dbPool.query(`
+        SELECT
+            id,
+            email,
+            phone_number,
+            password
+        FROM users
+        WHERE phone_number = $1 OR email = $1
+    `, [login])
+        .then(async result => {;
+            const userData: UserCredentials | null =
+                result.rows.length === 0
+                ? null 
+                : result.rows[0];
+
+            if (!userData || !await bcryptjs.compare(password, userData.password)) {
+                return Promise.resolve(null);
+            }
+
+            return Promise.resolve(userData.id);
+        });
+};
+
+export const generateAPIKey = (userId: number): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        jwt.sign(
+            { id: userId },
+            process.env.API_KEY_SECRET as string,
+            {
+                algorithm: 'HS256',
+                expiresIn: process.env.API_KEY_EXPIRES_IN
+            },
+            (err, encoded) => {
+                if (err) reject(err);
+                resolve(encoded as string);
+            }
+        )
+    });
+};
+
+export const verifyAPIKey = (API_KEY: string): Promise<VerifiedUserInfo> => {
+    return new Promise((resolve, reject) => {
+        jwt.verify(
+            API_KEY + 'g',
+            process.env.API_KEY_SECRET as string,
+            (err, decoded) => {
+                if (err) reject(err);
+                resolve(decoded as VerifiedUserInfo);
+            }
+        );
+    });
 };

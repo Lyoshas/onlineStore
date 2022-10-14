@@ -61,4 +61,6 @@ router.post(
 
 router.get('/activate-account/:activationToken', authController.activateAccount);
 
+router.post('/sign-in', authController.postSignIn);
+
 export default router;

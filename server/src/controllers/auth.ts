@@ -84,4 +84,18 @@ controllers.activateAccount = async (req, res, next) => {
     res.status(200).json({ msg: 'The account has been activated' });
 };
 
+controllers.postSignIn = async (req, res, next) => {
+    const userId = await authModel.getUserIdByCredentials(
+        // the login can be either a mobile phone (+380-XX-XXX-XX-XX) or an email
+        req.body.login,
+        req.body.password
+    );
+
+    if (userId === null) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    res.status(200).json({ API_KEY: await authModel.generateAPIKey(userId) });
+};
+
 export default controllers;

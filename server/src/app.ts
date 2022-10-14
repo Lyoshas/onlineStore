@@ -6,10 +6,13 @@ import path from 'path';
 dotenv.config({ path: path.join(process.cwd(), 'src', 'config', '.env') });
 
 import authRoutes from './routes/auth';
+import identifyUser from './middlewares/identify-user';
 
 const app = express();
 
 app.use(bodyParser.json());
+
+app.use(identifyUser);
 
 app.use('/auth', authRoutes);
 
