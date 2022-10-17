@@ -103,7 +103,7 @@ export const generateAPIKey = (userId: number): Promise<string> => {
 export const verifyAPIKey = (API_KEY: string): Promise<VerifiedUserInfo> => {
     return new Promise((resolve, reject) => {
         jwt.verify(
-            API_KEY + 'g',
+            API_KEY,
             process.env.API_KEY_SECRET as string,
             (err, decoded) => {
                 if (err) reject(err);

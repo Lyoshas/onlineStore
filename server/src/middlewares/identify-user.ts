@@ -14,9 +14,8 @@ declare global {
 const identifyUser: RequestHandler = async (req, res, next) => {
     const API_KEY = req.headers.authorization?.split(' ')[1];
 
-    if (!API_KEY) return next();
-
     try {
+        if (!API_KEY) throw new Error('API_KEY is not specified');
         req.user = await authModel.verifyAPIKey(API_KEY) as VerifiedUserInfo;
     } catch (e) {
         req.user = null;
