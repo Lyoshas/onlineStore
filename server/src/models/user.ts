@@ -1,6 +1,8 @@
 import sgMail from '@sendgrid/mail';
 import { randomBytes } from 'crypto';
 
+import dbPool from '../util/database';
+
 sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
 
 export const sendEmail = (
@@ -23,4 +25,9 @@ export const generateToken = (sizeInBytes: number = 64): Promise<string | Error>
             resolve(buf.toString('hex'));
         })
     });
+};
+
+export const getUserIdByEmail = (email: string): Promise<number | null> => {
+    return dbPool.query('SELECT id FROM users WHERE email = $1', [email])
+        .then(({ rows }) => rows.length === 0 ? null : rows[0].id);
 };

@@ -98,4 +98,69 @@ controllers.postSignIn = async (req, res, next) => {
     res.status(200).json({ API_KEY: await authModel.generateAPIKey(userId) });
 };
 
+controllers.getURLToGoogleAuthorizationServer = async (req, res, next) => {
+    const state = await userModel.generateToken(32) as string;
+    await authModel.addOAuthStateToDB(state);
+    return res.status(200).json({
+        URL: `
+            https://accounts.google.com/o/oauth2/v2/auth
+                ?client_id=${process.env.GOOGLE_CLIENT_ID}
+                &redirect_uri=${process.env.GOOGLE_REDIRECT_URI}
+                &scope=email%20profile
+                &response_type=code
+                &state=${state}
+        `.replace(/\s/g, '')
+    });
+};
+
+controllers.googleOAuthCallback = async (req, res, next) => {
+    const state = req.query.state as string;
+
+    if (!await authModel.isOAuthStateValid(state)) {
+        return res.status(403).json({ error: 'Invalid "state" parameter' });
+    }
+
+    await authModel.deleteOAuthState(state);
+
+    const idToken = await authModel.getGoogleIdToken(
+        process.env.GOOGLE_CLIENT_ID as string,
+        process.env.GOOGLE_CLIENT_SECRET as string,
+        req.query.code as string,
+        'authorization_code',
+        process.env.GOOGLE_REDIRECT_URI as string
+    );
+
+    const {
+        firstName,
+        lastName,
+        email,
+        avatarURL
+    } = authModel.getUserDataFromGoogleIdToken(idToken);
+
+    // check if the user is signed up with userModel.getUserIdByEmail 
+    const storedUserId = await userModel.getUserIdByEmail(email);
+
+    if (storedUserId === null) {
+        // the user is new, so perform a signup
+        const userId: number = await authModel.signUpUser(
+            firstName,
+            lastName,
+            email,
+            await bcryptjs.hash(authModel.generateStrongPassword(), 12),
+            null,
+            avatarURL,
+            true
+        ).then(({ rows }) => rows[0].id);
+        
+        return res.status(201).json({
+            API_KEY: await authModel.generateAPIKey(userId)
+        });
+    }
+
+    // if we make it here, the user is already signed up, so just sign them in
+    res.status(200).json({
+        API_KEY: await authModel.generateAPIKey(storedUserId)
+    });
+};
+
 export default controllers;

@@ -64,4 +64,10 @@ router.get('/activate-account/:activationToken', authController.activateAccount)
 
 router.post('/sign-in', authController.postSignIn);
 
+// get a link to the google authorization server
+router.get('/google-oauth-link', authController.getURLToGoogleAuthorizationServer);
+
+// if the user consented, they will be redirected here
+router.get('/google-oauth-callback', authController.googleOAuthCallback);
+
 export default router;
