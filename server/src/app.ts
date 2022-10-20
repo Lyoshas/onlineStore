@@ -12,6 +12,8 @@ const app = express();
 
 app.use(bodyParser.json());
 
+app.use(express.static(path.join(process.cwd(), 'src', 'public')));
+
 app.use(identifyUser);
 
 app.use('/auth', authRoutes);

@@ -11,13 +11,21 @@ export const signUpUser = (
     lastName: string,
     email: string,
     password: string,
-    phoneNumber: string
+    phoneNumber: string,
+    avatarURL: string = (process.env.DEFAULT_AVATAR_URL as string)
 ) => {
     return dbPool.query(`
-        INSERT INTO users (email, password, first_name, last_name, phone_number)
-        VALUES ($1, $2, $3, $4, $5)
+        INSERT INTO users (
+            email,
+            password,
+            first_name,
+            last_name,
+            phone_number,
+            avatar_URL
+        )
+        VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING id;
-    `, [email, password, firstName, lastName, phoneNumber]);
+    `, [email, password, firstName, lastName, phoneNumber, avatarURL]);
 };
 
 export const addActivationTokenToDB = async (userId: number, activationToken: string) => {
