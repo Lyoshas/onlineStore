@@ -50,6 +50,7 @@ router.post(
         'phoneNumber',
         'the field "phoneNumber" must conform to this schema: +380-XX-XXX-XX-XX'
     )
+        .optional()
         .isString()
         .withMessage('the field "phoneNumber" must be a string')
         .custom((phoneNumber: any) => {

@@ -11,7 +11,7 @@ export const signUpUser = (
     lastName: string,
     email: string,
     password: string,
-    phoneNumber: string,
+    phoneNumber: string | null,
     avatarURL: string = (process.env.DEFAULT_AVATAR_URL as string)
 ) => {
     return dbPool.query(`
