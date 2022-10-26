@@ -5,6 +5,7 @@ import Controller from '../interfaces/Controller';
 import * as authModel from '../models/auth';
 import * as userModel from '../models/user';
 import * as helperModel from '../models/helper';
+import OAuthUserData from '../interfaces/OAuthUserData';
 
 const controllers: Controller = {};
 
@@ -98,51 +99,81 @@ controllers.postSignIn = async (req, res, next) => {
     res.status(200).json({ API_KEY: await authModel.generateAPIKey(userId) });
 };
 
-controllers.getURLToGoogleAuthorizationServer = async (req, res, next) => {
+controllers.getURLToOAuthAuthorizationServer = async (req, res, next) => {
+    // for now the supported options are facebook and google
+    const authorizationServerName = req.params.authorizationServerName.toLowerCase();
+
+    if (!['google', 'facebook'].includes(authorizationServerName)) {
+        return res.status(422).json({
+            error: 'Invalid authorization server name: ' +
+                'it can be either "google" or "facebook"'
+        });
+    }
+
     const state = await userModel.generateToken(32) as string;
-    await authModel.addOAuthStateToDB(state);
+    const authorizationServerId = await authModel.getAuthorizationServerIdByName(
+        authorizationServerName
+    );
+
+    if (authorizationServerId === null) {
+        return res.status(500).json({
+            error: 'Unexpected error occurred ' +
+                'while retrieving the authorization server id'
+        });
+    }
+
+    await authModel.addOAuthStateToDB(state, authorizationServerId);
+
     return res.status(200).json({
-        URL: `
-            https://accounts.google.com/o/oauth2/v2/auth
-                ?client_id=${process.env.GOOGLE_CLIENT_ID}
-                &redirect_uri=${process.env.GOOGLE_REDIRECT_URI}
-                &scope=email%20profile
-                &response_type=code
-                &state=${state}
-        `.replace(/\s/g, '')
+        URL: authorizationServerName === 'google'
+            ? authModel.getURLToGoogleAuthorizationServer(state)
+            : authModel.getURLToFacebookAuthorizationServer(state)
     });
 };
 
-controllers.googleOAuthCallback = async (req, res, next) => {
+controllers.OAuthCallback = async (req, res, next) => {
     const state = req.query.state as string;
+    const code = req.query.code as string;
 
-    if (!await authModel.isOAuthStateValid(state)) {
+    const authServerName = await authModel.getAuthorizationServerNameByState(state);
+    
+    if (!authServerName) {
         return res.status(403).json({ error: 'Invalid "state" parameter' });
     }
 
     await authModel.deleteOAuthState(state);
 
-    const idToken = await authModel.getGoogleIdToken(
-        process.env.GOOGLE_CLIENT_ID as string,
-        process.env.GOOGLE_CLIENT_SECRET as string,
-        req.query.code as string,
-        'authorization_code',
-        process.env.GOOGLE_REDIRECT_URI as string
-    );
+    let userData: OAuthUserData;
 
-    const {
-        firstName,
-        lastName,
-        email,
-        avatarURL
-    } = authModel.getUserDataFromGoogleIdToken(idToken);
+    if (authServerName === 'google') {
+        const idToken = await authModel.getGoogleIdToken(
+            process.env.GOOGLE_CLIENT_ID as string,
+            process.env.GOOGLE_CLIENT_SECRET as string,
+            code,
+            'authorization_code',
+            process.env.OAUTH_REDIRECT_URI as string
+        );
+
+        userData = authModel.getUserDataFromGoogleIdToken(idToken);
+    } else if (authServerName === 'facebook') {
+        userData = await authModel.getUserDataFromFacebookAccessToken(
+            await authModel.getFacebookAccessTokenByCode(code)
+        );
+    } else {
+        return res.status(422).json({
+            error: 'Unknown authorization server name'
+        });
+    }
+
+    const { firstName, lastName, email, avatarURL } = userData;
 
     // check if the user is signed up with userModel.getUserIdByEmail 
-    const storedUserId = await userModel.getUserIdByEmail(email);
+    let userId = await userModel.getUserIdByEmail(email);
+    let responseStatus: number = 200;
 
-    if (storedUserId === null) {
+    if (userId === null) {
         // the user is new, so perform a signup
-        const userId: number = await authModel.signUpUser(
+        userId = await authModel.signUpUser(
             firstName,
             lastName,
             email,
@@ -152,14 +183,12 @@ controllers.googleOAuthCallback = async (req, res, next) => {
             true
         ).then(({ rows }) => rows[0].id);
         
-        return res.status(201).json({
-            API_KEY: await authModel.generateAPIKey(userId)
-        });
+        responseStatus = 201;
     }
 
     // if we make it here, the user is already signed up, so just sign them in
-    res.status(200).json({
-        API_KEY: await authModel.generateAPIKey(storedUserId)
+    res.status(responseStatus).json({
+        API_KEY: await authModel.generateAPIKey(userId as number)
     });
 };
 

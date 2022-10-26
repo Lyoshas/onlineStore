@@ -64,10 +64,13 @@ router.get('/activate-account/:activationToken', authController.activateAccount)
 
 router.post('/sign-in', authController.postSignIn);
 
-// get a link to the google authorization server
-router.get('/google-oauth-link', authController.getURLToGoogleAuthorizationServer);
+// get a link to the google/facebook authorization server
+router.get(
+    '/oauth-link/:authorizationServerName',
+    authController.getURLToOAuthAuthorizationServer
+);
 
 // if the user consented, they will be redirected here
-router.get('/google-oauth-callback', authController.googleOAuthCallback);
+router.get('/oauth-callback', authController.OAuthCallback);
 
 export default router;
