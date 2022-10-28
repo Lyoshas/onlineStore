@@ -46,16 +46,28 @@ router.post(
             minLowercase: 1,
             minSymbols: 1
         }),
-    body(
-        'phoneNumber',
-        'the field "phoneNumber" must conform to this schema: +380-XX-XXX-XX-XX'
-    )
+    body('phoneNumber')
         .optional()
         .isString()
         .withMessage('the field "phoneNumber" must be a string')
         .custom((phoneNumber: any) => {
             if (typeof phoneNumber !== 'string') return false;
             return /^\+380-\d{2}-\d{3}(-\d{2}){2}$/.test(phoneNumber);
+        })
+        .withMessage(
+            'the field "phoneNumber" must conform to this schema: ' +
+            '+380-XX-XXX-XX-XX'
+        )
+        .custom(async (phoneNumber: string) => {
+            const isPhoneNumberTaken: boolean = await dbPool.query(
+                'SELECT EXISTS(SELECT 1 FROM users WHERE phone_number = $1)',
+                [phoneNumber]
+            ).then(({ rows }) => rows[0].exists);
+
+            if (isPhoneNumberTaken) {
+                return Promise.reject('The phone number is already taken');
+            }
+            return Promise.resolve();
         }),
     authController.postSignUp
 );
