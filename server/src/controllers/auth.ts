@@ -1,15 +1,13 @@
+import { RequestHandler } from 'express';
 import { validationResult } from 'express-validator';
 import bcryptjs from 'bcryptjs';
 
-import Controller from '../interfaces/Controller';
 import * as authModel from '../models/auth';
 import * as userModel from '../models/user';
 import * as helperModel from '../models/helper';
 import OAuthUserData from '../interfaces/OAuthUserData';
 
-const controllers: Controller = {};
-
-controllers.postSignUp = async (req, res, next) => {
+export const postSignUp: RequestHandler = async (req, res, next) => {
     try {
         const errors = validationResult(req);
 
@@ -70,7 +68,7 @@ controllers.postSignUp = async (req, res, next) => {
     }
 };
 
-controllers.activateAccount = async (req, res, next) => {
+export const activateAccount: RequestHandler = async (req, res, next) => {
     const activationToken = req.params.activationToken;
 
     const tokenDBEntry = await authModel.getActivationTokenEntry(activationToken);
@@ -85,7 +83,7 @@ controllers.activateAccount = async (req, res, next) => {
     res.status(200).json({ msg: 'The account has been activated' });
 };
 
-controllers.postSignIn = async (req, res, next) => {
+export const postSignIn: RequestHandler = async (req, res, next) => {
     const userId = await authModel.getUserIdByCredentials(
         // the login can be either a mobile phone (+380-XX-XXX-XX-XX) or an email
         req.body.login,
@@ -99,7 +97,9 @@ controllers.postSignIn = async (req, res, next) => {
     res.status(200).json({ API_KEY: await authModel.generateAPIKey(userId) });
 };
 
-controllers.getURLToOAuthAuthorizationServer = async (req, res, next) => {
+export const getURLToOAuthAuthorizationServer: RequestHandler = async (
+    req, res, next
+) => {
     // for now the supported options are facebook and google
     const authorizationServerName = req.params.authorizationServerName.toLowerCase();
 
@@ -131,7 +131,7 @@ controllers.getURLToOAuthAuthorizationServer = async (req, res, next) => {
     });
 };
 
-controllers.OAuthCallback = async (req, res, next) => {
+export const OAuthCallback: RequestHandler = async (req, res, next) => {
     const state = req.query.state as string;
     const code = req.query.code as string;
 
@@ -191,5 +191,3 @@ controllers.OAuthCallback = async (req, res, next) => {
         API_KEY: await authModel.generateAPIKey(userId as number)
     });
 };
-
-export default controllers;

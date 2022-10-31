@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
 
-import authController from '../controllers/auth';
+import * as authController from '../controllers/auth';
 import dbPool from '../util/database';
 
 const router = Router();
