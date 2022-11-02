@@ -7,6 +7,7 @@ import { graphqlHTTP } from 'express-graphql';
 dotenv.config({ path: path.join(process.cwd(), 'src', 'config', '.env') });
 
 import authRoutes from './routes/auth';
+import cartRoutes from './routes/cart';
 import identifyUser from './middlewares/identify-user';
 import schema from './schema/schema';
 
@@ -24,5 +25,7 @@ app.use('/graphql', graphqlHTTP({
     schema,
     graphiql: true
 }));
+
+app.use('/user', cartRoutes);
 
 app.listen(3000);
