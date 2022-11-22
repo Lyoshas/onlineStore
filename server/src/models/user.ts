@@ -31,3 +31,12 @@ export const getUserIdByEmail = (email: string): Promise<number | null> => {
     return dbPool.query('SELECT id FROM users WHERE email = $1', [email])
         .then(({ rows }) => rows.length === 0 ? null : rows[0].id);
 };
+
+export const getPhoneNumberByUserId = (
+    userId: number
+): Promise<string | null> => {
+    return dbPool.query(
+        'SELECT phone_number FROM users WHERE id = $1',
+        [userId]
+    ).then(({ rows }) => rows.length === 0 ? null : rows[0].phone_number);
+};

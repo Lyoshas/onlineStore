@@ -63,3 +63,7 @@ export const deleteProductFromCart = (
         [userId, productId]
     );
 };
+
+export const cleanCart = (userId: number) => {
+    return dbPool.query('DELETE FROM carts WHERE user_id = $1', [userId]);
+};
