@@ -33,4 +33,4 @@ app.use('/user', cartRoutes);
 
 app.use('/user', orderRoutes);
 
-app.listen(3000);
+export default app;
