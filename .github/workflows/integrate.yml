@@ -1,0 +1,15 @@
+name: Node Continuous Integration
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test_pull_request:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Start up the project
+        run: docker-compose up
+      - name: Run tests
+        run: docker exec -it onlinestore-api-1 npm run test:ci
