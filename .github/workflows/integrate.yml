@@ -9,6 +9,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Go to server/src folder
+        run: cd server/src
+      - name: create "config" folder if it doesn't exist
+        run: mkdir -p config
+      - name: go to the config folder
+        run: cd config
+      - name: Create .env file
+        run: |
+          echo "${{ secrets.MAIN_ENV_FILE }}" > .env
+      - name: Create postgres.env file
+        run: |
+          echo "${{ secrets.POSTGRES_ENV_FILE }}" > postgres.env
+      - name: Go to the root folder
+        run: cd ../../..
       - name: Start up the project
         run: docker-compose up
       - name: Run tests
