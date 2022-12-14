@@ -15,7 +15,7 @@ jobs:
         working-directory: ./server
         run: mkdir config
       - name: Create dev.env file inside that folder
-        working-directory: ./server/config
+        working-directory: ./server/src/config
         run: |
           echo "${{ secrets.DEV_ENV_FILE_CONTENTS }}" > dev.env
       - name: Start up the application 

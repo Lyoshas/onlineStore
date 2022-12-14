@@ -1,7 +1,8 @@
 import dotenv from 'dotenv';
+import path from 'path';
 
 export default () => {
     dotenv.config({
-        path: '/app/src/config/dev.env'
+        path: path.join(process.cwd(), 'src', 'config', 'dev.env')
     });
 };
