@@ -13,6 +13,14 @@ jobs:
       - uses: actions/checkout@v2
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
+      - name: create "config folder" if it doesn't exist
+        working-directory: ./server
+        run: mkdir config
+      - name: Create .env file inside that folder
+        working-directory: ./server
+        run: |
+          echo "${{ secrets.MAIN_ENV_FILE }}" > .env
+      
       # - name: Go to server/src folder
       #   run: cd server/src
       # - name: create "config" folder if it doesn't exist

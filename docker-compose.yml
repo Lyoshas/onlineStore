@@ -1,21 +1,11 @@
 version: '3'
 services:
-  postgres:
-    image: 'postgres:latest'
-    ports:
-      - "5433:5432"
-    env_file:
-      - ./server/src/config/postgres.env
   api:
     build:
       context: ./server
       dockerfile: Dockerfile.dev
-    # ports:
-    #   - "3000:3000"
     volumes:
       - "./server:/app"
-    env_file:
-      - ./server/src/config/.env
   nginx:
     restart: always
     build:

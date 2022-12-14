@@ -4,7 +4,16 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { graphqlHTTP } from 'express-graphql';
 
-dotenv.config({ path: path.join(process.cwd(), 'src', 'config', '.env') });
+dotenv.config({
+    path: path.join(
+        process.cwd(),
+        'src',
+        'config',
+        ['dev', 'test'].includes(process.env.NODE_ENV as string) ?
+            'dev.env' :
+            'prod.env'
+    )
+});
 
 import authRoutes from './routes/auth';
 import cartRoutes from './routes/cart';

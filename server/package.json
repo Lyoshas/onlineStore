@@ -4,7 +4,7 @@
   "description": "REST API for an online store",
   "main": "./src/app.ts",
   "scripts": {
-    "dev": "nodemon -L --ignore ./src/tests ./src/server.ts",
+    "dev": "NODE_ENV=dev nodemon -L --ignore ./src/tests ./src/server.ts",
     "test": "vitest --reporter verbose",
     "test:ci": "vitest run --watch false"
   },
