@@ -17,11 +17,11 @@ jobs:
         working-directory: ./server
         run: mkdir config
       - name: Create dev.env file inside that folder
-        working-directory: ./server
+        working-directory: ./server/config
         run: |
           echo "${{ secrets.DEV_ENV_FILE_CONTENTS }}" > dev.env
       - name: Start up the application 
-        run: docker-compose -f docker-compose-ci.yml up --build
+        run: docker-compose -f docker-compose-ci.yml up -d --build
       - name: Run tests
         run: docker exec -it onlinestore-api-1 npm run test:ci
       - name: If everything is okay, you should see this message
