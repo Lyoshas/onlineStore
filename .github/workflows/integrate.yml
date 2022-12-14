@@ -11,8 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      # - name: Setup tmate session
-      #   uses: mxschmitt/action-tmate@v3
       - name: create "config folder" if it doesn't exist
         working-directory: ./server
         run: mkdir config
@@ -26,6 +24,8 @@ jobs:
         run: docker ps
       - name: Check running docker-compose containers
         run: docker-compose -f docker-compose-ci.yml ps
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
       - name: Run tests
         run: docker exec onlinestore_api_1 npm run test:ci
       - name: If everything is okay, you should see this message
