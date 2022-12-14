@@ -24,6 +24,8 @@ jobs:
         run: docker ps
       - name: docker compose ps
         run: docker-compose -f docker-compose-ci.yml ps
+      - name: sleep for 5 seconds so the API can connect to the DB
+        run: sleep 5
       # - name: Setup tmate session
       #   uses: mxschmitt/action-tmate@v3
       - name: Run tests
