@@ -24,8 +24,8 @@ jobs:
         run: docker ps
       - name: Check running docker-compose containers
         run: docker-compose -f docker-compose-ci.yml ps
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
       - name: Run tests
         run: docker exec onlinestore_api_1 npm run test:ci
       - name: If everything is okay, you should see this message
