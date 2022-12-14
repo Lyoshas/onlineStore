@@ -22,6 +22,10 @@ jobs:
           echo "${{ secrets.DEV_ENV_FILE_CONTENTS }}" > dev.env
       - name: Start up the application 
         run: docker-compose -f docker-compose-ci.yml up -d --build
+      - name: Check running containers
+        run: docker ps
+      - name: Check running docker-compose containers
+        run: docker-compose -f docker-compose-ci.yml ps
       - name: Run tests
         run: docker exec -it onlinestore-api-1 npm run test:ci
       - name: If everything is okay, you should see this message
