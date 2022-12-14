@@ -1,4 +1,4 @@
-name: Node Continuous Integration
+name: Node CI/CD
 
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
         run: |
           echo "${{ secrets.DEV_ENV_FILE_CONTENTS }}" > dev.env
       - name: Start up the application 
-        run: docker-compose up --build
+        run: docker-compose -f docker-compose-ci.yml up --build
       - name: Run tests
         run: docker exec -it onlinestore-api-1 npm run test:ci
       - name: If everything is okay, you should see this message

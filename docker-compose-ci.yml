@@ -1,0 +1,13 @@
+version: '3'
+services:
+  api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+  nginx:
+    restart: always
+    build:
+      dockerfile: ./nginx/Dockerfile.dev
+      context: ./ # we will make use of web-client, so we need to include it too
+    ports:
+      - '80:80'
