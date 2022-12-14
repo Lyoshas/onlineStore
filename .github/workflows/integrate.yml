@@ -27,7 +27,7 @@ jobs:
       - name: Check running docker-compose containers
         run: docker-compose -f docker-compose-ci.yml ps
       - name: Run tests
-        run: docker exec -it onlinestore_api_1 npm run test:ci
+        run: docker exec onlinestore_api_1 npm run test:ci
       - name: If everything is okay, you should see this message
         run: echo "success!"
       # - name: Go to server/src folder
