@@ -11,16 +11,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
       - name: create "config folder" if it doesn't exist
         working-directory: ./server
         run: mkdir config
-      - name: Create .env file inside that folder
+      - name: Create dev.env file inside that folder
         working-directory: ./server
         run: |
-          echo "${{ secrets.MAIN_ENV_FILE }}" > .env
-      
+          echo "${{ secrets.DEV_ENV_FILE_CONTENTS }}" > dev.env
+      - name: Start up the application 
+        run: docker-compose up --build
+      - name: Run tests
+        run: docker exec -it onlinestore-api-1 npm run test:ci
+      - name: If everything is okay, you should see this message
+        run: echo "success!"
       # - name: Go to server/src folder
       #   run: cd server/src
       # - name: create "config" folder if it doesn't exist
