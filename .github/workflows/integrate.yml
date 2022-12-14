@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: create "config folder" if it doesn't exist
-        working-directory: ./server
+        working-directory: ./server/src
         run: mkdir config
       - name: Create dev.env file inside that folder
         working-directory: ./server/src/config
