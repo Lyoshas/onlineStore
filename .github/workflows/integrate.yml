@@ -20,6 +20,10 @@ jobs:
           echo "${{ secrets.DEV_ENV_FILE_CONTENTS }}" > dev.env
       - name: Start up the application 
         run: docker-compose -f docker-compose-ci.yml up -d --build
+      - name: docker ps
+        run: docker ps
+      - name: docker compose ps
+        run: docker-compose -f docker-compose-ci.yml ps
       # - name: Setup tmate session
       #   uses: mxschmitt/action-tmate@v3
       - name: Run tests
