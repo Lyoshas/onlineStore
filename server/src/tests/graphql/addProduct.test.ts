@@ -13,6 +13,10 @@ import makeGraphQLRequest from '../util/makeGraphQLRequest';
 
 loadEnvVariables();
 
+// A quick note about setting up a transaction:
+// it will work only for creating new users
+// when we will make API requests, rolling back won't do anything,
+// because we'll be making a request to a completely different environment
 beforeEach(async () => {
     await dbPool.query('BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ');
 });
