@@ -20,34 +20,9 @@ jobs:
           echo "${{ secrets.DEV_ENV_FILE_CONTENTS }}" > dev.env
       - name: Start up the application 
         run: docker-compose -f docker-compose-ci.yml up -d --build
-      - name: docker ps
-        run: docker ps
-      - name: docker compose ps
-        run: docker-compose -f docker-compose-ci.yml ps
-      - name: sleep for 5 seconds so the API can connect to the DB
+      - name: sleep for 5 seconds so that the API can connect to the DB
         run: sleep 5
-      # - name: Setup tmate session
-      #   uses: mxschmitt/action-tmate@v3
       - name: Run tests
         run: docker exec onlinestore_api_1 npm run test:ci
       - name: If everything is okay, you should see this message
         run: echo "success!"
-      # - name: Go to server/src folder
-      #   run: cd server/src
-      # - name: create "config" folder if it doesn't exist
-      #   working-directory: onlinestore
-      #   run: mkdir -p config
-      # - name: go to the config folder
-      #   run: cd config
-      # - name: Create .env file
-      #   run: |
-      #     echo "${{ secrets.MAIN_ENV_FILE }}" > .env
-      # - name: Create postgres.env file
-      #   run: |
-      #     echo "${{ secrets.POSTGRES_ENV_FILE }}" > postgres.env
-      # - name: Go to the root folder
-      #   run: cd ../../..
-      # - name: Start up the project
-      #   run: docker-compose up
-      # - name: Run tests
-      #   run: docker exec -it onlinestore-api-1 npm run test:ci
