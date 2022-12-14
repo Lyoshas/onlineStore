@@ -1,10 +1,8 @@
-name: Node CI/CD
+name: Node CI
 
 on:
   push:
     branches: [ feature/graphql-add-product ]
-  # pull_request:
-  #   branches: [ main ]
 
 jobs:
   test_pull_request:
@@ -24,5 +22,3 @@ jobs:
         run: sleep 5
       - name: Run tests
         run: docker exec onlinestore_api_1 npm run test:ci
-      - name: If everything is okay, you should see this message
-        run: echo "success!"
