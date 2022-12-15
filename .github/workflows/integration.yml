@@ -1,8 +1,10 @@
 name: Node CI
 
 on:
-  push:
-    branches: [ feature/graphql-add-product ]
+  pull_request:
+    types:
+      - opened
+    branches: [ main ]
 
 jobs:
   test_commit:
@@ -18,7 +20,7 @@ jobs:
           echo "${{ secrets.DEV_ENV_FILE_CONTENTS }}" > dev.env
       - name: Start up the application 
         run: docker-compose -f docker-compose-ci.yml up -d --build
-      - name: sleep for 5 seconds so that the API can connect to the DB
+      - name: Sleep for 5 seconds so that the API can connect to the DB
         run: sleep 5
       - name: Run tests
         run: docker exec onlinestore_api_1 npm run test:ci
