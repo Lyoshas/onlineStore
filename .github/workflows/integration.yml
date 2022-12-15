@@ -5,7 +5,7 @@ on:
     branches: [ feature/graphql-add-product ]
 
 jobs:
-  test_and_push_to_docker_hub:
+  test_commit:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
