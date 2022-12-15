@@ -4,14 +4,21 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { graphqlHTTP } from 'express-graphql';
 
+const NODE_ENV = process.env.NODE_ENV as string;
+
+if (!['development', 'test', 'production'].includes(NODE_ENV)) {
+    throw new Error(`
+        Environment variable NODE_ENV is neither
+             'development', nor 'test', nor 'production'
+    `.replace(/[\n\t]|\s{2}/g, ''));
+}
+
 dotenv.config({
     path: path.join(
         process.cwd(),
         'src',
         'config',
-        ['dev', 'test'].includes(process.env.NODE_ENV as string) ?
-            'dev.env' :
-            'prod.env'
+        ['development', 'test'].includes(NODE_ENV) ? 'dev.env' : 'prod.env'
     )
 });
 
