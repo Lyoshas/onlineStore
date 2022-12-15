@@ -5,9 +5,7 @@ services:
       context: ./server
       dockerfile: Dockerfile.dev
     environment:
-      - NODE_ENV=development
-    volumes:
-      - "./server:/app"
+      - NODE_ENV=test
   nginx:
     restart: always
     build:

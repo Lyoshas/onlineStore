@@ -7,6 +7,7 @@ import TokenEntry from '../interfaces/TokenEntry';
 import UserCredentials from '../interfaces/UserCredentials';
 import VerifiedUserInfo from '../interfaces/VerifiedUserInfo';
 import OAuthUserData from '../interfaces/OAuthUserData';
+import UserPrivileges from '../interfaces/UserPrivileges';
 
 export const signUpUser = (
     firstName: string,
@@ -95,20 +96,46 @@ export const getUserIdByCredentials = (
         });
 };
 
-export const generateAPIKey = (userId: number): Promise<string> => {
+// it returns an object with { isVerified: boolean; isAdmin: boolean }
+// or, if the user doesn't exist, it returns null
+export const getUserPrivileges = async (
+    userId: number
+): Promise<UserPrivileges | null> => {
+    const { rows } = await dbPool.query(`
+        SELECT is_activated, is_admin FROM users WHERE id = $1
+    `, [userId]);
+
+    if (rows[0]) {
+        return {
+            isActivated: rows[0].is_activated,
+            isAdmin: rows[0].is_admin
+        }
+    }
+
+    return null;
+};
+
+export const generateAPIKey = (userId: number): Promise<string | never> => {
     return new Promise((resolve, reject) => {
-        jwt.sign(
-            { id: userId },
-            process.env.API_KEY_SECRET as string,
-            {
-                algorithm: 'HS256',
-                expiresIn: process.env.API_KEY_EXPIRES_IN
-            },
-            (err, encoded) => {
-                if (err) reject(err);
-                resolve(encoded as string);
-            }
-        )
+        getUserPrivileges(userId)
+            .then(userPrivileges => {
+                if (userPrivileges === null) {
+                    reject(`user with userId ${userId} does not exist`);
+                }
+
+                jwt.sign(
+                    { id: userId, ...userPrivileges },
+                    process.env.API_KEY_SECRET as string,
+                    {
+                        algorithm: 'HS256',
+                        expiresIn: process.env.API_KEY_EXPIRES_IN
+                    },
+                    (err, encoded) => {
+                        if (err) reject(err);
+                        resolve(encoded as string);
+                    }
+                )
+            })
     });
 };
 

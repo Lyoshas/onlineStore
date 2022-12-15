@@ -4,10 +4,12 @@ import {
     GraphQLString,
     GraphQLFloat,
     GraphQLBoolean,
+    GraphQLNonNull,
     GraphQLList,
     GraphQLSchema
 } from 'graphql';
 
+import VerifiedUserInfo from '../interfaces/VerifiedUserInfo';
 import dbPool from '../util/database';
 
 const ProductType = new GraphQLObjectType({
@@ -72,6 +74,70 @@ const RootQuery = new GraphQLObjectType({
     }
 });
 
+function validateUser(user: VerifiedUserInfo | null) {
+    if (!user) {
+        throw new Error('User must be authenticated to perform this action');
+    }
+
+    if (!user.isActivated) {
+        throw new Error('User must be activated to perform this action');
+    }
+
+    if (!user.isAdmin) {
+        throw new Error('User must be an admin to perform this action');
+    }
+}
+
+const RootMutationType = new GraphQLObjectType({
+    name: 'Mutation',
+    description: 'Root Mutation',
+    fields: () => ({
+        addProduct: {
+            type: ProductType,
+            description: 'Add a product',
+            args: {
+                title: {
+                    type: new GraphQLNonNull(GraphQLString)
+                },
+                price: {
+                    type: new GraphQLNonNull(GraphQLFloat)
+                },
+                previewURL: {
+                    type: new GraphQLNonNull(GraphQLString)
+                },
+                quantityInStock: {
+                    type: new GraphQLNonNull(GraphQLInt)
+                }
+            },
+            resolve(parent, args, req) {
+                validateUser(req.user);
+
+                return dbPool.query(
+                    `INSERT INTO products (
+                        title,
+                        price,
+                        preview_url,
+                        quantity_in_stock
+                    ) VALUES ($1, $2, $3, $4) RETURNING id`,
+                    [
+                        args.title,
+                        args.price,
+                        args.previewURL,
+                        args.quantityInStock
+                    ]
+                ).then(({ rows }) => ({
+                    id: rows[0].id,
+                    title: args.title,
+                    previewURL: args.previewURL,
+                    isAvailable: args.quantityInStock > 1,
+                    isRunningOut: args.quantityInStock <= 5
+                }));
+            }
+        }
+    })
+});
+
 export default new GraphQLSchema({
-    query: RootQuery
+    query: RootQuery,
+    mutation: RootMutationType
 });

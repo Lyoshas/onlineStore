@@ -4,7 +4,23 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { graphqlHTTP } from 'express-graphql';
 
-dotenv.config({ path: path.join(process.cwd(), 'src', 'config', '.env') });
+const NODE_ENV = process.env.NODE_ENV as string;
+
+if (!['development', 'test', 'production'].includes(NODE_ENV)) {
+    throw new Error(`
+        Environment variable NODE_ENV is neither
+             'development', nor 'test', nor 'production'
+    `.replace(/[\n\t]|\s{2}/g, ''));
+}
+
+dotenv.config({
+    path: path.join(
+        process.cwd(),
+        'src',
+        'config',
+        ['development', 'test'].includes(NODE_ENV) ? 'dev.env' : 'prod.env'
+    )
+});
 
 import authRoutes from './routes/auth';
 import cartRoutes from './routes/cart';
@@ -33,4 +49,4 @@ app.use('/user', cartRoutes);
 
 app.use('/user', orderRoutes);
 
-app.listen(3000);
+export default app;

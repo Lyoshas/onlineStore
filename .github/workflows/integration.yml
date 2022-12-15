@@ -1,0 +1,26 @@
+name: Node CI
+
+on:
+  pull_request:
+    types:
+      - opened
+    branches: [ main ]
+
+jobs:
+  test_commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: create "config folder" if it doesn't exist
+        working-directory: ./server/src
+        run: mkdir config
+      - name: Create dev.env file inside that folder
+        working-directory: ./server/src/config
+        run: |
+          echo "${{ secrets.DEV_ENV_FILE_CONTENTS }}" > dev.env
+      - name: Start up the application 
+        run: docker-compose -f docker-compose-ci.yml up -d --build
+      - name: Sleep for 5 seconds so that the API can connect to the DB
+        run: sleep 5
+      - name: Run tests
+        run: docker exec onlinestore_api_1 npm run test:ci
