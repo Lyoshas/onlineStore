@@ -75,7 +75,7 @@ jobs:
           rm -rf onlineStore &&
           eval `ssh-agent -s` &&
           echo "${{ secrets.SSH_GITHUB_PASSPHRASE }}" | ssh-add ~/.ssh/id_ed25519 &&
-          git clone -b feature/ci-cd git@github.com:Lyoshas/onlineStore.git &&
+          git clone git@github.com:Lyoshas/onlineStore.git &&
           cd ./onlineStore &&
           docker-compose -f docker-compose-prod.yml up -d --build &&
           docker exec onlinestore_api_1 sh -c "cd /app/src && mkdir config && cd config && echo $PROD_ENV_FILE_CONTENTS > prod.env" &&
