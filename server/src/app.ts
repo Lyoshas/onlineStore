@@ -26,7 +26,7 @@ import authRoutes from './routes/auth';
 import cartRoutes from './routes/cart';
 import orderRoutes from './routes/order';
 import identifyUser from './middlewares/identify-user';
-import schema from './schema/schema';
+import schema from './graphql/schema';
 
 const app = express();
 
