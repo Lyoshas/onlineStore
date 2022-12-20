@@ -12,6 +12,7 @@ import ProductType from './types/ProductType';
 import getProductResolver from './resolvers/getProduct';
 import getProductsByPageResolver from './resolvers/getProductsByPage';
 import addProductResolver from './resolvers/addProduct';
+import updateProductResolver from './resolvers/updateProduct';
 
 const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
@@ -51,6 +52,18 @@ const RootMutationType = new GraphQLObjectType({
                 }
             },
             resolve: addProductResolver
+        },
+        updateProduct: {
+            type: ProductType,
+            description: 'Update a product',
+            args: {
+                id: { type: new GraphQLNonNull(GraphQLInt) },
+                title: { type: GraphQLString },
+                price: { type: GraphQLFloat },
+                previewURL: { type: GraphQLString },
+                quantityInStock: { type: GraphQLInt }
+            },
+            resolve: updateProductResolver
         }
     })
 });
