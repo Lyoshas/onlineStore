@@ -14,6 +14,8 @@ import {
     randomString,
     randomFloat
 } from '../util/random';
+import isProductAvailable from '../../graphql/helpers/isProductAvailable';
+import isProductRunningOut from '../../graphql/helpers/isProductRunningOut';
 
 loadEnvVariables();
 
@@ -111,8 +113,8 @@ describe('Updating a product with GraphQL', async () => {
             title: expectedProductInfo.title,
             price: expectedProductInfo.price,
             previewURL: expectedProductInfo.previewURL,
-            isAvailable: expectedProductInfo.quantityInStock > 0,
-            isRunningOut: expectedProductInfo.quantityInStock <= 5
+            isAvailable: isProductAvailable(expectedProductInfo.quantityInStock),
+            isRunningOut: isProductRunningOut(expectedProductInfo.quantityInStock)
         });
     });
 

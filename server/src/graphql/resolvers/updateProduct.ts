@@ -3,6 +3,8 @@ import { Request } from 'express';
 import validateUser from '../helpers/validateUser';
 import dbPool from '../../util/database';
 import DBProduct from '../../interfaces/DBProduct';
+import isProductRunningOut from '../helpers/isProductRunningOut';
+import isProductAvailable from '../helpers/isProductAvailable';
 
 export default async (parent: any, args: DBProduct, req: Request) => {
     validateUser(req.user);
@@ -54,7 +56,7 @@ export default async (parent: any, args: DBProduct, req: Request) => {
         title,
         price,
         previewURL,
-        isAvailable: quantityInStock > 0,
-        isRunningOut: quantityInStock <= 5
+        isAvailable: isProductAvailable(quantityInStock),
+        isRunningOut: isProductRunningOut(quantityInStock)
     };
 }

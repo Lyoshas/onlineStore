@@ -1,4 +1,6 @@
 import dbPool from '../../util/database';
+import isProductAvailable from '../helpers/isProductAvailable';
+import isProductRunningOut from '../helpers/isProductRunningOut';
 
 export default (parent: any, args: { id: number }) => {
     // code to get data from the DB
@@ -12,8 +14,8 @@ export default (parent: any, args: { id: number }) => {
             title: product.title,
             price: product.price,
             previewURL: product.preview_url,
-            isAvailable: product.quantity_in_stock > 1,
-            isRunningOut: product.quantity_in_stock <= 5
+            isAvailable: isProductAvailable(product.quantity_in_stock),
+            isRunningOut: isProductRunningOut(product.quantity_in_stock)
         };
     });
 };

@@ -4,6 +4,8 @@ import DBProduct from '../../interfaces/DBProduct';
 import validateUser from '../helpers/validateUser';
 import dbPool from '../../util/database';
 import DisplayProduct from '../../interfaces/DisplayProduct';
+import isProductAvailable from '../helpers/isProductAvailable';
+import isProductRunningOut from '../helpers/isProductRunningOut';
 
 export default (
     parent: any,
@@ -30,7 +32,7 @@ export default (
         title: args.title,
         price: args.price,
         previewURL: args.previewURL,
-        isAvailable: args.quantityInStock > 1,
-        isRunningOut: args.quantityInStock <= 5
+        isAvailable: isProductAvailable(args.quantityInStock),
+        isRunningOut: isProductRunningOut(args.quantityInStock)
     }));
 };
