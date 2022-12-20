@@ -1,6 +1,7 @@
 import { generateAPIKey } from '../../models/auth';
 import dbPool from '../../util/database';
 import CreateUserOptions from '../interfaces/CreateUserOptions';
+import { randomString } from './random';
 
 export function createUserAndReturnId(
     options: CreateUserOptions
@@ -17,10 +18,10 @@ export function createUserAndReturnId(
             is_admin
         ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id
     `, [
-        'test@test.com',
+        `${randomString(15)}@test.com`,
         'test_password',
-        'firstName',
-        'lastName',
+        randomString(15),
+        randomString(15),
         isActivated,
         '/images/default-avatar.png',
         isAdmin
