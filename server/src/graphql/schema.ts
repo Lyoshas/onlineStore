@@ -9,10 +9,12 @@ import {
 } from 'graphql';
 
 import ProductType from './types/ProductType';
+import ProductIdType from './types/ProductIdType';
 import getProductResolver from './resolvers/getProduct';
 import getProductsByPageResolver from './resolvers/getProductsByPage';
 import addProductResolver from './resolvers/addProduct';
 import updateProductResolver from './resolvers/updateProduct';
+import deleteProductResolver from './resolvers/deleteProduct';
 
 const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
@@ -64,6 +66,14 @@ const RootMutationType = new GraphQLObjectType({
                 quantityInStock: { type: GraphQLInt }
             },
             resolve: updateProductResolver
+        },
+        deleteProduct: {
+            type: ProductIdType,
+            description: 'Delete a product',
+            args: {
+                id: { type: new GraphQLNonNull(GraphQLInt) }
+            },
+            resolve: deleteProductResolver
         }
     })
 });

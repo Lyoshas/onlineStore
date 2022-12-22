@@ -1,3 +1,5 @@
+import DBProduct from '../../interfaces/DBProduct';
+
 export function randomInteger(min: number, max: number): number {
     let rand = min - 0.5 + Math.random() * (max - min + 1);
     return Math.round(rand);
@@ -31,3 +33,12 @@ export function randomFloat(
 
     return +(+mantissa * (10 ** (-exponentLength))).toFixed(exponentLength);
 }
+
+export function randomProductInfo(): Omit<DBProduct, 'id'> {
+    return {
+        title: randomString(25),
+        price: randomFloat(randomInteger(1, 7), 2),
+        previewURL: `http://${randomString(50)}`,
+        quantityInStock: randomInteger(1, 50)
+    };
+};

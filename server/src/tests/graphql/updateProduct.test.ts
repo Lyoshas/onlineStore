@@ -9,42 +9,16 @@ import loadEnvVariables from '../util/loadEnv';
 import { createUserAndReturnAPIKey } from '../util/createUser';
 import makeGraphQLRequest from '../util/makeGraphQLRequest';
 import DBProduct from '../../interfaces/DBProduct';
-import {
-    randomInteger,
-    randomString,
-    randomFloat
-} from '../util/random';
+import { randomProductInfo } from '../util/random';
 import isProductAvailable from '../../graphql/helpers/isProductAvailable';
 import isProductRunningOut from '../../graphql/helpers/isProductRunningOut';
+import createProduct from '../util/createProduct';
 
 loadEnvVariables();
 
 // we don't isolate the transactions, because we want our API server to 
 // see changes made by the test suite. When you update a product, 
 // a new product needs to be created beforehand
-
-// it takes an id and returns a query prefilled with random values
-function randomProductInfo(): Omit<DBProduct, 'id'> {
-    return {
-        title: randomString(25),
-        price: randomFloat(randomInteger(1, 7), 2),
-        previewURL: `http://${randomString(50)}`,
-        quantityInStock: randomInteger(1, 50)
-    };
-}
-
-// it should return the id of the newly created product
-async function createProduct(
-    productInfo: Omit<DBProduct, 'id'>
-): Promise<number> {
-    const { title, price, previewURL, quantityInStock } = productInfo;
-    return dbPool.query(`
-        INSERT INTO products (title, price, preview_url, quantity_in_stock)
-        VALUES ($1, $2, $3, $4)
-        RETURNING id
-    `, [title, price, previewURL, quantityInStock])
-        .then(({ rows }) => rows[0].id as number);
-}
 
 async function executeUpdateQuery(
     API_KEY: string | null,
