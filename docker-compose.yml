@@ -15,3 +15,9 @@ services:
       context: ./ # we will make use of web-client, so we need to include it too
     ports:
       - '80:80'
+  client:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./client
+    volumes:
+      - "./client:/app"
