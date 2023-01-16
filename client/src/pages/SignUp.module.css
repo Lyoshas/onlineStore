@@ -1,0 +1,28 @@
+.flex-wrapper {
+    min-height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-container {
+    width: 400px;
+    margin: 20px;
+    padding: 20px;
+    border-radius: 10px;
+    background: white;
+}
+
+.auth-container__heading {
+    margin: 0;
+    margin-bottom: 10px;
+}
+
+.auth-container__heading,
+.form-actions {
+    text-align: center;
+}
+
+.auth-form__submit-button {
+    margin-top: 10px;
+}
