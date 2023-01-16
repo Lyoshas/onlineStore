@@ -1,83 +1,83 @@
-name: Node CI/CD
+# name: Node CI/CD
 
-on:
-  push:
-    branches: [ main ]
+# on:
+#   push:
+#     branches: [ main ]
 
-env:
-  GCLOUD_KEY_FILE_CONTENTS: ${{ secrets.GCLOUD_KEY_FILE_CONTENTS }}
-  PROD_ENV_FILE_CONTENTS: ${{ secrets.PROD_ENV_FILE_CONTENTS }}
+# env:
+#   GCLOUD_KEY_FILE_CONTENTS: ${{ secrets.GCLOUD_KEY_FILE_CONTENTS }}
+#   PROD_ENV_FILE_CONTENTS: ${{ secrets.PROD_ENV_FILE_CONTENTS }}
 
-jobs:
-  test_and_deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Start up the application ((!) dev.env is not there)
-        run: docker-compose -f docker-compose-ci.yml up -d --build
-      - name: Create config folder inside the API container
-        run: docker exec onlinestore_api_1 mkdir -p /app/src/config
-      - name: Create dev.env file inside the API container
-        run: docker exec onlinestore_api_1 sh -c "echo \"${{ secrets.DEV_ENV_FILE_CONTENTS }}\" > /app/src/config/dev.env"
-      - name: Restart the API container
-        run: docker-compose -f docker-compose-ci.yml restart api
-      - name: Sleep for 5 seconds so that the server can connect to the DB
-        run: sleep 5
-      - name: Run the tests
-        run: docker exec onlinestore_api_1 npm run test:ci
-      - name: Log in to Docker Hub
-        run: >-
-          echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | 
-          docker login -u ${{ secrets.DOCKER_HUB_LOGIN }} --password-stdin
-      - name: Build the production API image
-        run: docker build --no-cache -t lyoshas/onlinestore-api ./server
-      - name: Build the production nginx image
-        # nginx will copy the content of web-client folder, so the build context is . (root folder) 
-        run: docker build --no-cache -t lyoshas/onlinestore-nginx -f ./nginx/Dockerfile .
-      - name: Push the API image to Docker Hub
-        run: docker push lyoshas/onlinestore-api
-      - name: Push the nginx image to Docker Hub
-        run: docker push lyoshas/onlinestore-nginx
-      - name: Copy the schema from the development database to a new file
-        # this connects to the db with this kind of string:
-        # postgresql://username:password@127.0.0.1:5432/mydatabase
-        run: >-
-          pg_dump
-          --dbname="${{ secrets.AWS_DEVELOPMENT_DATABASE_CONNECTION_STRING }}"
-          --schema-only
-          --file=database-schema.sql
-      - name: Create a file that will drop the database and recreate it
-        run: >-
-          echo -e "
-          DROP DATABASE IF EXISTS ${{ secrets.PGDATABASE }};\n
-          CREATE DATABASE ${{ secrets.PGDATABASE }};\n
-          " > drop-and-recreate-db.sql
-      - name: Execute this file (psql is connecting to (!) postgres, not to the main database)
-        run: psql --dbname="${{ secrets.AWS_PRODUCTION_POSTGRES_DATABASE_CONNECTION_STRING }}" -f drop-and-recreate-db.sql
-      - name: Execute database-schema.sql to apply the new schema
-        run: psql --dbname="${{ secrets.AWS_PRODUCTION_DATABASE_CONNECTION_STRING }}" -f database-schema.sql
-      - name: Create a key file that will be used to authenticate to Google Cloud
-        run: echo "$GCLOUD_KEY_FILE_CONTENTS" > gcloud_key_file.json
-      - name: Log in to Google Cloud
-        run: gcloud auth activate-service-account --key-file=gcloud_key_file.json
-      - name: Connect to the remote VM and deploy the project
-        run: >-
-          gcloud compute ssh 
-          --zone "europe-north1-a" 
-          "${{ secrets.GOOGLE_CLOUD_DEFAULT_USER }}@instance-1" 
-          --project="healthy-display-371312" 
-          --command='
-          cd onlineStore &&
-          docker-compose -f docker-compose-prod.yml down &&
-          docker rmi -f lyoshas/onlinestore-api &&
-          docker rmi -f lyoshas/onlinestore-nginx &&
-          cd .. &&
-          rm -rf onlineStore &&
-          eval `ssh-agent -s` &&
-          echo "${{ secrets.SSH_GITHUB_PASSPHRASE }}" | ssh-add ~/.ssh/id_ed25519 &&
-          git clone git@github.com:Lyoshas/onlineStore.git &&
-          cd ./onlineStore &&
-          docker-compose -f docker-compose-prod.yml up -d --build &&
-          docker exec onlinestore_api_1 sh -c "cd /app/src && mkdir config && cd config && echo $PROD_ENV_FILE_CONTENTS > prod.env" &&
-          docker-compose -f docker-compose-prod.yml restart api
-          '
+# jobs:
+#   test_and_deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+#       - name: Start up the application ((!) dev.env is not there)
+#         run: docker-compose -f docker-compose-ci.yml up -d --build
+#       - name: Create config folder inside the API container
+#         run: docker exec onlinestore_api_1 mkdir -p /app/src/config
+#       - name: Create dev.env file inside the API container
+#         run: docker exec onlinestore_api_1 sh -c "echo \"${{ secrets.DEV_ENV_FILE_CONTENTS }}\" > /app/src/config/dev.env"
+#       - name: Restart the API container
+#         run: docker-compose -f docker-compose-ci.yml restart api
+#       - name: Sleep for 5 seconds so that the server can connect to the DB
+#         run: sleep 5
+#       - name: Run the tests
+#         run: docker exec onlinestore_api_1 npm run test:ci
+#       - name: Log in to Docker Hub
+#         run: >-
+#           echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | 
+#           docker login -u ${{ secrets.DOCKER_HUB_LOGIN }} --password-stdin
+#       - name: Build the production API image
+#         run: docker build --no-cache -t lyoshas/onlinestore-api ./server
+#       - name: Build the production nginx image
+#         # nginx will copy the content of web-client folder, so the build context is . (root folder) 
+#         run: docker build --no-cache -t lyoshas/onlinestore-nginx -f ./nginx/Dockerfile .
+#       - name: Push the API image to Docker Hub
+#         run: docker push lyoshas/onlinestore-api
+#       - name: Push the nginx image to Docker Hub
+#         run: docker push lyoshas/onlinestore-nginx
+#       - name: Copy the schema from the development database to a new file
+#         # this connects to the db with this kind of string:
+#         # postgresql://username:password@127.0.0.1:5432/mydatabase
+#         run: >-
+#           pg_dump
+#           --dbname="${{ secrets.AWS_DEVELOPMENT_DATABASE_CONNECTION_STRING }}"
+#           --schema-only
+#           --file=database-schema.sql
+#       - name: Create a file that will drop the database and recreate it
+#         run: >-
+#           echo -e "
+#           DROP DATABASE IF EXISTS ${{ secrets.PGDATABASE }};\n
+#           CREATE DATABASE ${{ secrets.PGDATABASE }};\n
+#           " > drop-and-recreate-db.sql
+#       - name: Execute this file (psql is connecting to (!) postgres, not to the main database)
+#         run: psql --dbname="${{ secrets.AWS_PRODUCTION_POSTGRES_DATABASE_CONNECTION_STRING }}" -f drop-and-recreate-db.sql
+#       - name: Execute database-schema.sql to apply the new schema
+#         run: psql --dbname="${{ secrets.AWS_PRODUCTION_DATABASE_CONNECTION_STRING }}" -f database-schema.sql
+#       - name: Create a key file that will be used to authenticate to Google Cloud
+#         run: echo "$GCLOUD_KEY_FILE_CONTENTS" > gcloud_key_file.json
+#       - name: Log in to Google Cloud
+#         run: gcloud auth activate-service-account --key-file=gcloud_key_file.json
+#       - name: Connect to the remote VM and deploy the project
+#         run: >-
+#           gcloud compute ssh 
+#           --zone "europe-north1-a" 
+#           "${{ secrets.GOOGLE_CLOUD_DEFAULT_USER }}@instance-1" 
+#           --project="healthy-display-371312" 
+#           --command='
+#           cd onlineStore &&
+#           docker-compose -f docker-compose-prod.yml down &&
+#           docker rmi -f lyoshas/onlinestore-api &&
+#           docker rmi -f lyoshas/onlinestore-nginx &&
+#           cd .. &&
+#           rm -rf onlineStore &&
+#           eval `ssh-agent -s` &&
+#           echo "${{ secrets.SSH_GITHUB_PASSPHRASE }}" | ssh-add ~/.ssh/id_ed25519 &&
+#           git clone git@github.com:Lyoshas/onlineStore.git &&
+#           cd ./onlineStore &&
+#           docker-compose -f docker-compose-prod.yml up -d --build &&
+#           docker exec onlinestore_api_1 sh -c "cd /app/src && mkdir config && cd config && echo $PROD_ENV_FILE_CONTENTS > prod.env" &&
+#           docker-compose -f docker-compose-prod.yml restart api
+#           '
