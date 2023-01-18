@@ -1,10 +1,19 @@
 import { Router } from 'express';
-import { body } from 'express-validator';
+import { body, query } from 'express-validator';
 
 import * as authController from '../controllers/auth';
+import { isEmailAvailable } from '../models/auth';
 import dbPool from '../util/database';
 
 const router = Router();
+
+router.get(
+    '/is-email-available',
+    query('email')
+        .isEmail()
+        .withMessage('the field "email" must be a correct email address'),
+    authController.isEmailAvailable
+);
 
 router.post(
     '/sign-up',
@@ -24,12 +33,10 @@ router.post(
         .isLength({ max: 254 })
         .withMessage('the field "email" can be up to 254 characters long')
         .custom(async (email: string) => {
-            const isEmailTaken = await dbPool.query(
-                'SELECT EXISTS(SELECT 1 FROM users WHERE email = $1)',
-                [email]
-            ).then(({ rows }) => rows[0].exists);
+            if ( !(await isEmailAvailable(email)) ) {
+                return Promise.reject('The email is already taken');
+            }
 
-            if (isEmailTaken) return Promise.reject('The email is already taken');;
             return Promise.resolve();
         }),
     body(

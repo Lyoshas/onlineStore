@@ -345,3 +345,13 @@ export const generateStrongPassword = () => {
     strongPassword = shuffle(strongPassword.split('')).join('');
     return strongPassword;
 };
+
+export const isEmailAvailable = async (email: string) => {
+    const { rows } = await dbPool.query(`
+        SELECT EXISTS(
+            SELECT 1 FROM users WHERE email = $1
+        )
+    `, [email]);
+    
+    return !rows[0].exists;
+};

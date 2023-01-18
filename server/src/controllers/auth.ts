@@ -191,3 +191,23 @@ export const OAuthCallback: RequestHandler = async (req, res, next) => {
         API_KEY: await authModel.generateAPIKey(userId as number)
     });
 };
+
+// query
+export const isEmailAvailable: RequestHandler<
+    {},
+    {},
+    {},
+    { email: string } // defining req.query
+> = async (req, res, next) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors });
+    }
+
+    const email = req.query.email;
+    
+    res.json({
+        isEmailAvailable: await authModel.isEmailAvailable(email)
+    });
+}
