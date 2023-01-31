@@ -136,10 +136,17 @@ const SignUpForm = () => {
                                         classes['password-requirements__ul']
                                     }
                                 >
-                                    <li>8 characters or longer</li>
+                                    <li>
+                                        8 characters or longer, not exceeding 72
+                                        characters
+                                    </li>
                                     <li>Include at least 1 number</li>
                                     <li>Include at least 1 uppercase letter</li>
                                     <li>Include at least 1 lowercase letter</li>
+                                    <li>
+                                        Include at least 1 special character (!,
+                                        @, #, etc)
+                                    </li>
                                 </ul>
                             </div>
                         }
