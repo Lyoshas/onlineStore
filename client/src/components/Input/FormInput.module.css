@@ -2,6 +2,10 @@
     margin-bottom: 10px;
 }
 
+.form-control.recaptcha {
+    margin-top: 20px;
+}
+
 .form-control.invalid input,
 .form-control.invalid input:focus {
     outline: none;
@@ -27,6 +31,10 @@
 
 .form__error-message {
     color: red;
+}
+
+.form__error-message.recaptcha {
+    text-align: center;
 }
 
 .form-control__input-block {

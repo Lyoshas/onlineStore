@@ -88,6 +88,8 @@ const useSignupValidation = () => {
         confirmPassword: Yup.string()
             .required('Password confirmation is required')
             .oneOf([Yup.ref('password')], 'Passwords must match'),
+        recaptchaToken: Yup.string()
+            .required('Captcha verification is required')
     });
 
     return { validationSchema, errorState, isValidatingEmail };

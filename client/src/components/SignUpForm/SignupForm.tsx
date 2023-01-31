@@ -1,5 +1,5 @@
 import { useReducer, useState, useEffect } from 'react';
-import { Formik } from 'formik';
+import { ErrorMessage, Formik } from 'formik';
 
 import classes from './SignupForm.module.css';
 import Button from '../UI/Button/Button';
@@ -10,6 +10,8 @@ import ErrorNotification, {
 } from '../UI/ErrorNotification/ErrorNotification';
 import Loading from '../UI/Loading/Loading';
 import useSignupValidation from '../hooks/useSignupValidation';
+import ReCAPTCHA from '../UI/reCAPTCHA/ReCAPTCHA';
+import formInputClasses from '../Input/FormInput.module.css';
 
 const SignUpForm = () => {
     const [errorState, dispatchError] = useReducer(errorNotificationReducer, {
@@ -46,6 +48,7 @@ const SignUpForm = () => {
                 email: '',
                 password: '',
                 confirmPassword: '',
+                recaptchaToken: '',
             }}
             initialErrors={{
                 firstName: '',
@@ -53,7 +56,9 @@ const SignUpForm = () => {
                 email: '',
                 password: '',
                 confirmPassword: '',
+                recaptchaToken: '',
             }}
+            initialTouched={{ recaptchaToken: true }}
             validationSchema={signupValidationSchema}
             validateOnBlur={false}
             validateOnChange={false}
@@ -159,6 +164,24 @@ const SignUpForm = () => {
                         placeholder="Write the password again"
                         validationSchema={signupValidationSchema}
                     />
+                    <div
+                        className={`${formInputClasses['form-control']} ${formInputClasses['recaptcha']}`}
+                    >
+                        <ReCAPTCHA />
+                        <ErrorMessage
+                            name="recaptcha"
+                            render={(msg) => (
+                                <p
+                                    className={`
+                                        ${formInputClasses['form__error-message']}
+                                        ${formInputClasses['recaptcha']}
+                                    `}
+                                >
+                                    {msg}
+                                </p>
+                            )}
+                        />
+                    </div>
                     <div className={classes['form-actions']}>
                         <Button
                             type="submit"
