@@ -1,11 +1,27 @@
-import { Router } from 'express';
+import { Router, Request } from 'express';
 import { body, query } from 'express-validator';
 
 import * as authController from '../controllers/auth';
-import { isEmailAvailable } from '../models/auth';
+import { isEmailAvailable, isRecaptchaValid } from '../models/auth';
 import dbPool from '../util/database';
 
 const router = Router();
+
+const recaptchaValidation = body('recaptchaToken')
+    .not()
+    .isEmpty()
+    .withMessage('recaptchaToken must be specified')    
+    .isString()
+    .withMessage('recaptchaToken must be a string')
+    .custom(async (recaptchaToken: string, { req }) => {
+        const validationInfo = await isRecaptchaValid(
+            recaptchaToken,
+            (req as Request).socket.remoteAddress
+        );
+
+        if (validationInfo.success) return Promise.resolve();
+        return Promise.reject(validationInfo.errors);
+    });
 
 router.get(
     '/is-email-available',
@@ -17,6 +33,7 @@ router.get(
 
 router.post(
     '/sign-up',
+    recaptchaValidation,
     body('firstName')
         .isString()
         .withMessage('the field "firstName" must be a string')

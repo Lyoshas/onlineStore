@@ -1,6 +1,7 @@
 import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import fetch from 'node-fetch';
+import axios from 'axios';
 
 import dbPool from '../util/database';
 import TokenEntry from '../interfaces/TokenEntry';
@@ -8,6 +9,7 @@ import UserCredentials from '../interfaces/UserCredentials';
 import VerifiedUserInfo from '../interfaces/VerifiedUserInfo';
 import OAuthUserData from '../interfaces/OAuthUserData';
 import UserPrivileges from '../interfaces/UserPrivileges';
+import RecaptchaValidationResult from '../interfaces/RecaptchaValidationResult';
 
 export const signUpUser = (
     firstName: string,
@@ -354,4 +356,22 @@ export const isEmailAvailable = async (email: string) => {
     `, [email]);
     
     return !rows[0].exists;
+};
+
+export const isRecaptchaValid = async (
+    recaptchaToken: string,
+    remoteIP?: string
+): Promise<RecaptchaValidationResult> => {
+    const { data } = await axios.post(
+        'https://www.google.com/recaptcha/api/siteverify?' + 
+        new URLSearchParams({
+            secret: process.env.RECAPTCHA_SECRET_KEY as string,
+            response: recaptchaToken,
+            // user's IP address
+            remoteip: remoteIP || ''
+        }).toString()
+    );
+
+    // more about possible errors: https://developers.google.com/recaptcha/docs/verify
+    return { success: data.success, errors: data['error-codes'] };
 };
