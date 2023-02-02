@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-import SignUp from './pages/SignUp';
+import SignUp from './pages/SignUp/SignUp';
 import './App.css';
 
 const App: FC = () => {

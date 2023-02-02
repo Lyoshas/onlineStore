@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import SignUpForm from '../components/SignUpForm/SignupForm';
+import SignUpForm from '../../components/SignUpForm/SignupForm';
 import classes from './SignUp.module.css';
 
 const SignUp: FC = () => {
