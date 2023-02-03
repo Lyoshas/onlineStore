@@ -97,7 +97,7 @@ router.post(
     authController.postSignUp
 );
 
-router.get('/activate-account/:activationToken', authController.activateAccount);
+router.patch('/activate-account/:activationToken', authController.activateAccount);
 
 router.post('/sign-in', authController.postSignIn);
 
