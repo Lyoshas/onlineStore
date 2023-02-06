@@ -114,6 +114,7 @@ const SignUpForm = () => {
                                 'Something went wrong. Please reload the page',
                         });
                     } finally {
+                        setSubmitting(false);
                         setIsLoading(false);
                     }
                 }}
@@ -241,7 +242,7 @@ const SignUpForm = () => {
                                     Object.keys(formik.errors).length !== 0
                                 }
                             >
-                                {isLoading ? (
+                                {isLoading || formik.isSubmitting ? (
                                     <Loading width="30px" height="30px" />
                                 ) : (
                                     'Sign Up'
