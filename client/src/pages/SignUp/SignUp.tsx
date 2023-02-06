@@ -6,7 +6,7 @@ import classes from './SignUp.module.css';
 
 const SignUp: FC = () => {
     return (
-        <div className={classes['flex-wrapper']}>
+        <div className="flex-wrapper">
             <Card className={classes['auth-container']}>
                 <h2 className={classes['auth-container__heading']}>Sign Up</h2>
                 <SignUpForm />

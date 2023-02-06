@@ -1,0 +1,18 @@
+.activation-block {
+    background: white;
+    text-align: center;
+    margin: 0 20px;
+    max-width: 500px;
+}
+
+.message {
+    font-size: 1.1rem;
+    margin: 0;
+    margin-top: 15px;
+    margin-bottom: 20px;
+}
+
+.icon {
+    width: 48px;
+    height: 48px;
+}
