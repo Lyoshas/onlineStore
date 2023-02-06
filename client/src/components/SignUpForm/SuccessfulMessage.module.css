@@ -1,5 +1,8 @@
-.success-message {
+.success-message-block {
     text-align: center;
+}
+
+.success-message__text {
     font-size: 1.1rem;
     line-height: 1.5;
 }

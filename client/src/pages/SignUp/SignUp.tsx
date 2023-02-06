@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, Fragment, useState } from 'react';
 
 import SignUpForm from '../../components/SignUpForm/SignupForm';
 import SuccessfulSignupMessage from '../../components/SignUpForm/SuccessfulSignupMessage';
@@ -12,15 +12,19 @@ const SignUp: FC = () => {
     return (
         <div className="flex-wrapper">
             <Card className={classes['auth-container']}>
-                <h2 className={classes['auth-container__heading']}>Sign Up</h2>
                 {wasSignupSuccessful ? (
                     <SuccessfulSignupMessage />
                 ) : (
-                    <SignUpForm
-                        onSuccessfulSignUp={() =>
-                            setWasSignupSuccessful(true)
-                        }
-                    />
+                    <Fragment>
+                        <h2 className={classes['auth-container__heading']}>
+                            Sign Up
+                        </h2>
+                        <SignUpForm
+                            onSuccessfulSignUp={() =>
+                                setWasSignupSuccessful(true)
+                            }
+                        />
+                    </Fragment>
                 )}
             </Card>
         </div>
