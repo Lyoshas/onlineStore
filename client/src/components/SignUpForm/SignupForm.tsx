@@ -1,4 +1,4 @@
-import { useReducer, useState, useEffect } from 'react';
+import { useReducer, useState, useEffect, FC } from 'react';
 import { ErrorMessage, Formik } from 'formik';
 
 import classes from './SignupForm.module.css';
@@ -12,9 +12,8 @@ import Loading from '../UI/Loading/Loading';
 import useSignupValidation from '../hooks/useSignupValidation';
 import ReCAPTCHA from '../UI/reCAPTCHA/ReCAPTCHA';
 import formInputClasses from '../Input/FormInput.module.css';
-import SuccessfulSignupMessage from './SuccessfulSignupMessage';
 
-const SignUpForm = () => {
+const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
     const [errorState, dispatchError] = useReducer(errorNotificationReducer, {
         isErrorNotificationShown: false,
         errorMessage: '',
@@ -25,9 +24,6 @@ const SignUpForm = () => {
         errorState: signupErrorState,
         isValidatingEmail,
     } = useSignupValidation();
-    // if "true" - show the success message (like "check your email for further instructions"), otherwise show the signup form
-    const [wasSignupSuccessful, setWasSignupSuccessful] =
-        useState<boolean>(false);
 
     useEffect(() => {
         setIsLoading(isValidatingEmail);
@@ -44,14 +40,7 @@ const SignUpForm = () => {
         }
     }, [signupErrorState]);
 
-    let jsxToRender;
-
-    // if the signup validation went well and the user has sent the form
-    if (wasSignupSuccessful) {
-        jsxToRender = <SuccessfulSignupMessage />;
-    } else {
-        jsxToRender = (
-            <Formik
+            return <Formik
                 initialValues={{
                     firstName: '',
                     lastName: '',
@@ -87,7 +76,7 @@ const SignUpForm = () => {
                         });
 
                         if (response.status === 201) {
-                            setWasSignupSuccessful(true);
+                            props.onSuccessfulSignUp();
                             return;
                         }
 
@@ -252,10 +241,6 @@ const SignUpForm = () => {
                     </form>
                 )}
             </Formik>
-        );
-    }
-
-    return jsxToRender;
 };
 
 export default SignUpForm;
