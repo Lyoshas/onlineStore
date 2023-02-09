@@ -1,11 +1,11 @@
 import { RequestHandler } from 'express';
+import AuthenticationError from '../errors/AuthenticationError';
 
 const ensureAuthentication: RequestHandler = (req, res, next) => {
     if (!req.user) {
-        return res.status(401).json({
-            error: 'Authentication is required'
-        });
+        throw new AuthenticationError('Authentication is required');
     }
+
     next();
 };
 

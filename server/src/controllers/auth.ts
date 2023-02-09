@@ -1,18 +1,23 @@
 import { RequestHandler } from 'express';
 import { validationResult } from 'express-validator';
 import bcryptjs from 'bcryptjs';
+import asyncHandler from 'express-async-handler';
 
 import * as authModel from '../models/auth';
 import * as userModel from '../models/user';
 import * as helperModel from '../models/helper';
 import OAuthUserData from '../interfaces/OAuthUserData';
+import RequestValidationError from '../errors/RequestValidationError';
+import UnexpectedError from '../errors/UnexpectedError';
+import CustomValidationError from '../errors/CustomValidationError';
+import InvalidCredentialsError from '../errors/InvalidPasswordError';
 
-export const postSignUp: RequestHandler = async (req, res, next) => {
-    try {
+export const postSignUp: RequestHandler = asyncHandler(
+    async (req, res, next) => {
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
-            return res.status(422).json(errors);
+            throw new RequestValidationError(errors.array());
         }
 
         const {
@@ -20,7 +25,7 @@ export const postSignUp: RequestHandler = async (req, res, next) => {
             lastName,
             email,
             password: plainPassword,
-            phoneNumber
+            phoneNumber,
         } = req.body;
 
         const activationToken = await userModel.generateToken(32);
@@ -28,24 +33,29 @@ export const postSignUp: RequestHandler = async (req, res, next) => {
         await helperModel.beginTransaction();
 
         try {
-            const insertedId = await authModel.signUpUser(
-                firstName,
-                lastName,
-                email,
-                await bcryptjs.hash(plainPassword, 12),
-                phoneNumber
-            ).then(({ rows }) => rows[0].id);
+            const insertedId = await authModel
+                .signUpUser(
+                    firstName,
+                    lastName,
+                    email,
+                    await bcryptjs.hash(plainPassword, 12),
+                    phoneNumber
+                )
+                .then(({ rows }) => rows[0].id);
 
-            await authModel.addActivationTokenToDB(insertedId, activationToken as string);
+            await authModel.addActivationTokenToDB(
+                insertedId,
+                activationToken as string
+            );
         } catch (e) {
             console.log(e);
             helperModel.rollbackTransaction();
-            return res.status(500).json({ error: 'An unexpected error occurred.' });
+            throw new UnexpectedError();
         }
 
         await helperModel.commitTransaction();
 
-        const activationLink = 
+        const activationLink =
             `http://${req.get('host')}` +
             `/auth/activate-account/${activationToken}`;
 
@@ -60,95 +70,115 @@ export const postSignUp: RequestHandler = async (req, res, next) => {
         );
 
         res.status(201).json({
-            msg: 'A new account has been created. Email confirmation is required.'
-        });
-    } catch (e) {
-        console.log(e);
-        res.sendStatus(500);
-    }
-};
-
-export const activateAccount: RequestHandler = async (req, res, next) => {
-    const activationToken = req.params.activationToken;
-
-    const tokenDBEntry = await authModel.getActivationTokenEntry(activationToken);
-
-    if (!tokenDBEntry) {
-        return res.status(422).json({ error: 'Invalid activation token' });
-    } else if (new Date() > new Date(tokenDBEntry.expires_at)) {
-        return res.status(422).json({ error: 'The activation token has expired' });
-    }
-
-    await authModel.activateAccount(tokenDBEntry.user_id);
-    res.status(200).json({ msg: 'The account has been activated' });
-};
-
-export const postSignIn: RequestHandler = async (req, res, next) => {
-    const userId = await authModel.getUserIdByCredentials(
-        // the login can be either a mobile phone (+380-XX-XXX-XX-XX) or an email
-        req.body.login,
-        req.body.password
-    );
-
-    if (userId === null) {
-        return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    res.status(200).json({ API_KEY: await authModel.generateAPIKey(userId) });
-};
-
-export const getURLToOAuthAuthorizationServer: RequestHandler = async (
-    req, res, next
-) => {
-    // for now the supported options are facebook and google
-    const authorizationServerName = req.params.authorizationServerName.toLowerCase();
-
-    if (!['google', 'facebook'].includes(authorizationServerName)) {
-        return res.status(422).json({
-            error: 'Invalid authorization server name: ' +
-                'it can be either "google" or "facebook"'
+            msg: 'A new account has been created. Email confirmation is required.',
         });
     }
+);
 
-    const state = await userModel.generateToken(32) as string;
-    const authorizationServerId = await authModel.getAuthorizationServerIdByName(
-        authorizationServerName
-    );
+export const activateAccount: RequestHandler = asyncHandler(
+    async (req, res, next) => {
+        const activationToken = req.params.activationToken;
 
-    if (authorizationServerId === null) {
-        return res.status(500).json({
-            error: 'Unexpected error occurred ' +
-                'while retrieving the authorization server id'
+        const tokenDBEntry = await authModel.getActivationTokenEntry(
+            activationToken
+        );
+
+        if (!tokenDBEntry) {
+            throw new CustomValidationError({
+                message: 'Invalid activation token',
+                field: 'activationToken',
+            });
+        } else if (new Date() > new Date(tokenDBEntry.expires_at)) {
+            throw new CustomValidationError({
+                message: 'The activationToken has expired',
+                field: 'activationToken',
+            });
+        }
+
+        await authModel.activateAccount(tokenDBEntry.user_id);
+        res.status(200).json({ msg: 'The account has been activated' });
+    }
+);
+
+export const postSignIn: RequestHandler = asyncHandler(
+    async (req, res, next) => {
+        const userId = await authModel.getUserIdByCredentials(
+            // the login can be either a mobile phone (+380-XX-XXX-XX-XX) or an email
+            req.body.login,
+            req.body.password
+        );
+
+        if (userId === null) {
+            throw new InvalidCredentialsError();
+        }
+
+        res.status(200).json({
+            API_KEY: await authModel.generateAPIKey(userId),
         });
     }
+);
 
-    await authModel.addOAuthStateToDB(state, authorizationServerId);
+export const getURLToOAuthAuthorizationServer: RequestHandler = asyncHandler(
+    async (req, res, next) => {
+        // for now the supported options are facebook and google
+        const authorizationServerName =
+            req.params.authorizationServerName.toLowerCase();
 
-    return res.status(200).json({
-        URL: authorizationServerName === 'google'
-            ? authModel.getURLToGoogleAuthorizationServer(state)
-            : authModel.getURLToFacebookAuthorizationServer(state)
-    });
-};
+        if (!['google', 'facebook'].includes(authorizationServerName)) {
+            throw new CustomValidationError({
+                message:
+                    'Invalid authorization server name: ' +
+                    'it can be either "google" or "facebook"',
+                field: 'authorizationServerName',
+            });
+        }
+
+        const state = (await userModel.generateToken(32)) as string;
+        const authorizationServerId =
+            await authModel.getAuthorizationServerIdByName(
+                authorizationServerName
+            );
+
+        if (authorizationServerId === null) {
+            throw new UnexpectedError(
+                'Unexpected error occurred while retrieving the authorization server id'
+            );
+        }
+
+        await authModel.addOAuthStateToDB(state, authorizationServerId);
+
+        res.status(200).json({
+            URL:
+                authorizationServerName === 'google'
+                    ? authModel.getURLToGoogleAuthorizationServer(state)
+                    : authModel.getURLToFacebookAuthorizationServer(state),
+        });
+    }
+);
 
 export const OAuthCallback: RequestHandler<
     {},
     {},
     {},
-    { state: string, code: string }
-> = async (req, res, next) => {
+    { state: string; code: string }
+> = asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() });
+        throw new RequestValidationError(errors.array());
     }
 
     const { state, code } = req.query;
 
-    const authServerName = await authModel.getAuthorizationServerNameByState(state);
-    
+    const authServerName = await authModel.getAuthorizationServerNameByState(
+        state
+    );
+
     if (!authServerName) {
-        return res.status(422).json({ error: 'Invalid "state" parameter' });
+        throw new CustomValidationError({
+            message: 'Invalid "state" parameter',
+            field: 'state',
+        });
     }
 
     await authModel.deleteOAuthState(state);
@@ -170,37 +200,37 @@ export const OAuthCallback: RequestHandler<
             await authModel.getFacebookAccessTokenByCode(code)
         );
     } else {
-        return res.status(500).json({
-            error: 'Unknown authorization server name'
-        });
+        throw new UnexpectedError('Invalid authorization server name');
     }
 
     const { firstName, lastName, email, avatarURL } = userData;
 
-    // check if the user is signed up with userModel.getUserIdByEmail 
+    // check if the user is signed up with userModel.getUserIdByEmail
     let userId = await userModel.getUserIdByEmail(email);
     let responseStatus: number = 200;
 
     if (userId === null) {
         // the user is new, so perform a signup
-        userId = await authModel.signUpUser(
-            firstName,
-            lastName,
-            email,
-            await bcryptjs.hash(authModel.generateStrongPassword(), 12),
-            null,
-            avatarURL,
-            true
-        ).then(({ rows }) => rows[0].id);
-        
+        userId = await authModel
+            .signUpUser(
+                firstName,
+                lastName,
+                email,
+                await bcryptjs.hash(authModel.generateStrongPassword(), 12),
+                null,
+                avatarURL,
+                true
+            )
+            .then(({ rows }) => rows[0].id);
+
         responseStatus = 201;
     }
 
     // if we make it here, the user is already signed up, so just sign them in
     res.status(responseStatus).json({
-        API_KEY: await authModel.generateAPIKey(userId as number)
+        API_KEY: await authModel.generateAPIKey(userId as number),
     });
-};
+});
 
 // query
 export const isEmailAvailable: RequestHandler<
@@ -208,16 +238,16 @@ export const isEmailAvailable: RequestHandler<
     {},
     {},
     { email: string } // defining req.query
-> = async (req, res, next) => {
+> = asyncHandler(async (req, res, next) => {
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-        return res.status(422).json({ errors });
+        throw new RequestValidationError(errors.array());
     }
 
     const email = req.query.email;
-    
+
     res.json({
-        isEmailAvailable: await authModel.isEmailAvailable(email)
+        isEmailAvailable: await authModel.isEmailAvailable(email),
     });
-}
+});

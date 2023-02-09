@@ -1,75 +1,79 @@
 import { RequestHandler } from 'express';
 import { validationResult } from 'express-validator';
-import crypto from 'crypto';
+import asyncHandler from 'express-async-handler';
 
 import VerifiedUserInfo from '../interfaces/VerifiedUserInfo';
 
 import * as orderModel from '../models/order';
 import * as cartModel from '../models/cart';
 import * as helperModel from '../models/helper';
+import RequestValidationError from '../errors/RequestValidationError';
+import EmptyCartError from '../errors/EmptyCartError';
+import UnexpectedError from '../errors/UnexpectedError';
 
-export const createOrder: RequestHandler = async (req, res, next) => {
-    const errors = validationResult(req);
+export const createOrder: RequestHandler = asyncHandler(
+    async (req, res, next) => {
+        const errors = validationResult(req);
 
-    if (!errors.isEmpty()) {
-        return res.status(422).json(errors);
-    }
-
-    const userId: number = (req.user as VerifiedUserInfo).id;
-
-    try {
-        await helperModel.beginTransaction();
-
-        const orderId: number = await orderModel.createOrder(
-            userId,
-            req.body.deliveryMethodName,
-            req.body.paymentMethodName,
-            req.body.postOffice,
-            req.body.cityName
-        );
-
-        await orderModel.transferCartProductsToOrderProducts(userId, orderId);
-        
-        if (req.body.paymentMethodName === 'Оплата при отриманні товару') {
-            await orderModel.notifyAboutOrderByTelegram(orderId);
+        if (!errors.isEmpty()) {
+            throw new RequestValidationError(errors.array());
         }
 
-        await cartModel.cleanCart(userId);
+        const userId: number = (req.user as VerifiedUserInfo).id;
 
-        await helperModel.commitTransaction();
+        try {
+            await helperModel.beginTransaction();
 
-        res.status(201).json({ orderId });
-    } catch (e) {
-        await helperModel.rollbackTransaction();
+            const orderId: number = await orderModel.createOrder(
+                userId,
+                req.body.deliveryMethodName,
+                req.body.paymentMethodName,
+                req.body.postOffice,
+                req.body.cityName
+            );
 
-        if (e === 'OrderCreationError: User cart is empty') {
-            // you can't create an order if there's nothing to order
-            return res.status(422).json({
-                error: 'The user cart is empty'
-            });
+            await orderModel.transferCartProductsToOrderProducts(
+                userId,
+                orderId
+            );
+
+            if (req.body.paymentMethodName === 'Оплата при отриманні товару') {
+                await orderModel.notifyAboutOrderByTelegram(orderId);
+            }
+
+            await cartModel.cleanCart(userId);
+
+            await helperModel.commitTransaction();
+
+            res.status(201).json({ orderId });
+        } catch (e) {
+            await helperModel.rollbackTransaction();
+
+            if (e === 'OrderCreationError: User cart is empty') {
+                // you can't create an order if there's nothing to order
+                throw new EmptyCartError();
+            }
+
+            throw new UnexpectedError();
         }
-
-        res.status(500).json({
-            error: 'An unexpected error occurred while creating an order'
-        });
     }
-};
+);
 
 // this returns "data" and "signature" for LiqPay
 // more: https://www.liqpay.ua/en/documentation/data_signature
-export const getLiqpayFormData: RequestHandler = async (req, res, next) => {
-    const errors = validationResult(req);
+export const getLiqpayFormData: RequestHandler = asyncHandler(
+    async (req, res, next) => {
+        const errors = validationResult(req);
 
-    if (!errors.isEmpty()) {
-        return res.status(422).json(errors);
-    }
+        if (!errors.isEmpty()) {
+            throw new RequestValidationError(errors.array());
+        }
 
-    const orderId = +req.params.orderId;
-    const username = await orderModel.getFirstAndLastNameByOrderId(orderId);
+        const orderId = +req.params.orderId;
+        const username = await orderModel.getFirstAndLastNameByOrderId(orderId);
 
-    const data = Buffer.from(
-        JSON.stringify(
-            {
+        const data = Buffer.from(
+            JSON.stringify({
                 version: 3,
                 public_key: process.env.LIQPAY_PUBLIC_KEY,
                 action: 'pay',
@@ -79,37 +83,39 @@ export const getLiqpayFormData: RequestHandler = async (req, res, next) => {
                     `Оплата ордеру №${orderId}.\n` +
                     `Ордер створив(-ла): ${username}`,
                 order_id: orderId,
-                result_url: `http://localhost:3000/user/order/callback`
-            }
-        )
-    ).toString('base64');
+                result_url: `http://localhost:3000/user/order/callback`,
+            })
+        ).toString('base64');
 
-    res.json({
-        data,
-        signature: orderModel.createLiqPaySignature(
-            process.env.LIQPAY_PRIVATE_KEY +
-            data +
-            process.env.LIQPAY_PRIVATE_KEY
-        )
-    });
-};
-
-export const postPaymentCallback: RequestHandler = async (req, res, next) => {
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-        return res.status(422).json(errors);
+        res.json({
+            data,
+            signature: orderModel.createLiqPaySignature(
+                process.env.LIQPAY_PRIVATE_KEY +
+                    data +
+                    process.env.LIQPAY_PRIVATE_KEY
+            ),
+        });
     }
+);
 
-    // if we make it here, it means the user paid for the product
+export const postPaymentCallback: RequestHandler = asyncHandler(
+    async (req, res, next) => {
+        const errors = validationResult(req);
 
-    // req.params.orderId will be a number, but wrapped inside a string
-    // we made sure about it using express-validator (see routes/order.ts) 
-    const orderId: number = req.body.orderId;
+        if (!errors.isEmpty()) {
+            throw new RequestValidationError(errors.array());
+        }
 
-    await orderModel.markOrderAsPaid(orderId);
+        // if we make it here, it means the user paid for the product
 
-    orderModel.notifyAboutOrderByTelegram(orderId);
+        // req.params.orderId will be a number, but wrapped inside a string
+        // we made sure about it using express-validator (see routes/order.ts)
+        const orderId: number = req.body.orderId;
 
-    res.sendStatus(204);
-};
+        await orderModel.markOrderAsPaid(orderId);
+
+        orderModel.notifyAboutOrderByTelegram(orderId);
+
+        res.sendStatus(204);
+    }
+);

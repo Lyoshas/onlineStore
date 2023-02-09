@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
+import { GraphQLFormattedError } from 'graphql';
 
 const NODE_ENV = process.env.NODE_ENV as string;
 
@@ -29,6 +30,7 @@ import orderRoutes from './routes/order';
 import identifyUser from './middlewares/identify-user';
 import { typeDefs, resolvers } from './graphql/schema';
 import ApolloServerContext from './interfaces/ApolloServerContext';
+import errorHandler from './middlewares/error-handler';
 
 const app = express();
 
@@ -45,7 +47,16 @@ app.use('/auth', authRoutes);
 const startGraphQLServer = async () => {
     const server = new ApolloServer<ApolloServerContext>({
         typeDefs,
-        resolvers
+        resolvers,
+        formatError(formattedError: GraphQLFormattedError) {
+            if (process.env.NODE_ENV === 'production') {
+                // don't include anything that might expose the server code
+                return { message: formattedError.message };
+            }
+
+            // if it's dev environment, don't do anything
+            return formattedError;
+        },
     });
 
     await server.start();
@@ -60,5 +71,7 @@ startGraphQLServer();
 app.use('/user', cartRoutes);
 
 app.use('/user', orderRoutes);
+
+app.use(errorHandler);
 
 export default app;
