@@ -138,7 +138,7 @@ export const OAuthCallback: RequestHandler = async (req, res, next) => {
     const authServerName = await authModel.getAuthorizationServerNameByState(state);
     
     if (!authServerName) {
-        return res.status(403).json({ error: 'Invalid "state" parameter' });
+        return res.status(422).json({ error: 'Invalid "state" parameter' });
     }
 
     await authModel.deleteOAuthState(state);
