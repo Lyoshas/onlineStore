@@ -108,6 +108,15 @@ router.get(
 );
 
 // if the user consented, they will be redirected here
-router.get('/oauth-callback', authController.OAuthCallback);
+router.get(
+    '/oauth-callback', 
+    query('state')
+        .isString()
+        .withMessage('the field "state" must be a string'),
+    query('code')
+        .isString()
+        .withMessage('the field "code" must be a string'),
+    authController.OAuthCallback
+);
 
 export default router;

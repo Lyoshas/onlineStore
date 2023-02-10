@@ -131,9 +131,19 @@ export const getURLToOAuthAuthorizationServer: RequestHandler = async (
     });
 };
 
-export const OAuthCallback: RequestHandler = async (req, res, next) => {
-    const state = req.query.state as string;
-    const code = req.query.code as string;
+export const OAuthCallback: RequestHandler<
+    {},
+    {},
+    {},
+    { state: string, code: string }
+> = async (req, res, next) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+
+    const { state, code } = req.query;
 
     const authServerName = await authModel.getAuthorizationServerNameByState(state);
     
