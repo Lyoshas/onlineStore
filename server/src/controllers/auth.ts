@@ -170,7 +170,7 @@ export const OAuthCallback: RequestHandler<
             await authModel.getFacebookAccessTokenByCode(code)
         );
     } else {
-        return res.status(422).json({
+        return res.status(500).json({
             error: 'Unknown authorization server name'
         });
     }
