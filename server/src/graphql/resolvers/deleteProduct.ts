@@ -1,14 +1,13 @@
-import { Request } from 'express';
-
 import validateUser from '../helpers/validateUser';
 import dbPool from '../../util/database';
+import ApolloServerContext from '../../interfaces/ApolloServerContext';
 
 export default async (
-    parent: any,
+    _: any,
     args: any,
-    req: Request
+    context: ApolloServerContext
 ): Promise<{ id: number }> => {
-    validateUser(req.user);
+    validateUser(context.user);
 
     const { id } = args;
 

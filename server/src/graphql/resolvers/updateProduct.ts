@@ -1,13 +1,16 @@
-import { Request } from 'express';
-
 import validateUser from '../helpers/validateUser';
 import dbPool from '../../util/database';
 import DBProduct from '../../interfaces/DBProduct';
 import isProductRunningOut from '../helpers/isProductRunningOut';
 import isProductAvailable from '../helpers/isProductAvailable';
+import ApolloServerContext from '../../interfaces/ApolloServerContext';
 
-export default async (parent: any, args: DBProduct, req: Request) => {
-    validateUser(req.user);
+export default async (
+    _: any,
+    args: DBProduct,
+    context: ApolloServerContext
+) => {
+    validateUser(context.user);
 
     const { id, title, price, previewURL, quantityInStock } = args;
     let i = 0;

@@ -2,7 +2,8 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import path from 'path';
-import { graphqlHTTP } from 'express-graphql';
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@apollo/server/express4';
 
 const NODE_ENV = process.env.NODE_ENV as string;
 
@@ -26,7 +27,8 @@ import authRoutes from './routes/auth';
 import cartRoutes from './routes/cart';
 import orderRoutes from './routes/order';
 import identifyUser from './middlewares/identify-user';
-import schema from './graphql/schema';
+import { typeDefs, resolvers } from './graphql/schema';
+import ApolloServerContext from './interfaces/ApolloServerContext';
 
 const app = express();
 
@@ -40,10 +42,20 @@ app.use(identifyUser);
 
 app.use('/auth', authRoutes);
 
-app.use('/graphql', graphqlHTTP({
-    schema,
-    graphiql: true
-}));
+const startGraphQLServer = async () => {
+    const server = new ApolloServer<ApolloServerContext>({
+        typeDefs,
+        resolvers
+    });
+
+    await server.start();
+
+    app.use('/graphql', expressMiddleware(server, {
+        context: async ({ req }) => ({ user: req.user })
+    }));
+};
+
+startGraphQLServer();
 
 app.use('/user', cartRoutes);
 

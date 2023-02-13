@@ -1,84 +1,58 @@
-import {
-    GraphQLObjectType,
-    GraphQLInt,
-    GraphQLString,
-    GraphQLFloat,
-    GraphQLNonNull,
-    GraphQLList,
-    GraphQLSchema
-} from 'graphql';
+import getProduct from './resolvers/getProduct';
+import getProductsByPage from './resolvers/getProductsByPage';
+import addProduct from './resolvers/addProduct';
+import updateProduct from './resolvers/updateProduct';
+import deleteProduct from './resolvers/deleteProduct';
 
-import ProductType from './types/ProductType';
-import ProductIdType from './types/ProductIdType';
-import getProductResolver from './resolvers/getProduct';
-import getProductsByPageResolver from './resolvers/getProductsByPage';
-import addProductResolver from './resolvers/addProduct';
-import updateProductResolver from './resolvers/updateProduct';
-import deleteProductResolver from './resolvers/deleteProduct';
-
-const RootQuery = new GraphQLObjectType({
-    name: 'RootQueryType',
-    fields: {
-        product: {
-            type: ProductType,
-            args: { id: { type: GraphQLInt } },
-            resolve: getProductResolver
-        },
-        products: {
-            type: new GraphQLList(ProductType),
-            args: { page: { type: GraphQLInt } },
-            resolve: getProductsByPageResolver
-        }
+export const typeDefs = `#graphql
+    type Query {
+        "Get products by page number"
+        products(page: Int!): [Product]!
+        "Get a single product by its id"
+        product(id: Int!): Product
     }
-});
 
-const RootMutationType = new GraphQLObjectType({
-    name: 'Mutation',
-    description: 'Root Mutation',
-    fields: () => ({
-        addProduct: {
-            type: ProductType,
-            description: 'Add a product',
-            args: {
-                title: {
-                    type: new GraphQLNonNull(GraphQLString)
-                },
-                price: {
-                    type: new GraphQLNonNull(GraphQLFloat)
-                },
-                previewURL: {
-                    type: new GraphQLNonNull(GraphQLString)
-                },
-                quantityInStock: {
-                    type: new GraphQLNonNull(GraphQLInt)
-                }
-            },
-            resolve: addProductResolver
-        },
-        updateProduct: {
-            type: ProductType,
-            description: 'Update a product',
-            args: {
-                id: { type: new GraphQLNonNull(GraphQLInt) },
-                title: { type: GraphQLString },
-                price: { type: GraphQLFloat },
-                previewURL: { type: GraphQLString },
-                quantityInStock: { type: GraphQLInt }
-            },
-            resolve: updateProductResolver
-        },
-        deleteProduct: {
-            type: ProductIdType,
-            description: 'Delete a product',
-            args: {
-                id: { type: new GraphQLNonNull(GraphQLInt) }
-            },
-            resolve: deleteProductResolver
-        }
-    })
-});
+    type Mutation {
+        addProduct(
+            title: String!,
+            price: Float!,
+            previewURL: String!,
+            quantityInStock: Int!
+        ): Product!
 
-export default new GraphQLSchema({
-    query: RootQuery,
-    mutation: RootMutationType
-});
+        updateProduct(
+            id: Int!,
+            title: String!,
+            price: Float!,
+            previewURL: String!,
+            quantityInStock: Int!
+        ): Product!
+
+        deleteProduct(id: Int!): DeleteProductReturnValue
+    }
+
+    type DeleteProductReturnValue {
+        id: Int!
+    }
+
+    type Product {
+        id: Int!
+        title: String!
+        price: Float!
+        previewURL: String!
+        isAvailable: Boolean!
+        isRunningOut: Boolean!
+    }
+`;
+
+export const resolvers = {
+    Query: {
+        products: getProductsByPage,
+        product: getProduct,
+    },
+    Mutation: {
+        addProduct,
+        updateProduct,
+        deleteProduct
+    },
+};

@@ -1,18 +1,17 @@
-import { Request } from 'express';
-
 import DBProduct from '../../interfaces/DBProduct';
 import validateUser from '../helpers/validateUser';
 import dbPool from '../../util/database';
 import DisplayProduct from '../../interfaces/DisplayProduct';
 import isProductAvailable from '../helpers/isProductAvailable';
 import isProductRunningOut from '../helpers/isProductRunningOut';
+import ApolloServerContext from '../../interfaces/ApolloServerContext';
 
 export default (
-    parent: any,
+    _: any,
     args: Omit<DBProduct, 'id'>,
-    req: Request
+    context: ApolloServerContext
 ): Promise<DisplayProduct> => {
-    validateUser(req.user);
+    validateUser(context.user);
 
     return dbPool.query(
         `INSERT INTO products (
