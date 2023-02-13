@@ -9,7 +9,7 @@ import isProductRunningOut from '../helpers/isProductRunningOut';
 
 export default (
     parent: any,
-    args: DBProduct,
+    args: Omit<DBProduct, 'id'>,
     req: Request
 ): Promise<DisplayProduct> => {
     validateUser(req.user);
