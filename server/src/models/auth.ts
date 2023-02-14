@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import fetch from 'node-fetch';
 import axios from 'axios';
 import { PoolClient } from 'pg';
+import { Response } from 'express';
 
 import dbPool from '../util/database';
 import TokenEntry from '../interfaces/TokenEntry';
@@ -11,6 +12,7 @@ import VerifiedUserInfo from '../interfaces/VerifiedUserInfo';
 import OAuthUserData from '../interfaces/OAuthUserData';
 import UserPrivileges from '../interfaces/UserPrivileges';
 import RecaptchaValidationResult from '../interfaces/RecaptchaValidationResult';
+import { generateRandomString } from '../models/user';
 
 export const signUpUser = (
     options: {
@@ -149,7 +151,12 @@ export const getUserPrivileges = async (
     return null;
 };
 
-export const generateAPIKey = (userId: number): Promise<string | never> => {
+// The access token is generated as a JWT.
+// It's important to make sure that the user exists beforehand,
+// otherwise the token will point to a non-existent user
+export const generateAccessToken = (
+    userId: number
+): Promise<string | never> => {
     return new Promise((resolve, reject) => {
         getUserPrivileges(userId)
             .then(userPrivileges => {
@@ -159,10 +166,10 @@ export const generateAPIKey = (userId: number): Promise<string | never> => {
 
                 jwt.sign(
                     { id: userId, ...userPrivileges },
-                    process.env.API_KEY_SECRET as string,
+                    process.env.ACCESS_TOKEN_SECRET as string,
                     {
                         algorithm: 'HS256',
-                        expiresIn: process.env.API_KEY_EXPIRES_IN
+                        expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN
                     },
                     (err, encoded) => {
                         if (err) reject(err);
@@ -173,17 +180,95 @@ export const generateAPIKey = (userId: number): Promise<string | never> => {
     });
 };
 
-export const verifyAPIKey = (API_KEY: string): Promise<VerifiedUserInfo> => {
+// there is a table in the database called 'token_types' that stores available token names
+// as of the time of writing this comment, there are "activation" and "refresh" types of tokens.
+// this line below tries to get the id of the "refreshToken" entry.
+// this is needed to store the newly generated refresh token in the database
+export const getRefreshTokenTypeId = async (): Promise<number> => {
+    const { rows } = await dbPool.query<{ id: number }>(
+        "SELECT id FROM token_types WHERE type = 'refresh'"
+    );
+    return rows[0].id;
+};
+
+// refresh token is generated as a random string and is then placed in the database
+export const generateRefreshToken = async (
+    userId: number
+): Promise<{ refreshToken: string, expiresAt: Date }> => {
+    // the length of the refresh token is 64 characters
+    // why is "32" specified as an argument in the generateRandomString() function?
+    // this function uses crypto.randomBytes under the hood, so this is a side effect of using this function.
+    // Long story short, if you want to get a random string of length N, use "await generateRandomString(N / 2)"
+    const refreshToken = await generateRandomString(32);
+    const refreshTokenTypeId = await getRefreshTokenTypeId();
+
+    const expiresAt = new Date(
+        Date.now() +
+        +(process.env.REFRESH_TOKEN_EXPIRATION_IN_SECONDS as string) * 1000
+    );
+
+    await dbPool.query(`
+        INSERT INTO tokens (token, token_type_id, user_id, expires_at)
+        VALUES ($1, $2, $3, $4)
+    `, [
+        refreshToken,
+        refreshTokenTypeId,
+        userId,
+        expiresAt
+    ]);
+
+    return { refreshToken, expiresAt };
+};
+
+// this function will be used in multiple places
+// to not copy paste this stuff, it's better to make a separate function for this
+export const attachRefreshTokenAsCookie = (
+    res: Response,
+    refreshToken: string,
+    expiresAt: Date
+) => {
+    // add the 'secure' option once you have an SSL certificate
+    res.cookie('refreshToken', refreshToken, {
+        expires: expiresAt,
+        path: '/api/auth/refresh',
+        httpOnly: true,
+        sameSite: 'strict'
+    });
+};
+
+export const verifyAccessToken = (
+    accessToken: string
+): Promise<VerifiedUserInfo> => {
     return new Promise((resolve, reject) => {
         jwt.verify(
-            API_KEY,
-            process.env.API_KEY_SECRET as string,
+            accessToken,
+            process.env.ACCESS_TOKEN_SECRET as string,
             (err, decoded) => {
                 if (err) reject(err);
                 resolve(decoded as VerifiedUserInfo);
             }
         );
     });
+};
+
+// if the refreshToken is expired or it doesn't exist, it will return null
+export const getUserIdByRefreshToken = async (
+    refreshToken: string
+): Promise<number | null> => {
+    const refreshTokenTypeId = await getRefreshTokenTypeId();
+
+    const userId = await dbPool.query<{ user_id?: number }>(`
+        SELECT user_id
+        FROM tokens
+        WHERE token = $1
+            AND token_type_id = $2
+            AND expires_at > CURRENT_TIMESTAMP
+    `, [refreshToken, refreshTokenTypeId])
+        .then(({ rows }) => rows[0]?.user_id);
+
+    if (!userId) return null;
+
+    return userId;
 };
 
 export const getAuthorizationServerIdByName = (

@@ -18,6 +18,10 @@ export const sendEmail = (
     });
 };
 
+// the length of the refresh token is 64 characters
+// why is "32" specified as an argument in the generateRandomString() function?
+// this function uses crypto.randomBytes under the hood, so this is a side effect of using this function.
+// Long story short, if you want to get a random string of length N, use "await generateRandomString(N / 2)"
 export const generateRandomString = (
     sizeInBytes: number = 64
 ): Promise<string> => {

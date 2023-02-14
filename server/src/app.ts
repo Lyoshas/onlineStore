@@ -5,6 +5,7 @@ import path from 'path';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import { GraphQLFormattedError } from 'graphql';
+import cookieParser from 'cookie-parser';
 
 const NODE_ENV = process.env.NODE_ENV as string;
 
@@ -35,6 +36,8 @@ import errorHandler from './middlewares/error-handler';
 const app = express();
 
 app.use(bodyParser.json());
+
+app.use(cookieParser());
 
 app.use(bodyParser.urlencoded({ extended: false }));
 

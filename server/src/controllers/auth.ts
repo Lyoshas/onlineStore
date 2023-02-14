@@ -1,4 +1,4 @@
-import { RequestHandler } from 'express';
+import { RequestHandler, Response } from 'express';
 import { validationResult } from 'express-validator';
 import bcryptjs from 'bcryptjs';
 import asyncHandler from 'express-async-handler';
@@ -114,7 +114,7 @@ export const activateAccount: RequestHandler = asyncHandler(
 
 export const postSignIn: RequestHandler<
     {},
-    { API_KEY: string },
+    { accessToken: string },
     { login: string; password: string }
 > = asyncHandler(
     async (req, res, next) => {
@@ -138,8 +138,15 @@ export const postSignIn: RequestHandler<
             throw new AccountNotActivatedError();
         }
 
+        const {
+            refreshToken,
+            expiresAt
+        } = await authModel.generateRefreshToken(userId);
+
+        authModel.attachRefreshTokenAsCookie(res, refreshToken, expiresAt);
+
         res.status(200).json({
-            API_KEY: await authModel.generateAPIKey(userId),
+            accessToken: await authModel.generateAccessToken(userId)
         });
     }
 );
@@ -184,7 +191,7 @@ export const getURLToOAuthAuthorizationServer: RequestHandler = asyncHandler(
 
 export const OAuthCallback: RequestHandler<
     {},
-    {},
+    { accessToken: string },
     {},
     { state: string; code: string }
 > = asyncHandler(async (req, res, next) => {
@@ -250,14 +257,21 @@ export const OAuthCallback: RequestHandler<
                 avatarURL,
                 withOAuth: true
             })
-            .then(({ rows }) => rows[0].id);
+            .then(({ rows }) => rows[0].id) as number;
 
         responseStatus = 201;
     }
 
+    const {
+        refreshToken,
+        expiresAt
+    } = await authModel.generateRefreshToken(userId);
+
+    authModel.attachRefreshTokenAsCookie(res, refreshToken, expiresAt);
+
     // if we make it here, the user is already signed up, so just sign them in
     res.status(responseStatus).json({
-        API_KEY: await authModel.generateAPIKey(userId as number),
+        accessToken: await authModel.generateAccessToken(userId)
     });
 });
 
@@ -278,5 +292,31 @@ export const isEmailAvailable: RequestHandler<
 
     res.json({
         isEmailAvailable: await authModel.isEmailAvailable(email),
+    });
+});
+
+export const acquireNewAccessToken: RequestHandler<
+    { userId: number },
+    { accessToken: string }
+> = asyncHandler(async (req, res, next) => {
+    const errors = validationResult(req); 
+
+    if (!errors.isEmpty()) {
+        throw new RequestValidationError(errors.array());
+    }
+
+    // refreshToken exists because we made sure it's the case by using express-validator
+    const refreshToken: string = req.cookies.refreshToken;
+    const userId = await authModel.getUserIdByRefreshToken(refreshToken);
+
+    if (userId === null) {
+        throw new CustomValidationError({
+            message: 'Invalid refresh token',
+            field: 'refreshToken'
+        });
+    }
+
+    res.json({
+        accessToken: await authModel.generateAccessToken(userId)
     });
 });

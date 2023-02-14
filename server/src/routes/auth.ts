@@ -1,5 +1,5 @@
 import { Router, Request } from 'express';
-import { body, query } from 'express-validator';
+import { body, cookie, query } from 'express-validator';
 
 import * as authController from '../controllers/auth';
 import { isEmailAvailable, isRecaptchaValid } from '../models/auth';
@@ -130,6 +130,15 @@ router.get(
         .isString()
         .withMessage('the field "code" must be a string'),
     authController.OAuthCallback
+);
+
+router.get(
+    '/refresh',
+    cookie('refreshToken')
+        .trim()
+        .notEmpty()
+        .withMessage('refreshToken must not be empty'),
+    authController.acquireNewAccessToken
 );
 
 export default router;

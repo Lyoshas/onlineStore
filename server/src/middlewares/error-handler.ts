@@ -15,6 +15,7 @@ const errorHandler = (
             .json({ errors: err.serializeErrors() });
     } else {
         console.log('another error???')
+        console.log(err);
     }
 
     return res
