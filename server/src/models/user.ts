@@ -18,7 +18,9 @@ export const sendEmail = (
     });
 };
 
-export const generateToken = (sizeInBytes: number = 64): Promise<string | Error> => {
+export const generateRandomString = (
+    sizeInBytes: number = 64
+): Promise<string> => {
     return new Promise((resolve, reject) => {
         randomBytes(sizeInBytes, (err, buf) => {
             if (err) return reject(err);

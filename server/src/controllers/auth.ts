@@ -29,7 +29,7 @@ export const postSignUp: RequestHandler = asyncHandler(
             phoneNumber,
         } = req.body;
 
-        const activationToken = await userModel.generateToken(32);
+        const activationToken = await userModel.generateRandomString(32);
 
         // You must use the same client instance for all statements within a transaction.
         // PostgreSQL isolates a transaction to individual clients.
@@ -154,7 +154,7 @@ export const getURLToOAuthAuthorizationServer: RequestHandler = asyncHandler(
             });
         }
 
-        const state = (await userModel.generateToken(32)) as string;
+        const state = (await userModel.generateRandomString(32)) as string;
         const authorizationServerId =
             await authModel.getAuthorizationServerIdByName(
                 authorizationServerName
