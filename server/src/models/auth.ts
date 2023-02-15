@@ -2,6 +2,7 @@ import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import fetch from 'node-fetch';
 import axios from 'axios';
+import { PoolClient } from 'pg';
 
 import dbPool from '../util/database';
 import TokenEntry from '../interfaces/TokenEntry';
@@ -12,15 +13,31 @@ import UserPrivileges from '../interfaces/UserPrivileges';
 import RecaptchaValidationResult from '../interfaces/RecaptchaValidationResult';
 
 export const signUpUser = (
-    firstName: string,
-    lastName: string,
-    email: string,
-    password: string,
-    phoneNumber: string | null,
-    avatarURL: string = (process.env.DEFAULT_AVATAR_URL as string),
-    withOAuth: boolean = false
+    options: {
+        firstName: string,
+        lastName: string,
+        email: string,
+        password: string,
+        phoneNumber: string | null,
+        avatarURL?: string,
+        withOAuth?: boolean,
+        dbClient?: PoolClient
+    }
 ) => {
-    return dbPool.query(`
+    const {
+        firstName,
+        lastName,
+        email,
+        password,
+        phoneNumber,
+        avatarURL = (process.env.DEFAULT_AVATAR_URL as string),
+        withOAuth = false,
+        dbClient
+    } = options;
+
+    const client = dbClient || dbPool;
+
+    return client.query(`
         INSERT INTO users (
             email,
             password,
@@ -35,13 +52,19 @@ export const signUpUser = (
     `, [email, password, firstName, lastName, phoneNumber, withOAuth, avatarURL]);
 };
 
-export const addActivationTokenToDB = async (userId: number, activationToken: string) => {
+export const addActivationTokenToDB = async (
+    userId: number,
+    activationToken: string,
+    dbClient?: PoolClient
+) => {
+    const client = dbClient || dbPool;
+
     const activationTypeId: number =
-        await dbPool
+        await client
             .query("SELECT id FROM token_types WHERE type = 'activation'")
             .then(({ rows }) => rows[0].id);
     
-    return dbPool.query(`
+    return client.query(`
         INSERT INTO tokens (token, token_type_id, user_id, expires_at)
         VALUES ($1, $2, $3, $4)
     `, [

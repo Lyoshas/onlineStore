@@ -1,3 +1,5 @@
+import { PoolClient } from 'pg';
+
 import dbPool from '../util/database';
 import CartEntry from '../interfaces/CartEntry';
 
@@ -64,6 +66,8 @@ export const deleteProductFromCart = (
     );
 };
 
-export const cleanCart = (userId: number) => {
-    return dbPool.query('DELETE FROM carts WHERE user_id = $1', [userId]);
+export const cleanCart = (userId: number, dbClient?: PoolClient) => {
+    const client = dbClient || dbPool;
+
+    return client.query('DELETE FROM carts WHERE user_id = $1', [userId]);
 };

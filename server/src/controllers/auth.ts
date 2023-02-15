@@ -11,6 +11,7 @@ import RequestValidationError from '../errors/RequestValidationError';
 import UnexpectedError from '../errors/UnexpectedError';
 import CustomValidationError from '../errors/CustomValidationError';
 import InvalidCredentialsError from '../errors/InvalidPasswordError';
+import dbPool from '../util/database';
 
 export const postSignUp: RequestHandler = asyncHandler(
     async (req, res, next) => {
@@ -30,30 +31,40 @@ export const postSignUp: RequestHandler = asyncHandler(
 
         const activationToken = await userModel.generateToken(32);
 
-        await helperModel.beginTransaction();
+        // You must use the same client instance for all statements within a transaction.
+        // PostgreSQL isolates a transaction to individual clients.
+        // This means if you initialize or use transactions with the pool.query method you will have problems.
+        // Do not use transactions with the pool.query method.
+        // more: https://node-postgres.com/features/transactions
+        const dbClient = await dbPool.connect();
+
+        await helperModel.beginTransaction(dbClient);
 
         try {
             const insertedId = await authModel
-                .signUpUser(
+                .signUpUser({
                     firstName,
                     lastName,
                     email,
-                    await bcryptjs.hash(plainPassword, 12),
-                    phoneNumber
-                )
+                    password: await bcryptjs.hash(plainPassword, 12),
+                    phoneNumber,
+                    // it's necessary to make the request using this client because transactions should be performed within a single client
+                    dbClient
+                })
                 .then(({ rows }) => rows[0].id);
 
             await authModel.addActivationTokenToDB(
                 insertedId,
-                activationToken as string
+                activationToken as string,
+                dbClient
             );
         } catch (e) {
             console.log(e);
-            helperModel.rollbackTransaction();
+            helperModel.rollbackTransaction(dbClient);
             throw new UnexpectedError();
         }
 
-        await helperModel.commitTransaction();
+        await helperModel.commitTransaction(dbClient);
 
         const activationLink =
             `http://${req.get('host')}` +
@@ -212,15 +223,18 @@ export const OAuthCallback: RequestHandler<
     if (userId === null) {
         // the user is new, so perform a signup
         userId = await authModel
-            .signUpUser(
+            .signUpUser({
                 firstName,
                 lastName,
                 email,
-                await bcryptjs.hash(authModel.generateStrongPassword(), 12),
-                null,
+                password: await bcryptjs.hash(
+                    authModel.generateStrongPassword(),
+                    12
+                ),
+                phoneNumber: null,
                 avatarURL,
-                true
-            )
+                withOAuth: true
+            })
             .then(({ rows }) => rows[0].id);
 
         responseStatus = 201;

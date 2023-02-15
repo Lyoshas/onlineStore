@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
 import crypto from 'crypto';
+import { PoolClient } from 'pg';
 
 import dbPool from '../util/database';
 import * as helperModel from './helper';
@@ -48,13 +49,16 @@ export const createOrder = async (
     deliveryMethodName: string,
     paymentMethodName: string,
     postOffice: number,
-    cityName: string
+    cityName: string,
+    dbClient?: PoolClient
 ): Promise<number> => {
     const deliveryMethodId = await getDeliveryMethodIdByName(deliveryMethodName);
     const paymentMethodId = await getPaymentMethodIdByName(paymentMethodName);
     const cityId = await getCityIdByName(cityName);
 
-    return dbPool.query(
+    const client = dbClient || dbPool;
+
+    return client.query(
         `
             INSERT INTO orders (
                 user_id,
@@ -72,9 +76,12 @@ export const createOrder = async (
 
 export const transferCartProductsToOrderProducts = (
     userId: number,
-    orderId: number
+    orderId: number,
+    dbClient?: PoolClient
 ) => {
-    return dbPool.query(`
+    const client = dbClient || dbPool;
+
+    return client.query(`
         INSERT INTO orders_products (order_id, product_id, quantity)
         (
             SELECT order_id, product_id, quantity

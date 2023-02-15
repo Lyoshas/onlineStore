@@ -10,6 +10,7 @@ import * as helperModel from '../models/helper';
 import RequestValidationError from '../errors/RequestValidationError';
 import EmptyCartError from '../errors/EmptyCartError';
 import UnexpectedError from '../errors/UnexpectedError';
+import dbPool from '../util/database';
 
 export const createOrder: RequestHandler = asyncHandler(
     async (req, res, next) => {
@@ -21,33 +22,42 @@ export const createOrder: RequestHandler = asyncHandler(
 
         const userId: number = (req.user as VerifiedUserInfo).id;
 
+        // You must use the same client instance for all statements within a transaction.
+        // PostgreSQL isolates a transaction to individual clients.
+        // This means if you initialize or use transactions with the pool.query method you will have problems.
+        // Do not use transactions with the pool.query method.
+        // more: https://node-postgres.com/features/transactions
+        const dbClient = await dbPool.connect();
+
         try {
-            await helperModel.beginTransaction();
+            await helperModel.beginTransaction(dbClient);
 
             const orderId: number = await orderModel.createOrder(
                 userId,
                 req.body.deliveryMethodName,
                 req.body.paymentMethodName,
                 req.body.postOffice,
-                req.body.cityName
+                req.body.cityName,
+                dbClient
             );
 
             await orderModel.transferCartProductsToOrderProducts(
                 userId,
-                orderId
+                orderId,
+                dbClient
             );
 
             if (req.body.paymentMethodName === 'Оплата при отриманні товару') {
                 await orderModel.notifyAboutOrderByTelegram(orderId);
             }
 
-            await cartModel.cleanCart(userId);
+            await cartModel.cleanCart(userId, dbClient);
 
-            await helperModel.commitTransaction();
+            await helperModel.commitTransaction(dbClient);
 
             res.status(201).json({ orderId });
         } catch (e) {
-            await helperModel.rollbackTransaction();
+            await helperModel.rollbackTransaction(dbClient);
 
             if (e === 'OrderCreationError: User cart is empty') {
                 // you can't create an order if there's nothing to order
