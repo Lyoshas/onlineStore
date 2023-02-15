@@ -111,8 +111,18 @@ export const activateAccount: RequestHandler = asyncHandler(
     }
 );
 
-export const postSignIn: RequestHandler = asyncHandler(
+export const postSignIn: RequestHandler<
+    {},
+    { API_KEY: string },
+    { login: string; password: string }
+> = asyncHandler(
     async (req, res, next) => {
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            throw new RequestValidationError(errors.array());
+        }
+
         const userId = await authModel.getUserIdByCredentials(
             // the login can be either a mobile phone (+380-XX-XXX-XX-XX) or an email
             req.body.login,

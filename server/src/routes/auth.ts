@@ -99,7 +99,20 @@ router.post(
 
 router.patch('/activate-account/:activationToken', authController.activateAccount);
 
-router.post('/sign-in', authController.postSignIn);
+router.post(
+    '/sign-in',
+    body('login')
+        .notEmpty()
+        .withMessage('the field "login" must be specified')
+        .isString()
+        .withMessage('the field "login" must be a string'),
+    body('password')
+        .notEmpty()
+        .withMessage('the field "password" must be specified')
+        .isString()
+        .withMessage('the field "password" must be a string'),
+    authController.postSignIn
+);
 
 // get a link to the google/facebook authorization server
 router.get(
