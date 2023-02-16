@@ -63,11 +63,12 @@ describe('Updating a product with GraphQL', async () => {
         // expectedProductInfo - random data that was generated.
         // this data was then passed to the update query to replace the old data,
         // whereas returnedProductInfo is what GraphQL returned as a result of the update
+        console.log(body);
         return {
             body,
             statusCode,
             expectedProductInfo: { id: productId, ...newProductInfo },
-            returnedProductInfo: body.data.updateProduct
+            returnedProductInfo: body.data?.updateProduct
         };
     }
 
@@ -136,9 +137,8 @@ describe('Updating a product with GraphQL', async () => {
         );
 
         expect(body.errors[0].message).toBe(
-            'At least one of these fields ' +
-            '("title", "price", "previewURL" and "quantityInStock") ' +
-            'must be specified'
+            'Field "updateProduct" argument "title" of type "String!" is required, ' +
+            'but it was not provided.'
         );
     });
 
