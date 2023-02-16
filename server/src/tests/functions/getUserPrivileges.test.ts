@@ -10,6 +10,7 @@ import dbPool from '../../util/database';
 import loadEnvVariables from '../util/loadEnv';
 import { createUserAndReturnId } from '../util/createUser';
 import { getUserPrivileges } from '../../models/auth';
+import CreateUserOptions from '../interfaces/CreateUserOptions';
 import UserPrivileges from '../../interfaces/UserPrivileges';
 
 loadEnvVariables();
@@ -23,16 +24,18 @@ afterEach(async () => {
 });
 
 describe('testing getUserPrivileges', () => {
-    async function testFunctionality(inputPrivileges: UserPrivileges) {
+    async function testFunctionality(inputPrivileges: CreateUserOptions) {
         const userId: number = await createUserAndReturnId(inputPrivileges);
 
         const userPrivilegesFromDB = await getUserPrivileges(userId);
 
-        expect(userPrivilegesFromDB).toMatchObject(inputPrivileges);
+        expect(
+            (userPrivilegesFromDB as UserPrivileges).isAdmin
+        ).toMatchObject(inputPrivileges.isAdmin);
     }
 
-    it('should return that a user is admin and is activated', async () => {
-        const inputPrivileges: UserPrivileges = {
+    it('should return that a user is an admin', async () => {
+        const inputPrivileges: CreateUserOptions = {
             isAdmin: true,
             isActivated: true
         };
@@ -40,30 +43,12 @@ describe('testing getUserPrivileges', () => {
         testFunctionality(inputPrivileges);
     });
 
-    it('should return that a user is admin but not activated', async () => {
-        const inputPrivileges: UserPrivileges = {
-            isAdmin: true,
-            isActivated: false
-        };
-    
-        testFunctionality(inputPrivileges);
-    });
-
-    it('should return that a user is not an admin but is activated', async () => {
-        const inputPrivileges: UserPrivileges = {
+    it('should return that a user is not an admin', async () => {
+        const inputPrivileges: CreateUserOptions = {
             isAdmin: false,
             isActivated: true
         };
-
-        testFunctionality(inputPrivileges);
-    });
-
-    it('should return that a user is not an admin and is not activated', async () => {
-        const inputPrivileges: UserPrivileges = {
-            isAdmin: false,
-            isActivated: false
-        };
-
+    
         testFunctionality(inputPrivileges);
     });
 

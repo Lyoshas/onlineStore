@@ -10,7 +10,7 @@ export default async (
     args: DBProduct,
     context: ApolloServerContext
 ) => {
-    validateUser(context.user);
+    await validateUser(context.user);
 
     const { id, title, price, previewURL, quantityInStock } = args;
     let i = 0;

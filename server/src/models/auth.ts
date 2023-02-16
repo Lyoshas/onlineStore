@@ -94,6 +94,16 @@ export const activateAccount = (userId: number) => {
     );
 };
 
+export const isAccountActivated = (userId: number): Promise<boolean> => {
+    return dbPool.query(
+        'SELECT is_activated FROM users WHERE id = $1',
+        [userId]
+    ).then(({ rows }) => {
+        if (rows.length === 0) throw new Error('Account does not exist');
+        return rows[0].is_activated;
+    });
+};
+
 export const getUserIdByCredentials = (
     login: string,
     password: string
@@ -127,12 +137,11 @@ export const getUserPrivileges = async (
     userId: number
 ): Promise<UserPrivileges | null> => {
     const { rows } = await dbPool.query(`
-        SELECT is_activated, is_admin FROM users WHERE id = $1
+        SELECT is_admin FROM users WHERE id = $1
     `, [userId]);
 
     if (rows[0]) {
         return {
-            isActivated: rows[0].is_activated,
             isAdmin: rows[0].is_admin
         }
     }

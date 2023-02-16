@@ -6,14 +6,14 @@ import isProductAvailable from '../helpers/isProductAvailable';
 import isProductRunningOut from '../helpers/isProductRunningOut';
 import ApolloServerContext from '../../interfaces/ApolloServerContext';
 
-export default (
+export default async (
     _: any,
     args: Omit<DBProduct, 'id'>,
     context: ApolloServerContext
 ): Promise<DisplayProduct> => {
-    validateUser(context.user);
+    await validateUser(context.user);
 
-    return dbPool.query(
+    const { rows } = await dbPool.query(
         `INSERT INTO products (
             title,
             price,
@@ -26,12 +26,14 @@ export default (
             args.previewURL,
             args.quantityInStock
         ]
-    ).then(({ rows }) => ({
+    );
+
+    return {
         id: rows[0].id as number,
         title: args.title,
         price: args.price,
         previewURL: args.previewURL,
         isAvailable: isProductAvailable(args.quantityInStock),
         isRunningOut: isProductRunningOut(args.quantityInStock)
-    }));
+    };
 };

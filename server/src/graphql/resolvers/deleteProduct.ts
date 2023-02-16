@@ -7,7 +7,7 @@ export default async (
     args: any,
     context: ApolloServerContext
 ): Promise<{ id: number }> => {
-    validateUser(context.user);
+    await validateUser(context.user);
 
     const { id } = args;
 

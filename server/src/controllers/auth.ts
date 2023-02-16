@@ -12,6 +12,7 @@ import UnexpectedError from '../errors/UnexpectedError';
 import CustomValidationError from '../errors/CustomValidationError';
 import InvalidCredentialsError from '../errors/InvalidPasswordError';
 import dbPool from '../util/database';
+import AccountNotActivatedError from '../errors/AccountNotActivatedError';
 
 export const postSignUp: RequestHandler = asyncHandler(
     async (req, res, next) => {
@@ -131,6 +132,10 @@ export const postSignIn: RequestHandler<
 
         if (userId === null) {
             throw new InvalidCredentialsError();
+        }
+
+        if ( !(await authModel.isAccountActivated(userId)) ) {
+            throw new AccountNotActivatedError();
         }
 
         res.status(200).json({
