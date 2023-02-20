@@ -6,6 +6,7 @@ import * as orderController from '../controllers/order';
 import * as orderModel from '../models/order';
 import ensureAuthentication from '../middlewares/ensure-authentication';
 import dbPool from '../util/database';
+import validateRequest from '../middlewares/validate-request';
 
 const router = express.Router();
 
@@ -107,6 +108,7 @@ router.post(
             }
         })
         .withMessage('postOffice is not correct'),
+    validateRequest,
     orderController.createOrder
 );
 
@@ -147,6 +149,7 @@ router.get(
     param('orderId')
         .isNumeric()
         .custom(checkOrderId),
+    validateRequest,
     orderController.getLiqpayFormData
 );
 
@@ -181,7 +184,8 @@ router.post(
             
             return Promise.resolve();
         }),
-        orderController.postPaymentCallback 
+    validateRequest,
+    orderController.postPaymentCallback 
 );
 
 export default router;

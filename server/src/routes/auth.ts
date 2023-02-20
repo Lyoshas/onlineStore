@@ -2,6 +2,7 @@ import { Router, Request } from 'express';
 import { body, cookie, query } from 'express-validator';
 
 import * as authController from '../controllers/auth';
+import validateRequest from '../middlewares/validate-request';
 import { isEmailAvailable, isRecaptchaValid } from '../models/auth';
 import dbPool from '../util/database';
 
@@ -28,6 +29,7 @@ router.get(
     query('email')
         .isEmail()
         .withMessage('the field "email" must be a correct email address'),
+    validateRequest,
     authController.isEmailAvailable
 );
 
@@ -94,6 +96,7 @@ router.post(
             }
             return Promise.resolve();
         }),
+    validateRequest,
     authController.postSignUp
 );
 
@@ -111,6 +114,7 @@ router.post(
         .withMessage('the field "password" must be specified')
         .isString()
         .withMessage('the field "password" must be a string'),
+    validateRequest,
     authController.postSignIn
 );
 
@@ -129,6 +133,7 @@ router.get(
     query('code')
         .isString()
         .withMessage('the field "code" must be a string'),
+    validateRequest,
     authController.OAuthCallback
 );
 
@@ -138,6 +143,7 @@ router.get(
         .trim()
         .notEmpty()
         .withMessage('refreshToken must not be empty'),
+    validateRequest,
     authController.acquireNewAccessToken
 );
 

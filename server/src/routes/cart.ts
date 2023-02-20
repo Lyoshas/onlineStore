@@ -3,6 +3,7 @@ import { body } from 'express-validator';
 
 import * as cartController from '../controllers/cart';
 import ensureAuthentication from '../middlewares/ensure-authentication';
+import validateRequest from '../middlewares/validate-request';
 import dbPool from '../util/database';
 
 const router = express.Router();
@@ -29,6 +30,7 @@ router.put(
     body('quantity')
         .isInt({ gt: 0 })
         .withMessage('quantity must be an integer and greater than zero'),
+    validateRequest,
     cartController.addProductToCart
 );
 

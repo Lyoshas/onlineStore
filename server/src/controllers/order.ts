@@ -1,5 +1,4 @@
 import { RequestHandler } from 'express';
-import { validationResult } from 'express-validator';
 import asyncHandler from 'express-async-handler';
 
 import VerifiedUserInfo from '../interfaces/VerifiedUserInfo';
@@ -7,19 +6,12 @@ import VerifiedUserInfo from '../interfaces/VerifiedUserInfo';
 import * as orderModel from '../models/order';
 import * as cartModel from '../models/cart';
 import * as helperModel from '../models/helper';
-import RequestValidationError from '../errors/RequestValidationError';
 import EmptyCartError from '../errors/EmptyCartError';
 import UnexpectedError from '../errors/UnexpectedError';
 import dbPool from '../util/database';
 
 export const createOrder: RequestHandler = asyncHandler(
     async (req, res, next) => {
-        const errors = validationResult(req);
-
-        if (!errors.isEmpty()) {
-            throw new RequestValidationError(errors.array());
-        }
-
         const userId: number = (req.user as VerifiedUserInfo).id;
 
         // You must use the same client instance for all statements within a transaction.
@@ -73,12 +65,6 @@ export const createOrder: RequestHandler = asyncHandler(
 // more: https://www.liqpay.ua/en/documentation/data_signature
 export const getLiqpayFormData: RequestHandler = asyncHandler(
     async (req, res, next) => {
-        const errors = validationResult(req);
-
-        if (!errors.isEmpty()) {
-            throw new RequestValidationError(errors.array());
-        }
-
         const orderId = +req.params.orderId;
         const username = await orderModel.getFirstAndLastNameByOrderId(orderId);
 
@@ -110,12 +96,6 @@ export const getLiqpayFormData: RequestHandler = asyncHandler(
 
 export const postPaymentCallback: RequestHandler = asyncHandler(
     async (req, res, next) => {
-        const errors = validationResult(req);
-
-        if (!errors.isEmpty()) {
-            throw new RequestValidationError(errors.array());
-        }
-
         // if we make it here, it means the user paid for the product
 
         // req.params.orderId will be a number, but wrapped inside a string

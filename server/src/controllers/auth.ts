@@ -1,5 +1,4 @@
-import { RequestHandler, Response } from 'express';
-import { validationResult } from 'express-validator';
+import { RequestHandler } from 'express';
 import bcryptjs from 'bcryptjs';
 import asyncHandler from 'express-async-handler';
 
@@ -7,7 +6,6 @@ import * as authModel from '../models/auth';
 import * as userModel from '../models/user';
 import * as helperModel from '../models/helper';
 import OAuthUserData from '../interfaces/OAuthUserData';
-import RequestValidationError from '../errors/RequestValidationError';
 import UnexpectedError from '../errors/UnexpectedError';
 import CustomValidationError from '../errors/CustomValidationError';
 import InvalidCredentialsError from '../errors/InvalidPasswordError';
@@ -16,12 +14,6 @@ import AccountNotActivatedError from '../errors/AccountNotActivatedError';
 
 export const postSignUp: RequestHandler = asyncHandler(
     async (req, res, next) => {
-        const errors = validationResult(req);
-
-        if (!errors.isEmpty()) {
-            throw new RequestValidationError(errors.array());
-        }
-
         const {
             firstName,
             lastName,
@@ -118,12 +110,6 @@ export const postSignIn: RequestHandler<
     { login: string; password: string }
 > = asyncHandler(
     async (req, res, next) => {
-        const errors = validationResult(req);
-
-        if (!errors.isEmpty()) {
-            throw new RequestValidationError(errors.array());
-        }
-
         const userId = await authModel.getUserIdByCredentials(
             // the login can be either a mobile phone (+380-XX-XXX-XX-XX) or an email
             req.body.login,
@@ -195,12 +181,6 @@ export const OAuthCallback: RequestHandler<
     {},
     { state: string; code: string }
 > = asyncHandler(async (req, res, next) => {
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-        throw new RequestValidationError(errors.array());
-    }
-
     const { state, code } = req.query;
 
     const authServerName = await authModel.getAuthorizationServerNameByState(
@@ -282,12 +262,6 @@ export const isEmailAvailable: RequestHandler<
     {},
     { email: string } // defining req.query
 > = asyncHandler(async (req, res, next) => {
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-        throw new RequestValidationError(errors.array());
-    }
-
     const email = req.query.email;
 
     res.json({
@@ -299,12 +273,6 @@ export const acquireNewAccessToken: RequestHandler<
     {},
     { accessToken: string }
 > = asyncHandler(async (req, res, next) => {
-    const errors = validationResult(req); 
-
-    if (!errors.isEmpty()) {
-        throw new RequestValidationError(errors.array());
-    }
-
     // refreshToken exists because we made sure it's the case by using express-validator
     const refreshToken: string = req.cookies.refreshToken;
     const userId = await authModel.getUserIdByRefreshToken(refreshToken);
