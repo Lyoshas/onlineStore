@@ -296,7 +296,7 @@ export const isEmailAvailable: RequestHandler<
 });
 
 export const acquireNewAccessToken: RequestHandler<
-    { userId: number },
+    {},
     { accessToken: string }
 > = asyncHandler(async (req, res, next) => {
     const errors = validationResult(req); 
