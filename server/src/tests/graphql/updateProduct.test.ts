@@ -6,7 +6,7 @@ import {
 
 import dbPool from '../../util/database';
 import loadEnvVariables from '../util/loadEnv';
-import { createUserAndReturnAPIKey } from '../util/createUser';
+import { createUserAndReturnAccessToken } from '../util/createUser';
 import makeGraphQLRequest from '../util/makeGraphQLRequest';
 import DBProduct from '../../interfaces/DBProduct';
 import { randomProductInfo } from '../util/random';
@@ -21,11 +21,11 @@ loadEnvVariables();
 // a new product needs to be created beforehand
 
 async function executeUpdateQuery(
-    API_KEY: string | null,
+    accessToken: string | null,
     productInfo: DBProduct
 ) {
     return makeGraphQLRequest(
-        API_KEY,
+        accessToken,
         `
             mutation {
                 updateProduct(
@@ -48,14 +48,14 @@ async function executeUpdateQuery(
 }
 
 describe('Updating a product with GraphQL', async () => {
-    async function createAndUpdateProduct(API_KEY: string | null) {
+    async function createAndUpdateProduct(accessToken: string | null) {
         // creating a product and getting its id
         const productId: number = await createProduct(randomProductInfo());
 
         // generating information to update the product
         const newProductInfo: Omit<DBProduct, 'id'> = randomProductInfo();
 
-        const { body, statusCode } = await executeUpdateQuery(API_KEY, {
+        const { body, statusCode } = await executeUpdateQuery(accessToken, {
             id: productId,
             ...newProductInfo
         });
@@ -73,7 +73,7 @@ describe('Updating a product with GraphQL', async () => {
     }
 
     it('should update a product if a user is an admin and is activated', async () => {
-        const API_KEY: string = await createUserAndReturnAPIKey({
+        const accessToken: string = await createUserAndReturnAccessToken({
             isAdmin: true,
             isActivated: true
         });
@@ -81,7 +81,7 @@ describe('Updating a product with GraphQL', async () => {
         const {
             expectedProductInfo,
             returnedProductInfo
-        } = await createAndUpdateProduct(API_KEY);
+        } = await createAndUpdateProduct(accessToken);
 
         expect(returnedProductInfo).toMatchObject({
             id: expectedProductInfo.id,
@@ -94,13 +94,13 @@ describe('Updating a product with GraphQL', async () => {
     });
 
     it('should throw an error if the specified id does not exist in the database', async () => {
-        const API_KEY: string = await createUserAndReturnAPIKey({
+        const accessToken: string = await createUserAndReturnAccessToken({
             isAdmin: true,
             isActivated: true
         });
         const nonExistentProductId = 999999; // make sure this id doesn't exist in the DB
 
-        const { body } = await executeUpdateQuery(API_KEY, {
+        const { body } = await executeUpdateQuery(accessToken, {
             id: nonExistentProductId,
             ...randomProductInfo()
         });
@@ -111,7 +111,7 @@ describe('Updating a product with GraphQL', async () => {
     });
 
     it('should throw an error if none of the fields except the id are specified', async () => {
-        const API_KEY: string = await createUserAndReturnAPIKey({
+        const accessToken: string = await createUserAndReturnAccessToken({
             isAdmin: true,
             isActivated: true
         });
@@ -119,7 +119,7 @@ describe('Updating a product with GraphQL', async () => {
         const productId: number = await createProduct(randomProductInfo());
 
         const { body } = await makeGraphQLRequest(
-            API_KEY,
+            accessToken,
             `
             mutation {
                 updateProduct(
@@ -143,34 +143,34 @@ describe('Updating a product with GraphQL', async () => {
     });
 
     it('should throw an error if a user is an admin but is not activated', async () => {
-        const API_KEY: string = await createUserAndReturnAPIKey({
+        const accessToken: string = await createUserAndReturnAccessToken({
             isAdmin: true,
             isActivated: false
         });
 
-        const { body } = await createAndUpdateProduct(API_KEY);
+        const { body } = await createAndUpdateProduct(accessToken);
 
         expect(body.errors[0].message).toBe('User must be activated to perform this action');
     });
 
     it('should throw an error if a user is not an admin but is activated', async () => {
-        const API_KEY: string = await createUserAndReturnAPIKey({
+        const accessToken: string = await createUserAndReturnAccessToken({
             isAdmin: false,
             isActivated: true
         });
 
-        const { body } = await createAndUpdateProduct(API_KEY);
+        const { body } = await createAndUpdateProduct(accessToken);
 
         expect(body.errors[0].message).toBe('User must be an admin to perform this action');
     });
 
     it('should throw an error if a user is not an admin and is not activated', async () => {
-        const API_KEY: string = await createUserAndReturnAPIKey({
+        const accessToken: string = await createUserAndReturnAccessToken({
             isAdmin: false,
             isActivated: false
         });
 
-        const { body } = await createAndUpdateProduct(API_KEY);
+        const { body } = await createAndUpdateProduct(accessToken);
 
         expect(body.errors[0].message).toBe('User must be activated to perform this action');
     });

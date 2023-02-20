@@ -1,4 +1,4 @@
-import { generateAPIKey } from '../../models/auth';
+import { generateAccessToken } from '../../models/auth';
 import dbPool from '../../util/database';
 import CreateUserOptions from '../interfaces/CreateUserOptions';
 import { randomString } from './random';
@@ -28,9 +28,9 @@ export function createUserAndReturnId(
     ]).then(({ rows }) => rows[0].id);
 };
 
-export const createUserAndReturnAPIKey = async (
+export const createUserAndReturnAccessToken = async (
     options: CreateUserOptions
 ): Promise<string> => {
     const id: number = await createUserAndReturnId(options);
-    return generateAPIKey(id);
+    return generateAccessToken(id);
 };

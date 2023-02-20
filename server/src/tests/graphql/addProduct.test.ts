@@ -2,27 +2,13 @@ import {
     it,
     expect,
     describe,
-    beforeEach,
-    afterEach
 } from 'vitest';
 
-import dbPool from '../../util/database';
 import loadEnvVariables from '../util/loadEnv';
-import { createUserAndReturnAPIKey } from '../util/createUser';
+import { createUserAndReturnAccessToken } from '../util/createUser';
 import makeGraphQLRequest from '../util/makeGraphQLRequest';
 
 loadEnvVariables();
-
-// A quick note about setting up a transaction:
-// it will work only for creating new users
-// when we will make API requests, rolling back won't do anything,
-// because we'll be making a request to a completely different environment
-beforeEach(async () => { await dbPool.query('BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ');
-});
-
-afterEach(async () => {
-    await dbPool.query('ROLLBACK');
-});
 
 describe('adding a new product with GraphQL', async () => {
     const query = `
@@ -39,12 +25,13 @@ describe('adding a new product with GraphQL', async () => {
     `;
 
     it('should create a new product if a user is authenticated and is an admin', async () => {
-        const API_KEY: string = await createUserAndReturnAPIKey({
+        const accessToken: string = await createUserAndReturnAccessToken({
             isAdmin: true,
             isActivated: true
         });
 
-        const { body, statusCode } = await makeGraphQLRequest(API_KEY, query);
+        const { body, statusCode } = await makeGraphQLRequest(accessToken, query);
+        console.log(body);
         const productId = body.data.addProduct.id;
 
         // if everything went well, we should get status code 200
@@ -54,42 +41,42 @@ describe('adding a new product with GraphQL', async () => {
     });
 
     it('should return an error if a user is authenticated and is an admin but is not activated', async () => {
-        const API_KEY: string = await createUserAndReturnAPIKey({
+        const accessToken: string = await createUserAndReturnAccessToken({
             isAdmin: true,
             isActivated: false
         });
 
-        const { body } = await makeGraphQLRequest(API_KEY, query);
+        const { body } = await makeGraphQLRequest(accessToken, query);
         
         expect(body.errors[0].message).toBe('User must be activated to perform this action'); 
     });
 
     it('should return an error if a user is authenticated and activated but is not an admin', async () => {
-        const API_KEY: string = await createUserAndReturnAPIKey({
+        const accessToken: string = await createUserAndReturnAccessToken({
             isAdmin: false,
             isActivated: true
         });
 
-        const { body } = await makeGraphQLRequest(API_KEY, query);
+        const { body } = await makeGraphQLRequest(accessToken, query);
         
         expect(body.errors[0].message).toBe('User must be an admin to perform this action')
     });
 
     it('should return an error if a user is authenticated, but is neither activated nor an admin', async () => {
-        const API_KEY: string = await createUserAndReturnAPIKey({
+        const accessToken: string = await createUserAndReturnAccessToken({
             isAdmin: false,
             isActivated: false
         });
 
-        const { body } = await makeGraphQLRequest(API_KEY, query);
+        const { body } = await makeGraphQLRequest(accessToken, query);
 
         expect(body.errors[0].message).toBe('User must be activated to perform this action');
     })
 
     it('should return an error if a user is not authenticated', async () => {
-        const API_KEY = null;
+        const accessToken = null;
 
-        const { body } = await makeGraphQLRequest(API_KEY, query);
+        const { body } = await makeGraphQLRequest(accessToken, query);
         
         expect(body.errors[0].message).toBe('User must be authenticated to perform this action');
     });

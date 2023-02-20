@@ -1,7 +1,7 @@
 import makeGraphQLRequest from './makeGraphQLRequest';
 
-export default async (API_KEY: string | null, productId: number) => {
-    const { body, statusCode } = await makeGraphQLRequest(API_KEY, `
+export default async (accessToken: string | null, productId: number) => {
+    const { body, statusCode } = await makeGraphQLRequest(accessToken, `
         mutation {
             deleteProduct(id: ${productId}) {
                 id
