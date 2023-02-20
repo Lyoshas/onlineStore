@@ -6,7 +6,7 @@ export default async (user: VerifiedUserInfo | null) => {
         throw new Error('User must be authenticated to perform this action');
     }
 
-    if ( !(isAccountActivated(user.id)) ) {
+    if ( !(await isAccountActivated(user.id)) ) {
         throw new Error('User must be activated to perform this action');
     }
 
