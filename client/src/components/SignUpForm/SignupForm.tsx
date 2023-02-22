@@ -12,22 +12,58 @@ import Loading from '../UI/Loading/Loading';
 import useSignupValidation from '../hooks/useSignupValidation';
 import ReCAPTCHA from '../UI/reCAPTCHA/ReCAPTCHA';
 import formInputClasses from '../Input/FormInput.module.css';
+import useFetch from '../hooks/useFetch';
 
 const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
     const [errorState, dispatchError] = useReducer(errorNotificationReducer, {
         isErrorNotificationShown: false,
         errorMessage: '',
     });
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const {
         validationSchema: signupValidationSchema,
         errorState: signupErrorState,
         isValidatingEmail,
     } = useSignupValidation();
+    const {
+        isRequestLoading: isSignupRequestLoading,
+        sendRequest,
+        wasRequestSuccessful,
+        statusCode,
+    } = useFetch(
+        '/api/auth/sign-up',
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        },
+        201
+    );
 
     useEffect(() => {
-        setIsLoading(isValidatingEmail);
-    }, [isValidatingEmail]);
+        if (wasRequestSuccessful === null) return; 
+        
+        // if the status code is as expected
+        if (wasRequestSuccessful) {
+            props.onSuccessfulSignUp();
+            return;
+        }
+
+        let errorMessage: string;
+
+        if (statusCode === 422) {
+            // this error is very unlikely to occur, because backend and frontend are synchronized in terms of signup validation requirements
+            errorMessage =
+                'Invalid input data. Please double-check your inputs or the captcha';
+        } else {
+            errorMessage = 'Something went wrong. Please reload the page.';
+        }
+
+        dispatchError({
+            type: ErrorActionType.SHOW_NOTIFICATION_ERROR,
+            errorMessage,
+        });
+    }, [wasRequestSuccessful]);
 
     useEffect(() => {
         if (signupErrorState.isErrorNotificationShown) {
@@ -65,48 +101,8 @@ const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
             validateOnMount={false}
             onSubmit={async (values, { setSubmitting, resetForm }) => {
                 setSubmitting(true);
-                setIsLoading(true);
-
-                try {
-                    const response = await fetch('/api/auth/sign-up', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ ...values }),
-                    });
-
-                    if (response.status === 201) {
-                        props.onSuccessfulSignUp();
-                        return;
-                    }
-
-                    let errorMessage: string;
-
-                    if (response.status === 422) {
-                        // this error is very unlikely to occur, because backend and frontend are synchronized in terms of signup validation requirements
-                        errorMessage =
-                            'Invalid input data. Please double-check your inputs or the captcha';
-                    } else {
-                        errorMessage =
-                            'Something went wrong. Please reload the page.';
-                    }
-
-                    dispatchError({
-                        type: ErrorActionType.SHOW_NOTIFICATION_ERROR,
-                        errorMessage,
-                    });
-                } catch (e) {
-                    console.log(e);
-                    dispatchError({
-                        type: ErrorActionType.SHOW_NOTIFICATION_ERROR,
-                        errorMessage:
-                            'Something went wrong. Please reload the page',
-                    });
-                } finally {
-                    setSubmitting(false);
-                    setIsLoading(false);
-                }
+                await sendRequest(values);
+                setSubmitting(false);
             }}
         >
             {(formik) => (
@@ -219,14 +215,17 @@ const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
                             type="submit"
                             disabled={
                                 formik.isSubmitting ||
-                                isLoading ||
+                                isSignupRequestLoading ||
+                                isValidatingEmail ||
                                 // dirty indicates whether the form fields have been modified or not
                                 !formik.dirty ||
                                 // or disable the button when there are validation errors
                                 Object.keys(formik.errors).length !== 0
                             }
                         >
-                            {isLoading || formik.isSubmitting ? (
+                            {isValidatingEmail ||
+                            isSignupRequestLoading ||
+                            formik.isSubmitting ? (
                                 <Loading width="30px" height="30px" />
                             ) : (
                                 'Sign Up'
