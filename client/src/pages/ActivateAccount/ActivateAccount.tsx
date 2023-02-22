@@ -1,4 +1,4 @@
-import { FC, Fragment } from 'react';
+import { FC, Fragment, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
 import classes from './ActivateAccount.module.css';
@@ -14,11 +14,16 @@ const ActivateAccount: FC = () => {
         wasRequestSuccessful,
         JSONResponse,
         unexpectedRequestError,
+        sendRequest
     } = useFetch(
         `/api/auth/activate-account/${activationToken}`,
         { method: 'PATCH' },
         200
     );
+
+    useEffect(() => {
+        sendRequest();
+    }, []);
 
     return (
         <div className="flex-wrapper">

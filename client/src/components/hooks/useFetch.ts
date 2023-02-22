@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 const useFetch = (
     URL: string,
     init: RequestInit | undefined,
     expectedStatusCode: number
 ) => {
-    const [isRequestLoading, setIsRequestLoading] = useState<boolean>(true);
+    const [isRequestLoading, setIsRequestLoading] = useState<boolean>(false);
     const [JSONResponse, setJSONResponse] = useState<any>(null);
     // null - the request hasn't even begun, true/false - the request succeeded/failed
     const [wasRequestSuccessful, setWasRequestSuccessful] = useState<
@@ -15,38 +15,37 @@ const useFetch = (
         string | null
     >(null);
 
-    useEffect(() => {
-        async function main() {
-            try {
-                const response = await fetch(URL, init);
-                const data = await response.json();
+    async function sendRequest() {
+        try {
+            setIsRequestLoading(true);
 
-                setJSONResponse(data);
+            const response = await fetch(URL, init);
+            const data = await response.json();
 
-                if (response.status !== expectedStatusCode) {
-                    setWasRequestSuccessful(false);
-                    return;
-                }
+            setJSONResponse(data);
 
-                setWasRequestSuccessful(true);
-            } catch {
+            if (response.status !== expectedStatusCode) {
                 setWasRequestSuccessful(false);
-                setUnexpectedRequestError(
-                    'Something went wrong while making a request. We are working on solving this problem. Please try reloading the page.'
-                );
-            } finally {
-                setIsRequestLoading(false);
+                return;
             }
-        }
 
-        main();
-    }, []);
+            setWasRequestSuccessful(true);
+        } catch {
+            setWasRequestSuccessful(false);
+            setUnexpectedRequestError(
+                'Something went wrong while making a request. We are working on solving this problem. Please try reloading the page.'
+            );
+        } finally {
+            setIsRequestLoading(false);
+        }
+    }
 
     return {
         isRequestLoading,
         wasRequestSuccessful,
         JSONResponse,
         unexpectedRequestError,
+        sendRequest,
     };
 };
 
