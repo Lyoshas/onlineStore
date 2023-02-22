@@ -15,6 +15,8 @@ const useFetch = (
     const [unexpectedRequestError, setUnexpectedRequestError] = useState<
         string | null
     >(null);
+    // "null" means that the request hasn't been sent yet
+    const [statusCode, setStatusCode] = useState<number | null>(null);
 
     async function sendRequest(requestBody?: object) {
         try {
@@ -28,6 +30,7 @@ const useFetch = (
 
             setJSONResponse(data);
 
+            setStatusCode(response.status);
             if (response.status !== expectedStatusCode) {
                 setWasRequestSuccessful(false);
                 return;
@@ -50,6 +53,7 @@ const useFetch = (
         JSONResponse,
         unexpectedRequestError,
         sendRequest,
+        statusCode,
     };
 };
 
