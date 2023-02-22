@@ -2,7 +2,8 @@ import { useState } from 'react';
 
 const useFetch = (
     URL: string,
-    init: RequestInit | undefined,
+    // sending the body occurs in sendRequest(jsonBody)
+    init: Omit<RequestInit, 'body'> | undefined,
     expectedStatusCode: number
 ) => {
     const [isRequestLoading, setIsRequestLoading] = useState<boolean>(false);
@@ -15,11 +16,14 @@ const useFetch = (
         string | null
     >(null);
 
-    async function sendRequest() {
+    async function sendRequest(requestBody?: object) {
         try {
             setIsRequestLoading(true);
 
-            const response = await fetch(URL, init);
+            const response = await fetch(
+                URL,
+                { ...init, body: JSON.stringify(requestBody) }
+            );
             const data = await response.json();
 
             setJSONResponse(data);
