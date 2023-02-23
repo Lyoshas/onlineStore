@@ -22,10 +22,11 @@ const useFetch = (
         try {
             setIsRequestLoading(true);
 
-            const response = await fetch(
-                URL,
-                { ...init, body: JSON.stringify(requestBody) }
-            );
+            const response = await fetch(URL, {
+                ...init,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestBody),
+            });
             const data = await response.json();
 
             setJSONResponse(data);
