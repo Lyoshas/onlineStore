@@ -13,6 +13,7 @@ import useSignupValidation from '../hooks/useSignupValidation';
 import ReCAPTCHA from '../UI/reCAPTCHA/ReCAPTCHA';
 import formInputClasses from '../Input/FormInput.module.css';
 import useFetch from '../hooks/useFetch';
+import ReCAPTCHABlock from '../ReCAPTCHABlock/ReCAPTCHABlock';
 
 const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
     const [errorState, dispatchError] = useReducer(errorNotificationReducer, {
@@ -192,24 +193,7 @@ const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
                         placeholder="Write the password again"
                         validationSchema={signupValidationSchema}
                     />
-                    <div
-                        className={`${formInputClasses['form-control']} ${formInputClasses['recaptcha']}`}
-                    >
-                        <ReCAPTCHA />
-                        <ErrorMessage
-                            name="recaptcha"
-                            render={(msg) => (
-                                <p
-                                    className={`
-                                    ${formInputClasses['form__error-message']}
-                                    ${formInputClasses['recaptcha']}
-                                `}
-                                >
-                                    {msg}
-                                </p>
-                            )}
-                        />
-                    </div>
+                    <ReCAPTCHABlock />
                     <div className={classes['form-actions']}>
                         <Button
                             type="submit"

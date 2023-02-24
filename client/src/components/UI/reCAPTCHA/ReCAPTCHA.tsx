@@ -4,15 +4,6 @@ import NpmRecaptcha from 'react-google-recaptcha';
 
 import classes from './reCAPTCHA.module.css';
 
-type OnCaptchaVerify = (recaptchaToken: string) => void;
-
-declare global {
-    interface Window {
-        onCaptchaVerify: OnCaptchaVerify;
-        onCaptchaExpired: () => void;
-    }
-}
-
 const ReCAPTCHA: FC = () => {
     const [field, meta, helpers] = useField('recaptchaToken');
 
