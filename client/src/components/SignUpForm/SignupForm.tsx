@@ -1,5 +1,5 @@
-import { useReducer, useState, useEffect, FC } from 'react';
-import { ErrorMessage, Formik } from 'formik';
+import { useReducer, useEffect, FC } from 'react';
+import { Formik } from 'formik';
 
 import classes from './SignupForm.module.css';
 import Button from '../UI/Button/Button';
@@ -10,8 +10,6 @@ import ErrorNotification, {
 } from '../UI/ErrorNotification/ErrorNotification';
 import Loading from '../UI/Loading/Loading';
 import useSignupValidation from '../hooks/useSignupValidation';
-import ReCAPTCHA from '../UI/reCAPTCHA/ReCAPTCHA';
-import formInputClasses from '../Input/FormInput.module.css';
 import useFetch from '../hooks/useFetch';
 import ReCAPTCHABlock from '../ReCAPTCHABlock/ReCAPTCHABlock';
 

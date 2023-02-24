@@ -1,0 +1,14 @@
+.error-message {
+    color: red;
+}
+
+.error-message.centered {
+    text-align: center;
+}
+
+.error-message.red-background {
+    background: rgb(255, 113, 113);
+    border: 2px solid red;
+    padding: 5px 0;
+    color: white;
+}

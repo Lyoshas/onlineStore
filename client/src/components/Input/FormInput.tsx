@@ -1,9 +1,10 @@
-import React, { FC, useState } from 'react';
+import React, { FC, Fragment, useState } from 'react';
 import { FieldHookConfig, useField, useFormikContext } from 'formik';
 import { ObjectShape, OptionalObjectSchema } from 'yup/lib/object';
 import { ValidationError } from 'yup';
 
 import classes from './FormInput.module.css';
+import ErrorMessage from '../UI/ErrorMessage/ErrorMessage';
 
 type FormInputProps = {
     label: string;
@@ -155,9 +156,7 @@ const FormInput: FC<FormInputProps> = ({
                     />
                 )}
             </div>
-            {isInputInvalid && (
-                <p className={classes['form__error-message']}>{meta.error}</p>
-            )}
+            {isInputInvalid && <ErrorMessage message={meta.error as string} />}
             {TipComponent}
         </div>
     );
