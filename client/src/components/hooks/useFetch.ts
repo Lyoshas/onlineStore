@@ -26,6 +26,7 @@ const useFetch = (
                 ...init,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestBody),
+                credentials: 'same-origin'
             });
             const data = await response.json();
 

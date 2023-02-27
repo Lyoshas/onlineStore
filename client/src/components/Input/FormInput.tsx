@@ -7,7 +7,7 @@ import classes from './FormInput.module.css';
 import ErrorMessage from '../UI/ErrorMessage/ErrorMessage';
 
 type FormInputProps = {
-    label: string;
+    label: string | React.ReactNode;
     isRequired: boolean;
     type: string;
     placeholder: string;
