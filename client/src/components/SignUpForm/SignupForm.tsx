@@ -12,6 +12,7 @@ import Loading from '../UI/Loading/Loading';
 import useSignupValidation from '../hooks/useSignupValidation';
 import useFetch from '../hooks/useFetch';
 import ReCAPTCHABlock from '../ReCAPTCHABlock/ReCAPTCHABlock';
+import PasswordTips from '../PasswordTips/PasswordTips';
 
 const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
     const [errorState, dispatchError] = useReducer(errorNotificationReducer, {
@@ -150,38 +151,7 @@ const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
                         name="password"
                         placeholder="Enter your password"
                         validationSchema={signupValidationSchema}
-                        TipComponent={
-                            <div
-                                className={
-                                    classes['form__password-requirements']
-                                }
-                            >
-                                <p
-                                    className={
-                                        classes['password-requirements__intro']
-                                    }
-                                >
-                                    Password must be:
-                                </p>
-                                <ul
-                                    className={
-                                        classes['password-requirements__ul']
-                                    }
-                                >
-                                    <li>
-                                        8 characters or longer, not exceeding 72
-                                        characters
-                                    </li>
-                                    <li>Include at least 1 number</li>
-                                    <li>Include at least 1 uppercase letter</li>
-                                    <li>Include at least 1 lowercase letter</li>
-                                    <li>
-                                        Include at least 1 special character (!,
-                                        @, #, etc)
-                                    </li>
-                                </ul>
-                            </div>
-                        }
+                        TipComponent={<PasswordTips />}
                     />
                     <FormInput
                         type="password"
