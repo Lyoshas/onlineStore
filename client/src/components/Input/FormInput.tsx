@@ -29,7 +29,7 @@ const FormInput: FC<FormInputProps> = ({
     ...props
 }) => {
     const [field, meta, helpers] = useField(props);
-    const { values: formikValues } = useFormikContext();
+    const { values: formikValues, setFieldError } = useFormikContext();
     const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
 
     const isInputInvalid = meta.touched && !!meta.error;
@@ -40,8 +40,13 @@ const FormInput: FC<FormInputProps> = ({
         fieldEntries: {
             [fieldName: string]: string;
         },
-        returnErrorForField: string
+        returnErrorForFields: string[]
     ) => {
+        // resetting errors
+        returnErrorForFields.forEach((fieldName) =>
+            setFieldError(fieldName, undefined)
+        );
+
         try {
             await validationSchema
                 .pick(Object.keys(fieldEntries))
@@ -51,12 +56,13 @@ const FormInput: FC<FormInputProps> = ({
             helpers.setError(undefined);
         } catch (e) {
             if (e instanceof ValidationError) {
-                // getting the error for returnErrorFor
-                let appropriateError = e.inner.find(
-                    (error) => error.path === returnErrorForField
-                );
-
-                helpers.setError(appropriateError?.message);
+                e.inner.forEach((error) => {
+                    returnErrorForFields.forEach((fieldName) => {
+                        if (error.path === fieldName) {
+                            setFieldError(fieldName, error.message);
+                        }
+                    });
+                });
 
                 return;
             }
@@ -75,6 +81,15 @@ const FormInput: FC<FormInputProps> = ({
             }
 
             objectToValidate.password = (formikValues as FormikValues).password;
+        } else if (fieldName === 'password') {
+            interface FormikValues {
+                [fieldName: string]: string;
+                confirmPassword: string;
+            }
+
+            objectToValidate.confirmPassword = (
+                formikValues as FormikValues
+            ).confirmPassword;
         }
 
         return objectToValidate;
@@ -88,7 +103,9 @@ const FormInput: FC<FormInputProps> = ({
         if (validateOnChange) {
             validateFields(
                 returnObjectToValidate(fieldName, fieldValue),
-                fieldName
+                ['password', 'confirmPassword'].includes(fieldName)
+                    ? ['password', 'confirmPassword']
+                    : [fieldName]
             );
         }
     };
@@ -101,7 +118,9 @@ const FormInput: FC<FormInputProps> = ({
         if (validateOnBlur) {
             validateFields(
                 returnObjectToValidate(fieldName, fieldValue),
-                fieldName
+                ['password', 'confirmPassword'].includes(fieldName)
+                    ? ['password', 'confirmPassword']
+                    : [fieldName]
             );
         }
     };
