@@ -13,6 +13,8 @@ import useSignupValidation from '../hooks/useSignupValidation';
 import useFetch from '../hooks/useFetch';
 import ReCAPTCHABlock from '../ReCAPTCHABlock/ReCAPTCHABlock';
 import PasswordTips from '../PasswordTips/PasswordTips';
+import FormActions from '../FormActions/FormActions';
+import SubmitButton from '../UI/SubmitButton/SubmitButton';
 
 const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
     const [errorState, dispatchError] = useReducer(errorNotificationReducer, {
@@ -41,8 +43,8 @@ const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
     );
 
     useEffect(() => {
-        if (wasRequestSuccessful === null) return; 
-        
+        if (wasRequestSuccessful === null) return;
+
         // if the status code is as expected
         if (wasRequestSuccessful) {
             props.onSuccessfulSignUp();
@@ -76,30 +78,25 @@ const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
         }
     }, [signupErrorState]);
 
+    const initialValues = {
+        firstName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        recaptchaToken: '',
+    };
+
     return (
         <Formik
-            initialValues={{
-                firstName: '',
-                lastName: '',
-                email: '',
-                password: '',
-                confirmPassword: '',
-                recaptchaToken: '',
-            }}
-            initialErrors={{
-                firstName: '',
-                lastName: '',
-                email: '',
-                password: '',
-                confirmPassword: '',
-                recaptchaToken: '',
-            }}
+            initialValues={initialValues}
+            initialErrors={initialValues}
             initialTouched={{ recaptchaToken: true }}
             validationSchema={signupValidationSchema}
             validateOnBlur={false}
             validateOnChange={false}
             validateOnMount={false}
-            onSubmit={async (values, { setSubmitting, resetForm }) => {
+            onSubmit={async (values, { setSubmitting }) => {
                 setSubmitting(true);
                 await sendRequest(values);
                 setSubmitting(false);
@@ -162,28 +159,14 @@ const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
                         validationSchema={signupValidationSchema}
                     />
                     <ReCAPTCHABlock />
-                    <div className={classes['form-actions']}>
-                        <Button
-                            type="submit"
-                            disabled={
-                                formik.isSubmitting ||
-                                isSignupRequestLoading ||
-                                isValidatingEmail ||
-                                // dirty indicates whether the form fields have been modified or not
-                                !formik.dirty ||
-                                // or disable the button when there are validation errors
-                                Object.keys(formik.errors).length !== 0
+                    <FormActions>
+                        <SubmitButton
+                            isLoading={
+                                isSignupRequestLoading || isValidatingEmail
                             }
-                        >
-                            {isValidatingEmail ||
-                            isSignupRequestLoading ||
-                            formik.isSubmitting ? (
-                                <Loading width="30px" height="30px" />
-                            ) : (
-                                'Sign Up'
-                            )}
-                        </Button>
-                    </div>
+                            label="Sign Up"
+                        />
+                    </FormActions>
                 </form>
             )}
         </Formik>
