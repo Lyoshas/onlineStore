@@ -4,7 +4,11 @@ import { FC } from 'react';
 import Button from '../Button/Button';
 import Loading from '../Loading/Loading';
 
-const SubmitButton: FC<{ label: string; isLoading: boolean }> = (props) => {
+const SubmitButton: FC<{
+    label: string;
+    isLoading: boolean;
+    onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+}> = (props) => {
     const { isSubmitting, dirty, errors } = useFormikContext();
     const { isLoading } = props;
 
@@ -19,10 +23,13 @@ const SubmitButton: FC<{ label: string; isLoading: boolean }> = (props) => {
                 // or disable the button when there are validation errors
                 Object.keys(errors).length !== 0
             }
+            onClick={props.onClick}
         >
             {isLoading || isSubmitting ? (
                 <Loading width="30px" height="30px" />
-            ) : props.label}
+            ) : (
+                props.label
+            )}
         </Button>
     );
 };

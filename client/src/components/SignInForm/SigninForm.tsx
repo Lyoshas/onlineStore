@@ -1,5 +1,5 @@
 import { Form, Formik } from 'formik';
-import { useEffect, useReducer } from 'react';
+import { Fragment, useEffect, useReducer } from 'react';
 import { useDispatch } from 'react-redux';
 
 import FormInput from '../Input/FormInput';
@@ -14,6 +14,7 @@ import ErrorNotification, {
 } from '../UI/ErrorNotification/ErrorNotification';
 import ErrorMessage from '../UI/ErrorMessage/ErrorMessage';
 import schema from './signin-schema';
+import SuggestAccountActivation from '../SuggestAccountActivation/SuggestAccountActivation';
 
 const SignInForm = () => {
     const [errorState, dispatchError] = useReducer(errorNotificationReducer, {
@@ -28,7 +29,7 @@ const SignInForm = () => {
         sendRequest,
         wasRequestSuccessful: wasLoginSuccessful,
         statusCode,
-    } = useFetch('/api/auth/sign-in', { method: 'POST' }, 200);
+    } = useFetch('http://localhost/api/auth/sign-in', { method: 'POST' }, 200);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -62,7 +63,7 @@ const SignInForm = () => {
             onSubmit={async (values, { setSubmitting }) => {
                 setSubmitting(true);
 
-                let { login, password } = values;
+                let { login, password, recaptchaToken } = values;
 
                 if (/^\+380\d{9}$/.test(login)) {
                     // sanitize the phone number
@@ -76,59 +77,69 @@ const SignInForm = () => {
                     ].join('-');
                 }
 
-                await sendRequest({ login, password });
+                await sendRequest({ login, password, recaptchaToken });
 
                 setSubmitting(false);
             }}
         >
             {(formik) => (
-                <Form>
-                    {errorState.isErrorNotificationShown && (
-                        <ErrorNotification
-                            message={unexpectedRequestError as string}
-                            onClose={() =>
-                                dispatchError({
-                                    type: ErrorActionType.HIDE_ERROR,
-                                })
-                            }
-                        />
-                    )}
-                    <FormInput
-                        type="text"
-                        label="Email or phone number (e.g. +380-50-123-45-67)"
-                        isRequired={true}
-                        name="login"
-                        placeholder="Enter your email or phone number"
-                        validationSchema={schema}
-                    />
-                    <FormInput
-                        type="password"
-                        label="Password"
-                        isRequired={true}
-                        name="password"
-                        placeholder="Enter your password"
-                        validationSchema={schema}
-                    />
-                    <ReCAPTCHABlock />
-                    {/* it can be null, so we check with the === operator */}
-                    {wasLoginSuccessful === false &&
-                        unexpectedRequestError === null && (
-                            <ErrorMessage
-                                message={
-                                    statusCode === 403
-                                        ? 'The account is not activated'
-                                        : 'Invalid login or password'
+                <Fragment>
+                    <Form>
+                        {errorState.isErrorNotificationShown && (
+                            <ErrorNotification
+                                message={unexpectedRequestError as string}
+                                onClose={() =>
+                                    dispatchError({
+                                        type: ErrorActionType.HIDE_ERROR,
+                                    })
                                 }
-                                centered={true}
                             />
                         )}
-                    <FormActions>
-                        <SubmitButton
-                            label="Sign In"
-                            isLoading={isRequestLoading}
+                        <FormInput
+                            type="text"
+                            label="Email or phone number (e.g. +380-50-123-45-67)"
+                            isRequired={true}
+                            name="login"
+                            placeholder="Enter your email or phone number"
+                            validationSchema={schema}
                         />
-                    </FormActions>
-                </Form>
+                        <FormInput
+                            type="password"
+                            label="Password"
+                            isRequired={true}
+                            name="password"
+                            placeholder="Enter your password"
+                            validationSchema={schema}
+                        />
+                        <ReCAPTCHABlock />
+                        {/* it can be null, so we check with the === operator */}
+                        {wasLoginSuccessful === false &&
+                            unexpectedRequestError === null && (
+                                <Fragment>
+                                    <ErrorMessage
+                                        message={
+                                            statusCode === 403
+                                                ? 'The account is not activated'
+                                                : 'Invalid login or password'
+                                        }
+                                        centered={true}
+                                    />
+                                </Fragment>
+                            )}
+                        <FormActions>
+                            <SubmitButton
+                                label="Sign In"
+                                isLoading={isRequestLoading}
+                            />
+                        </FormActions>
+                    </Form>
+                    {statusCode === 403 && (
+                        <SuggestAccountActivation
+                            login={formik.values.login}
+                            password={formik.values.password}
+                        />
+                    )}
+                </Fragment>
             )}
         </Formik>
     );
