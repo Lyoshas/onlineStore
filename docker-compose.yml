@@ -21,3 +21,9 @@ services:
       context: ./client
     volumes:
       - "./client:/app"
+  redis:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./redis
+    ports:
+      - '6379:6379'

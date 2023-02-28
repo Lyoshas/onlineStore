@@ -13,6 +13,7 @@ import OAuthUserData from '../interfaces/OAuthUserData';
 import UserPrivileges from '../interfaces/UserPrivileges';
 import RecaptchaValidationResult from '../interfaces/RecaptchaValidationResult';
 import { generateRandomString } from '../models/user';
+import redis from '../util/redis';
 
 export const signUpUser = (
     options: {
@@ -56,37 +57,21 @@ export const signUpUser = (
 
 export const addActivationTokenToDB = async (
     userId: number,
-    activationToken: string,
-    dbClient?: PoolClient
+    activationToken: string
 ) => {
-    const client = dbClient || dbPool;
-
-    const activationTypeId: number =
-        await client
-            .query("SELECT id FROM token_types WHERE type = 'activation'")
-            .then(({ rows }) => rows[0].id);
-    
-    return client.query(`
-        INSERT INTO tokens (token, token_type_id, user_id, expires_at)
-        VALUES ($1, $2, $3, $4)
-    `, [
+    // this entry will be automatically deleted after the specified amount of time
+    return redis.set(
         activationToken,
-        activationTypeId,
         userId,
-        new Date(
-            Date.now() + parseInt(
-                process.env.ACTIVATION_TOKEN_EXPIRATION_IN_SECONDS as string
-            ) * 1000
-        )
-    ]);
+        'EX',
+        +process.env.ACTIVATION_TOKEN_EXPIRATION_IN_SECONDS!
+    );
 };
 
-export const getActivationTokenEntry = (
+export const getUserIdByActivationToken = (
     activationToken: string
-): Promise<TokenEntry | null> => {
-    return dbPool
-        .query('SELECT * FROM tokens WHERE token = $1', [activationToken])
-        .then(result => result.rows[0]);
+): Promise<string | null> => {
+    return redis.get(activationToken);
 };
 
 export const activateAccount = (userId: number) => {

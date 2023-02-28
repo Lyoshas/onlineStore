@@ -48,8 +48,7 @@ export const postSignUp: RequestHandler = asyncHandler(
 
             await authModel.addActivationTokenToDB(
                 insertedId,
-                activationToken as string,
-                dbClient
+                activationToken
             );
         } catch (e) {
             console.log(e);
@@ -83,23 +82,22 @@ export const activateAccount: RequestHandler = asyncHandler(
     async (req, res, next) => {
         const activationToken = req.params.activationToken;
 
-        const tokenDBEntry = await authModel.getActivationTokenEntry(
+        const userId = await authModel.getUserIdByActivationToken(
             activationToken
         );
 
-        if (!tokenDBEntry) {
+        if (userId === null) {
             throw new CustomValidationError({
-                message: 'Invalid activation token',
-                field: 'activationToken',
-            });
-        } else if (new Date() > new Date(tokenDBEntry.expires_at)) {
-            throw new CustomValidationError({
-                message: 'The activation token has expired',
-                field: 'activationToken',
+                message: 'The activation token is either invalid or expired',
+                field: 'activationToken'
             });
         }
 
-        await authModel.activateAccount(tokenDBEntry.user_id);
+        console.log('USER_ID TYPE CHECKING!');
+        console.log(userId);
+        console.log(typeof userId);
+        await authModel.activateAccount(+userId);
+
         res.status(200).json({ msg: 'The account has been activated' });
     }
 );

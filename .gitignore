@@ -4,3 +4,4 @@ server/node_modules/
 server/test.sql
 server/src/config/
 client/node_modules/
+redis/redis.conf
