@@ -94,7 +94,7 @@ export const activateAccount: RequestHandler = asyncHandler(
             });
         } else if (new Date() > new Date(tokenDBEntry.expires_at)) {
             throw new CustomValidationError({
-                message: 'The activationToken has expired',
+                message: 'The activation token has expired',
                 field: 'activationToken',
             });
         }
