@@ -45,7 +45,7 @@ const ActivateAccount: FC = () => {
                         <p className={classes.message}>
                             {wasRequestSuccessful
                                 ? 'The account has been activated.'
-                                : JSONResponse?.error || unexpectedRequestError}
+                                : JSONResponse?.errors[0].message || unexpectedRequestError}
                         </p>
                         <ButtonLink
                             to={`${wasRequestSuccessful ? '/sign-in' : '/'}`}
