@@ -1,0 +1,43 @@
+.modal {
+    width: 30%;
+    display: inline-block;
+    background: #fff;
+    position: absolute;
+    z-index: 999;
+}
+
+.modal > div:not(:last-child) {
+    border-bottom: 2px solid #000;
+}
+
+.modal-header__title {
+    margin: 0; 
+    margin-bottom: 5px;
+}
+
+.modal__actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.modal-actions__cancel-button {
+    background: rgb(255, 81, 81);
+    color: white;
+}
+
+.modal-actions__cancel-button:hover {
+    background: rgb(255, 123, 123);
+}
+
+@media screen and (max-width: 1100px) {
+    .modal {
+        width: 50%;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .modal {
+        width: 70%;
+    }
+}
