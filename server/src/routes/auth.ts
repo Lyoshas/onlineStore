@@ -104,6 +104,7 @@ router.patch('/activate-account/:activationToken', authController.activateAccoun
 
 router.post(
     '/sign-in',
+    recaptchaValidation,
     body('login')
         .notEmpty()
         .withMessage('the field "login" must be specified')
