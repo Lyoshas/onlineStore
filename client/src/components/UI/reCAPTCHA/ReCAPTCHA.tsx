@@ -27,6 +27,10 @@ const ReCAPTCHA: FC = () => {
             onChange={onCaptchaVerify}
             onExpired={onCaptchaExpired}
             className={classes.recaptcha}
+            // I tried changing the size dynamically (on window resize), but changing this prop won't re-render the captcha
+            // so the only way is to set this value initially
+            // more about this issue here: https://github.com/dozoisch/react-google-recaptcha/issues/69 
+            size={document.body.clientWidth > 400 ? 'normal' : 'compact'}
         />
     );
 };
