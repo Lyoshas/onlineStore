@@ -50,7 +50,7 @@ const useSignupValidation = () => {
                 'Email is already in use',
                 async (value) => {
                     if (value == null || !isEmail(value as string)) {
-                        return Promise.resolve(false);
+                        return Promise.resolve(true);
                     }
 
                     try {
