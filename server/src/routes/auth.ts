@@ -148,4 +148,19 @@ router.get(
     authController.acquireNewAccessToken
 );
 
+router.post(
+    '/resend-activation-link',
+    recaptchaValidation,
+    body('login')
+        .trim()
+        .notEmpty()
+        .withMessage('login must not be empty'),
+    body('password')
+        .trim()
+        .notEmpty()
+        .withMessage('password must not be empty'),
+    validateRequest,
+    authController.resendActivationLink 
+);
+
 export default router;

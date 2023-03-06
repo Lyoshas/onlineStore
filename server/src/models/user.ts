@@ -46,3 +46,12 @@ export const getPhoneNumberByUserId = (
         [userId]
     ).then(({ rows }) => rows.length === 0 ? null : rows[0].phone_number);
 };
+
+export const getEmailByUserId = (
+    userId: number
+): Promise<string | null> => {
+    return dbPool.query(
+        'SELECT email FROM users WHERE id = $1',
+        [userId]
+    ).then(({ rows }) => rows.length === 0 ? null : rows[0].email);
+}

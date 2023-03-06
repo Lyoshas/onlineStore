@@ -477,3 +477,11 @@ export const isRecaptchaValid = async (
     // more about possible errors: https://developers.google.com/recaptcha/docs/verify
     return { success: data.success, errors: data['error-codes'] };
 };
+
+export const generateAccountActivationLink = (
+    hostname: string,
+    activationToken: string
+) => {
+    hostname = hostname.endsWith('/') ? hostname.slice(0, -1) : hostname;
+    return `http://${hostname}/auth/activate-account/${activationToken}`;
+};

@@ -11,6 +11,7 @@ import CustomValidationError from '../errors/CustomValidationError';
 import InvalidCredentialsError from '../errors/InvalidPasswordError';
 import dbPool from '../util/database';
 import AccountNotActivatedError from '../errors/AccountNotActivatedError';
+import AccountActivatedError from '../errors/AccountActivatedError';
 
 export const postSignUp: RequestHandler = asyncHandler(
     async (req, res, next) => {
@@ -285,4 +286,51 @@ export const acquireNewAccessToken: RequestHandler<
     res.json({
         accessToken: await authModel.generateAccessToken(userId)
     });
+});
+
+export const resendActivationLink: RequestHandler<
+    {},
+    { targetEmail: string },
+    { login: string; password: string }
+> = asyncHandler(async (req, res, next) => {
+    const userId = await authModel.getUserIdByCredentials(
+        // the login can be either a mobile phone (+380-XX-XXX-XX-XX) or an email
+        req.body.login,
+        req.body.password
+    );
+
+    if (userId === null) {
+        throw new InvalidCredentialsError();
+    }
+
+    if ( await authModel.isAccountActivated(userId) ) {
+        // you can't send the activation link again if the account is already activated
+        throw new AccountActivatedError();
+    } 
+
+    const email = await userModel.getEmailByUserId(userId);
+
+    if (email === null) {
+        throw new UnexpectedError('Email associated with userId was not found');
+    }
+
+    const activationToken = await userModel.generateRandomString(32);
+    await authModel.addActivationTokenToDB(userId, activationToken);
+
+    const activationLink = authModel.generateAccountActivationLink(
+        req.get('host')!,
+        activationToken
+    );
+
+    await userModel.sendEmail(
+        email,
+        '[onlineStore] Підтвердження email',
+        `
+            <p>Ви надіслали запит на повторну активацію акаунту.</p>
+            <p>Будь ласка, перейдіть за посиланням для підтвердження електронної пошти:</p>
+            <a href="${activationLink}">${activationLink}</a>
+        `
+    );
+
+    res.status(200).json({ targetEmail: email });
 });
