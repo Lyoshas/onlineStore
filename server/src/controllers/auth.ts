@@ -59,9 +59,10 @@ export const postSignUp: RequestHandler = asyncHandler(
 
         await helperModel.commitTransaction(dbClient);
 
-        const activationLink =
-            `http://${req.get('host')}` +
-            `/auth/activate-account/${activationToken}`;
+        const activationLink = authModel.generateAccountActivationLink(
+            req.get('host')!,
+            activationToken
+        );
 
         userModel.sendEmail(
             email,
