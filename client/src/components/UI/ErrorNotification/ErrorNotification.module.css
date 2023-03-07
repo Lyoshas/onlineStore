@@ -1,6 +1,7 @@
 .error-notification {
     max-width: 40%;
     position: absolute;
+    z-index: 1000;
     top: 50px;
     border-radius: 0 15px 0 0;
     background: white;
