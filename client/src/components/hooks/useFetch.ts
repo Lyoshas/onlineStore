@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 const useFetch = (
     URL: string,
@@ -17,6 +17,8 @@ const useFetch = (
     >(null);
     // "null" means that the request hasn't been sent yet
     const [statusCode, setStatusCode] = useState<number | null>(null);
+    // this unique prop will be used to re-render components that use this hook
+    const [requestTimestamp, setRequestTimestamp] = useState<Date>(new Date());
 
     async function sendRequest(requestBody?: object) {
         try {
@@ -46,6 +48,7 @@ const useFetch = (
             );
         } finally {
             setIsRequestLoading(false);
+            setRequestTimestamp(new Date());
         }
     }
 
@@ -56,6 +59,7 @@ const useFetch = (
         unexpectedRequestError,
         sendRequest,
         statusCode,
+        requestTimestamp,
     };
 };
 
