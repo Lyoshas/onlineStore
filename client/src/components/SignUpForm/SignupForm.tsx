@@ -4,58 +4,44 @@ import { useDispatch } from 'react-redux';
 
 import FormInput from '../Input/FormInput';
 import useSignupValidation from '../hooks/useSignupValidation';
-import useFetch from '../hooks/useFetch';
 import ReCAPTCHABlock from '../ReCAPTCHABlock/ReCAPTCHABlock';
 import PasswordTips from '../PasswordTips/PasswordTips';
 import FormActions from '../FormActions/FormActions';
 import SubmitButton from '../UI/SubmitButton/SubmitButton';
 import { errorActions } from '../../store/slices/error';
+import { IUserData, useSignUpMutation } from '../../store/apis/authApi';
 
 const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
     const dispatch = useDispatch();
-    const {
-        validationSchema: signupValidationSchema,
-        isValidatingEmail,
-    } = useSignupValidation();
-    const {
-        isRequestLoading: isSignupRequestLoading,
-        sendRequest,
-        wasRequestSuccessful,
-        statusCode,
-    } = useFetch(
-        '/api/auth/sign-up',
-        {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        },
-        201
-    );
+    const { validationSchema: signupValidationSchema, isValidatingEmail } =
+        useSignupValidation();
+    const [signUp, signupResults] = useSignUpMutation();
 
     useEffect(() => {
-        if (wasRequestSuccessful === null) return;
+        if (!signupResults.isSuccess) return;
 
-        // if the status code is as expected
-        if (wasRequestSuccessful) {
-            props.onSuccessfulSignUp();
-            return;
-        }
+        props.onSuccessfulSignUp();
+    }, [signupResults.isSuccess]);
 
-        let errorMessage: string;
+    useEffect(() => {
+        if (!signupResults.isError) return;
 
-        if (statusCode === 422) {
-            // this error is very unlikely to occur, because backend and frontend are synchronized in terms of signup validation requirements
-            errorMessage =
-                'Invalid input data. Please double-check your inputs or the captcha';
-        } else {
-            errorMessage = 'Something went wrong. Please reload the page.';
+        let errorMessage = 'Something went wrong. Please reload the page.';
+
+        if ('data' in signupResults.error) {
+            // this error is very unlikely to occur,
+            // becausebackend and frontend are synchronized
+            // in terms of signup validation requirements
+            if (signupResults.error?.status === 422) {
+                errorMessage =
+                    'Invalid input data. Please double-check your inputs or the captcha.';
+            }
         }
 
         dispatch(errorActions.showNotificationError(errorMessage));
-    }, [wasRequestSuccessful]);
+    }, [signupResults.isError, signupResults.error, errorActions]);
 
-    const initialValues = {
+    const initialValues: IUserData = {
         firstName: '',
         lastName: '',
         email: '',
@@ -75,7 +61,7 @@ const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
             validateOnMount={false}
             onSubmit={async (values, { setSubmitting }) => {
                 setSubmitting(true);
-                await sendRequest(values);
+                await signUp(values);
                 setSubmitting(false);
             }}
         >
@@ -129,7 +115,7 @@ const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
                     <FormActions>
                         <SubmitButton
                             isLoading={
-                                isSignupRequestLoading || isValidatingEmail
+                                signupResults.isLoading || isValidatingEmail
                             }
                             label="Sign Up"
                         />
