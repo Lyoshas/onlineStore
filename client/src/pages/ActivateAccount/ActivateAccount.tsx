@@ -5,66 +5,72 @@ import { useDispatch } from 'react-redux';
 import classes from './ActivateAccount.module.css';
 import Card from '../../components/UI/Card/Card';
 import Loading from '../../components/UI/Loading/Loading';
-import useFetch from '../../components/hooks/useFetch';
 import ButtonLink from '../../components/UI/ButtonLink/ButtonLink';
 import { errorActions } from '../../store/slices/error';
+import { useActivateAccountMutation } from '../../store/apis/authApi';
 
 const ActivateAccount: FC = () => {
     const dispatch = useDispatch();
     const { activationToken } = useParams<{ activationToken: string }>();
-    const {
-        isRequestLoading,
-        wasRequestSuccessful,
-        JSONResponse,
-        unexpectedRequestError,
-        sendRequest,
-    } = useFetch(
-        `/api/auth/activate-account/${activationToken}`,
-        { method: 'PATCH' },
-        200
-    );
+    const [activateAccount, { isError, isLoading, isSuccess, data, error }] =
+        useActivateAccountMutation();
 
     useEffect(() => {
-        sendRequest();
-    }, []);
+        activateAccount(activationToken!);
+    }, [activationToken]);
 
     useEffect(() => {
-        if (!unexpectedRequestError) return;
+        if (!isError) return;
+
+        // if this is not a server error OR the status code is less than 500, return
+        if (!error || !('data' in error) || error.status < 500) return;
 
         dispatch(
             errorActions.showNotificationError(
                 'Something went wrong. Please reload the page.'
             )
         );
-    }, [unexpectedRequestError]);
+    }, [isError, error]);
+
+    let message: string;
+
+    if (isError) {
+        interface ServerErrorResponse {
+            errors: {
+                message: string;
+                field?: string;
+            }[];
+        }
+
+        // if error is of type FetchBaseQueryError (from RTK Query)
+        if ('data' in error! && !('originalStatus' in error)) {
+            // take the message that the server has sent
+            message = (error.data as ServerErrorResponse).errors[0].message;
+        } else {
+            message = 'Something went wrong';
+        }
+    } else {
+        message = 'The account has been activated';
+    }
 
     return (
         <div className="flex-wrapper">
             <Card className={classes['activation-block']}>
-                {isRequestLoading && <Loading color="#273c99" />}
-                {!isRequestLoading && (
+                {isLoading && <Loading color="#273c99" />}
+                {!isLoading && (
                     <Fragment>
                         <img
                             src={
-                                wasRequestSuccessful
+                                isSuccess
                                     ? '/success-icon.svg'
                                     : '/error-icon.png'
                             }
                             className={classes.icon}
-                            alt={`${
-                                wasRequestSuccessful ? 'Success' : 'Error'
-                            } icon`}
+                            alt={`${isSuccess ? 'Success' : 'Error'} icon`}
                         />
-                        <p className={classes.message}>
-                            {wasRequestSuccessful
-                                ? 'The account has been activated.'
-                                : JSONResponse?.errors[0].message ||
-                                  unexpectedRequestError}
-                        </p>
-                        <ButtonLink
-                            to={`${wasRequestSuccessful ? '/sign-in' : '/'}`}
-                        >
-                            {wasRequestSuccessful ? 'Sign In' : 'Home Page'}
+                        <p className={classes.message}>{message}</p>
+                        <ButtonLink to={`${isSuccess ? '/sign-in' : '/'}`}>
+                            {isSuccess ? 'Sign In' : 'Home Page'}
                         </ButtonLink>
                     </Fragment>
                 )}

@@ -24,7 +24,15 @@ export const authApi = createApi({
                 };
             },
         }),
+        activateAccount: builder.mutation<{ msg: string }, string>({
+            query: (activationToken: string) => {
+                return {
+                    url: `/auth/activate-account/${activationToken}`,
+                    method: 'PATCH',
+                };
+            },
+        }),
     }),
 });
 
-export const { useSignUpMutation } = authApi;
+export const { useSignUpMutation, useActivateAccountMutation } = authApi;
