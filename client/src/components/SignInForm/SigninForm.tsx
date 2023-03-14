@@ -1,5 +1,5 @@
 import { Form, Formik } from 'formik';
-import { Fragment, useEffect, useReducer } from 'react';
+import { Fragment, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
 import FormInput from '../Input/FormInput';
@@ -8,19 +8,12 @@ import FormActions from '../FormActions/FormActions';
 import SubmitButton from '../UI/SubmitButton/SubmitButton';
 import useFetch from '../hooks/useFetch';
 import { authActions } from '../../store/slices/auth';
-import ErrorNotification, {
-    ErrorActionType,
-    errorNotificationReducer,
-} from '../UI/ErrorNotification/ErrorNotification';
 import ErrorMessage from '../UI/ErrorMessage/ErrorMessage';
 import schema from './signin-schema';
 import SuggestAccountActivation from '../SuggestAccountActivation/SuggestAccountActivation';
+import { errorActions } from '../../store/slices/error';
 
 const SignInForm = () => {
-    const [errorState, dispatchError] = useReducer(errorNotificationReducer, {
-        isErrorNotificationShown: false,
-        errorMessage: '',
-    });
     const initial = { login: '', password: '', recaptchaToken: '' };
     const {
         JSONResponse,
@@ -35,10 +28,11 @@ const SignInForm = () => {
     useEffect(() => {
         if (!unexpectedRequestError) return;
 
-        dispatchError({
-            type: ErrorActionType.SHOW_NOTIFICATION_ERROR,
-            errorMessage: unexpectedRequestError,
-        });
+        dispatch(
+            errorActions.showNotificationError(
+                'Something went wrong. Please reload the page.'
+            )
+        );
     }, [unexpectedRequestError]);
 
     useEffect(() => {
@@ -85,16 +79,6 @@ const SignInForm = () => {
             {(formik) => (
                 <Fragment>
                     <Form>
-                        {errorState.isErrorNotificationShown && (
-                            <ErrorNotification
-                                message={unexpectedRequestError as string}
-                                onClose={() =>
-                                    dispatchError({
-                                        type: ErrorActionType.HIDE_ERROR,
-                                    })
-                                }
-                            />
-                        )}
                         <FormInput
                             type="text"
                             label="Email or phone number (e.g. +380-50-123-45-67)"

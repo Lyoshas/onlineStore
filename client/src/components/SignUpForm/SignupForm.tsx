@@ -1,29 +1,20 @@
-import { useReducer, useEffect, FC } from 'react';
+import { useEffect, FC } from 'react';
 import { Formik } from 'formik';
+import { useDispatch } from 'react-redux';
 
-import classes from './SignupForm.module.css';
-import Button from '../UI/Button/Button';
 import FormInput from '../Input/FormInput';
-import ErrorNotification, {
-    ErrorActionType,
-    errorNotificationReducer,
-} from '../UI/ErrorNotification/ErrorNotification';
-import Loading from '../UI/Loading/Loading';
 import useSignupValidation from '../hooks/useSignupValidation';
 import useFetch from '../hooks/useFetch';
 import ReCAPTCHABlock from '../ReCAPTCHABlock/ReCAPTCHABlock';
 import PasswordTips from '../PasswordTips/PasswordTips';
 import FormActions from '../FormActions/FormActions';
 import SubmitButton from '../UI/SubmitButton/SubmitButton';
+import { errorActions } from '../../store/slices/error';
 
 const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
-    const [errorState, dispatchError] = useReducer(errorNotificationReducer, {
-        isErrorNotificationShown: false,
-        errorMessage: '',
-    });
+    const dispatch = useDispatch();
     const {
         validationSchema: signupValidationSchema,
-        errorState: signupErrorState,
         isValidatingEmail,
     } = useSignupValidation();
     const {
@@ -61,22 +52,8 @@ const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
             errorMessage = 'Something went wrong. Please reload the page.';
         }
 
-        dispatchError({
-            type: ErrorActionType.SHOW_NOTIFICATION_ERROR,
-            errorMessage,
-        });
+        dispatch(errorActions.showNotificationError(errorMessage));
     }, [wasRequestSuccessful]);
-
-    useEffect(() => {
-        if (signupErrorState.isErrorNotificationShown) {
-            dispatchError({
-                type: ErrorActionType.SHOW_NOTIFICATION_ERROR,
-                errorMessage: signupErrorState.errorMessage,
-            });
-        } else {
-            dispatchError({ type: ErrorActionType.HIDE_ERROR });
-        }
-    }, [signupErrorState]);
 
     const initialValues = {
         firstName: '',
@@ -104,16 +81,6 @@ const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
         >
             {(formik) => (
                 <form onSubmit={formik.handleSubmit}>
-                    {errorState.isErrorNotificationShown && (
-                        <ErrorNotification
-                            message={errorState.errorMessage}
-                            onClose={() =>
-                                dispatchError({
-                                    type: ErrorActionType.HIDE_ERROR,
-                                })
-                            }
-                        />
-                    )}
                     <FormInput
                         type="text"
                         label="First name"

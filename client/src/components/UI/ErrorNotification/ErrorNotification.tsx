@@ -3,47 +3,6 @@ import ReactDOM from 'react-dom';
 
 import classes from './ErrorNotification.module.css';
 
-interface ErrorState {
-    isErrorNotificationShown: boolean;
-    errorMessage: string;
-}
-
-export enum ErrorActionType {
-    SHOW_NOTIFICATION_ERROR,
-    HIDE_ERROR,
-}
-
-export interface ErrorAction {
-    type: ErrorActionType;
-    errorMessage?: string;
-}
-
-export function errorNotificationReducer(
-    prevState: ErrorState,
-    action: ErrorAction
-): ErrorState {
-    switch (action.type) {
-        case ErrorActionType.SHOW_NOTIFICATION_ERROR:
-            // if the error message is not specified
-            if (action.errorMessage == null) {
-                throw new Error(
-                    'errorNotificationReducer: errorMessage must be specified'
-                );
-            }
-            return {
-                isErrorNotificationShown: true,
-                errorMessage: action.errorMessage,
-            };
-        case ErrorActionType.HIDE_ERROR:
-            return {
-                isErrorNotificationShown: false,
-                errorMessage: '',
-            };
-        default:
-            throw new Error('errorNotificationReducer: unknown action.type');
-    }
-}
-
 const ErrorNotification: FC<{ message: string; onClose: () => void }> = (
     props
 ) => {

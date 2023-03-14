@@ -1,6 +1,7 @@
 import { Form, Formik } from 'formik';
-import { FC, Fragment, useEffect, useReducer, useState } from 'react';
+import { FC, Fragment, useEffect, useReducer } from 'react';
 import * as Yup from 'yup';
+import { useDispatch } from 'react-redux';
 
 import useFetch from '../hooks/useFetch';
 import Button from '../UI/Button/Button';
@@ -8,10 +9,7 @@ import Modal from '../UI/Modal/Modal';
 import classes from './SuggestAccountActivation.module.css';
 import ReCAPTCHABlock from '../ReCAPTCHABlock/ReCAPTCHABlock';
 import SubmitButton from '../UI/SubmitButton/SubmitButton';
-import ErrorNotification, {
-    ErrorActionType,
-    errorNotificationReducer,
-} from '../UI/ErrorNotification/ErrorNotification';
+import { errorActions } from '../../store/slices/error';
 
 interface ModalState {
     isModalShown: boolean;
@@ -58,15 +56,13 @@ const modalReducer = (
 const SuggestAccountActivation: FC<{ login: string; password: string }> = (
     props
 ) => {
+    const dispatch = useDispatch();
     const [modalState, dispatchModal] = useReducer(modalReducer, {
         isModalShown: false,
         isActivationModalShown: false,
         isSuccessModalShown: false,
     });
-    const [errorState, dispatchError] = useReducer(errorNotificationReducer, {
-        isErrorNotificationShown: false,
-        errorMessage: '',
-    });
+
     const {
         statusCode,
         isRequestLoading,
@@ -74,7 +70,7 @@ const SuggestAccountActivation: FC<{ login: string; password: string }> = (
         JSONResponse,
         unexpectedRequestError,
         wasRequestSuccessful,
-        requestTimestamp
+        requestTimestamp,
     } = useFetch(
         '/api/auth/resend-activation-link',
         {
@@ -91,14 +87,24 @@ const SuggestAccountActivation: FC<{ login: string; password: string }> = (
             return;
         }
 
-        dispatchError({
-            type: ErrorActionType.SHOW_NOTIFICATION_ERROR,
-            errorMessage:
+        dispatch(
+            errorActions.showNotificationError(
                 statusCode === 409
                     ? 'Your account is already activated'
-                    : 'Something went wrong. We are working on solving this problem. Please try reloading the page.',
-        });
+                    : 'Something went wrong. We are working on solving this problem. Please try reloading the page.'
+            )
+        );
     }, [wasRequestSuccessful, requestTimestamp]);
+
+    useEffect(() => {
+        if (!unexpectedRequestError) return;
+
+        dispatch(
+            errorActions.showNotificationError(
+                'Something went wrong. Please reload the page'
+            )
+        );
+    }, [unexpectedRequestError]);
 
     return (
         <Formik
@@ -122,16 +128,6 @@ const SuggestAccountActivation: FC<{ login: string; password: string }> = (
         >
             {(formik) => (
                 <Form>
-                    {errorState.isErrorNotificationShown && (
-                        <ErrorNotification
-                            message={errorState.errorMessage}
-                            onClose={() =>
-                                dispatchError({
-                                    type: ErrorActionType.HIDE_ERROR,
-                                })
-                            }
-                        />
-                    )}
                     {modalState.isModalShown && (
                         <Modal
                             title="Resend the activation link"

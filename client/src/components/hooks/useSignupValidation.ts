@@ -1,12 +1,9 @@
 import * as Yup from 'yup';
 import isEmail from 'validator/lib/isEmail';
-import { useReducer } from 'react';
+import { useDispatch } from 'react-redux';
 
 import useDebounce from './useDebounce';
-import {
-    ErrorActionType,
-    errorNotificationReducer,
-} from '../UI/ErrorNotification/ErrorNotification';
+import { errorActions } from '../../store/slices/error';
 
 const returnNameValidation = (field: 'First name' | 'Last name') => {
     return Yup.string()
@@ -29,11 +26,7 @@ const isEmailAvailable = async (email: string): Promise<boolean> => {
 };
 
 const useSignupValidation = () => {
-    const [errorState, dispatchError] = useReducer(errorNotificationReducer, {
-        isErrorNotificationShown: false,
-        errorMessage: '',
-    });
-
+    const dispatch = useDispatch();
     const {
         debouncedFunction: debouncedIsEmailAvailable,
         isActionExecuting: isValidatingEmail,
@@ -65,10 +58,7 @@ const useSignupValidation = () => {
                             errorMessage = 'Wow, slow down! Too many requests!';
                         }
 
-                        dispatchError({
-                            type: ErrorActionType.SHOW_NOTIFICATION_ERROR,
-                            errorMessage,
-                        });
+                        dispatch(errorActions.showNotificationError(errorMessage));
 
                         return Promise.resolve(false);
                     }
@@ -92,7 +82,7 @@ const useSignupValidation = () => {
             .required('Captcha verification is required')
     });
 
-    return { validationSchema, errorState, isValidatingEmail };
+    return { validationSchema, isValidatingEmail };
 };
 
 export default useSignupValidation;

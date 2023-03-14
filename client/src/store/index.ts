@@ -1,9 +1,13 @@
-import { createSlice, configureStore, PayloadAction } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
 
 import authSlice from './slices/auth';
+import errorSlice from './slices/error';
 
 const store = configureStore({
-    reducer: { auth: authSlice.reducer },
+    reducer: {
+        auth: authSlice.reducer,
+        error: errorSlice.reducer
+    },
 });
 
 export type RootState = ReturnType<typeof store.getState>;

@@ -1,20 +1,23 @@
 import { FC, Fragment, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 
 import classes from './ActivateAccount.module.css';
 import Card from '../../components/UI/Card/Card';
 import Loading from '../../components/UI/Loading/Loading';
 import useFetch from '../../components/hooks/useFetch';
 import ButtonLink from '../../components/UI/ButtonLink/ButtonLink';
+import { errorActions } from '../../store/slices/error';
 
 const ActivateAccount: FC = () => {
+    const dispatch = useDispatch();
     const { activationToken } = useParams<{ activationToken: string }>();
     const {
         isRequestLoading,
         wasRequestSuccessful,
         JSONResponse,
         unexpectedRequestError,
-        sendRequest
+        sendRequest,
     } = useFetch(
         `/api/auth/activate-account/${activationToken}`,
         { method: 'PATCH' },
@@ -24,6 +27,16 @@ const ActivateAccount: FC = () => {
     useEffect(() => {
         sendRequest();
     }, []);
+
+    useEffect(() => {
+        if (!unexpectedRequestError) return;
+
+        dispatch(
+            errorActions.showNotificationError(
+                'Something went wrong. Please reload the page.'
+            )
+        );
+    }, [unexpectedRequestError]);
 
     return (
         <div className="flex-wrapper">
@@ -45,7 +58,8 @@ const ActivateAccount: FC = () => {
                         <p className={classes.message}>
                             {wasRequestSuccessful
                                 ? 'The account has been activated.'
-                                : JSONResponse?.errors[0].message || unexpectedRequestError}
+                                : JSONResponse?.errors[0].message ||
+                                  unexpectedRequestError}
                         </p>
                         <ButtonLink
                             to={`${wasRequestSuccessful ? '/sign-in' : '/'}`}

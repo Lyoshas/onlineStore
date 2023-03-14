@@ -1,6 +1,6 @@
-import { FC, useEffect, useReducer } from 'react';
+import { FC, Fragment, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import SignUp from './pages/SignUp/SignUp';
 import './App.css';
@@ -8,17 +8,15 @@ import ActivateAccount from './pages/ActivateAccount/ActivateAccount';
 import SignIn from './pages/SignIn/SignIn';
 import useFetch from './components/hooks/useFetch';
 import { authActions } from './store/slices/auth';
-import ErrorNotification, {
-    ErrorActionType,
-    errorNotificationReducer,
-} from './components/UI/ErrorNotification/ErrorNotification';
+import ErrorNotification from './components/UI/ErrorNotification/ErrorNotification';
 import EnsureStatus from './components/EnsureStatus/EnsureStatus';
+import { RootState } from './store';
+import { errorActions } from './store/slices/error';
 
 const App: FC = () => {
-    const [errorState, dispatchError] = useReducer(errorNotificationReducer, {
-        isErrorNotificationShown: false,
-        errorMessage: '',
-    });
+    const { errorMessage, isErrorNotificationShown } = useSelector(
+        (state: RootState) => state.error
+    );
     const dispatch = useDispatch();
     const {
         // this will send a request to get a new access token
@@ -50,42 +48,36 @@ const App: FC = () => {
     useEffect(() => {
         if (!unexpectedRequestError) return;
 
-        dispatchError({
-            type: ErrorActionType.SHOW_NOTIFICATION_ERROR,
-            errorMessage: unexpectedRequestError,
-        });
+        dispatch(errorActions.showNotificationError(unexpectedRequestError));
     }, [unexpectedRequestError]);
 
     return (
-        <Routes>
-            <Route path="/sign-up" element={<SignUp />} />
-            <Route
-                path="/auth/activate-account/:activationToken"
-                element={<ActivateAccount />}
-            />
-            <Route
-                path="/sign-in"
-                element={
-                    // the user must be unauthenticated to access this route
-                    <EnsureStatus auth={false}>
-                        <SignIn />
-                    </EnsureStatus>
-                }
-            />
-            {errorState.isErrorNotificationShown && (
-                <Route
-                    path="*"
-                    element={
-                        <ErrorNotification
-                            message={errorState.errorMessage}
-                            onClose={() =>
-                                dispatchError({ type: ErrorActionType.HIDE_ERROR })
-                            }
-                        />
+        <Fragment>
+            {isErrorNotificationShown && (
+                <ErrorNotification
+                    message={errorMessage}
+                    onClose={() =>
+                        dispatch(errorActions.hideNotificationError())
                     }
                 />
             )}
-        </Routes>
+            <Routes>
+                <Route path="/sign-up" element={<SignUp />} />
+                <Route
+                    path="/auth/activate-account/:activationToken"
+                    element={<ActivateAccount />}
+                />
+                <Route
+                    path="/sign-in"
+                    element={
+                        // the user must be unauthenticated to access this route
+                        <EnsureStatus auth={false}>
+                            <SignIn />
+                        </EnsureStatus>
+                    }
+                />
+            </Routes>
+        </Fragment>
     );
 };
 
