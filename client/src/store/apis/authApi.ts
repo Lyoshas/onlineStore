@@ -9,10 +9,16 @@ export interface IUserData {
     recaptchaToken: string;
 }
 
+export interface IUserCredentials {
+    login: string;
+    password: string;
+    recaptchaToken: string;
+}
+
 export const authApi = createApi({
     reducerPath: 'authApi',
     baseQuery: fetchBaseQuery({
-        baseUrl: 'http://localhost/api'
+        baseUrl: 'http://localhost/api',
     }),
     endpoints: (builder) => ({
         signUp: builder.mutation<{ msg: string }, IUserData>({
@@ -41,6 +47,15 @@ export const authApi = createApi({
                 };
             },
         }),
+        signIn: builder.mutation<{ accessToken: string }, IUserCredentials>({
+            query: (credentials) => {
+                return {
+                    url: '/auth/sign-in',
+                    method: 'POST',
+                    body: credentials,
+                };
+            },
+        }),
     }),
 });
 
@@ -48,4 +63,5 @@ export const {
     useSignUpMutation,
     useActivateAccountMutation,
     useRequestAccessTokenQuery,
+    useSignInMutation
 } = authApi;

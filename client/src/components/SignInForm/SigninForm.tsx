@@ -7,49 +7,44 @@ import FormInput from '../Input/FormInput';
 import ReCAPTCHABlock from '../ReCAPTCHABlock/ReCAPTCHABlock';
 import FormActions from '../FormActions/FormActions';
 import SubmitButton from '../UI/SubmitButton/SubmitButton';
-import useFetch from '../hooks/useFetch';
 import { authActions } from '../../store/slices/auth';
 import ErrorMessage from '../UI/ErrorMessage/ErrorMessage';
 import schema from './signin-schema';
 import SuggestAccountActivation from '../SuggestAccountActivation/SuggestAccountActivation';
 import { errorActions } from '../../store/slices/error';
+import { useSignInMutation } from '../../store/apis/authApi';
 
 const SignInForm = () => {
     const initial = { login: '', password: '', recaptchaToken: '' };
-    const {
-        JSONResponse,
-        isRequestLoading,
-        unexpectedRequestError,
-        sendRequest,
-        wasRequestSuccessful: wasLoginSuccessful,
-        statusCode,
-    } = useFetch('http://localhost/api/auth/sign-in', { method: 'POST' }, 200);
+    const [
+        signIn,
+        { isSuccess, data, isError, error, isLoading, isUninitialized },
+    ] = useSignInMutation();
     const dispatch = useDispatch();
     const recaptchaRef = useRef<NpmRecaptcha>(null);
 
+    const statusCode: number | null =
+        error && 'data' in error && typeof error.status === 'number'
+            ? error.status
+            : null;
+
     useEffect(() => {
-        if (!unexpectedRequestError) return;
+        if (!isError) return;
+        if (typeof statusCode === 'number' && statusCode < 500) return;
 
         dispatch(
             errorActions.showNotificationError(
-                'Something went wrong. Please reload the page.'
+                'Something went wrong while signing in. Please reload the page.'
             )
         );
-    }, [unexpectedRequestError]);
+    }, [isError, statusCode]);
 
     useEffect(() => {
-        if (!wasLoginSuccessful) return;
+        if (!isSuccess) return;
+        if (!data) return;
 
-        if (typeof JSONResponse.accessToken !== 'string') {
-            throw new Error('JSONResponse.accessToken must be a string');
-        }
-
-        dispatch(
-            authActions.updateAccessToken(JSONResponse.accessToken as string)
-        );
-
-        return;
-    }, [wasLoginSuccessful, statusCode]);
+        dispatch(authActions.updateAccessToken(data.accessToken));
+    }, [isSuccess, data]);
 
     return (
         <Formik
@@ -73,7 +68,7 @@ const SignInForm = () => {
                     ].join('-');
                 }
 
-                await sendRequest({ login, password, recaptchaToken });
+                await signIn({ login, password, recaptchaToken });
 
                 setFieldValue('recaptchaToken', '');
                 recaptchaRef.current?.reset();
@@ -101,24 +96,26 @@ const SignInForm = () => {
                             validationSchema={schema}
                         />
                         <ReCAPTCHABlock ref={recaptchaRef} />
-                        {/* it can be null, so we check with the === operator */}
-                        {wasLoginSuccessful === false &&
-                            unexpectedRequestError === null && (
-                                <Fragment>
-                                    <ErrorMessage
-                                        message={
-                                            statusCode === 403
-                                                ? 'The account is not activated'
-                                                : 'Invalid login or password'
-                                        }
-                                        centered={true}
-                                    />
-                                </Fragment>
-                            )}
+                        {isError && (
+                            <Fragment>
+                                <ErrorMessage
+                                    message={
+                                        statusCode === 403
+                                            ? 'The account is not activated'
+                                            : statusCode === 401
+                                            ? 'Invalid login or password'
+                                            : statusCode === 422
+                                            ? 'Wrong inputs'
+                                            : 'Something went wrong'
+                                    }
+                                    centered={true}
+                                />
+                            </Fragment>
+                        )}
                         <FormActions>
                             <SubmitButton
                                 label="Sign In"
-                                isLoading={isRequestLoading}
+                                isLoading={isLoading}
                             />
                         </FormActions>
                     </Form>
