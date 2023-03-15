@@ -62,7 +62,15 @@ const App: FC = () => {
                 />
             )}
             <Routes>
-                <Route path="/sign-up" element={<SignUp />} />
+                <Route
+                    path="/sign-up"
+                    element={
+                        // the user must be unauthenticated to access this route
+                        <EnsureStatus auth={false}>
+                            <SignUp />
+                        </EnsureStatus>
+                    }
+                />
                 <Route
                     path="/auth/activate-account/:activationToken"
                     element={<ActivateAccount />}
