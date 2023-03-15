@@ -6,50 +6,48 @@ import SignUp from './pages/SignUp/SignUp';
 import './App.css';
 import ActivateAccount from './pages/ActivateAccount/ActivateAccount';
 import SignIn from './pages/SignIn/SignIn';
-import useFetch from './components/hooks/useFetch';
 import { authActions } from './store/slices/auth';
 import ErrorNotification from './components/UI/ErrorNotification/ErrorNotification';
 import EnsureStatus from './components/EnsureStatus/EnsureStatus';
 import { RootState } from './store';
 import { errorActions } from './store/slices/error';
+import { useRequestAccessTokenQuery } from './store/apis/authApi';
 
 const App: FC = () => {
     const { errorMessage, isErrorNotificationShown } = useSelector(
         (state: RootState) => state.error
     );
     const dispatch = useDispatch();
-    const {
-        // this will send a request to get a new access token
-        // if the refresh token is absent or invalid, the request will return the 422 status code
-        sendRequest: authenticateUser,
-        JSONResponse,
-        unexpectedRequestError,
-        wasRequestSuccessful,
-    } = useFetch('/api/auth/refresh', {}, 200);
+    const { data, isSuccess, isFetching, isError, error } =
+        useRequestAccessTokenQuery();
 
     useEffect(() => {
-        authenticateUser();
-    }, []);
+        if (isFetching) return;
 
-    useEffect(() => {
-        // if the request hasn't been sent yet
-        if (wasRequestSuccessful === null) return;
-
-        console.log(`is user authenticated? ${wasRequestSuccessful}`);
+        console.log(`is user authenticated? ${isSuccess}`);
 
         dispatch(
             // if the server returned the 200 status code
-            wasRequestSuccessful
-                ? authActions.updateAccessToken(JSONResponse.accessToken)
+            isSuccess
+                ? authActions.updateAccessToken(data.accessToken)
                 : authActions.invalidateUser()
         );
-    }, [wasRequestSuccessful]);
+    }, [isSuccess, isFetching]);
 
     useEffect(() => {
-        if (!unexpectedRequestError) return;
+        if (!isError) return;
 
-        dispatch(errorActions.showNotificationError(unexpectedRequestError));
-    }, [unexpectedRequestError]);
+        if (
+            ('data' in error && error.status >= 500) ||
+            ('originalStatus' in error && error.originalStatus >= 500)
+        ) {
+            dispatch(
+                errorActions.showNotificationError(
+                    'Something went wrong while authenticating. Please reload the page.'
+                )
+            );
+        }
+    }, [isError, error]);
 
     return (
         <Fragment>

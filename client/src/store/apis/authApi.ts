@@ -12,7 +12,7 @@ export interface IUserData {
 export const authApi = createApi({
     reducerPath: 'authApi',
     baseQuery: fetchBaseQuery({
-        baseUrl: 'http://localhost/api',
+        baseUrl: 'http://localhost/api'
     }),
     endpoints: (builder) => ({
         signUp: builder.mutation<{ msg: string }, IUserData>({
@@ -32,7 +32,20 @@ export const authApi = createApi({
                 };
             },
         }),
+        requestAccessToken: builder.query<{ accessToken: string }, void>({
+            query: () => {
+                return {
+                    url: '/auth/refresh',
+                    method: 'GET',
+                    credentials: 'include',
+                };
+            },
+        }),
     }),
 });
 
-export const { useSignUpMutation, useActivateAccountMutation } = authApi;
+export const {
+    useSignUpMutation,
+    useActivateAccountMutation,
+    useRequestAccessTokenQuery,
+} = authApi;
