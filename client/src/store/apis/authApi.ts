@@ -18,13 +18,13 @@ export interface IUserCredentials {
 export const authApi = createApi({
     reducerPath: 'authApi',
     baseQuery: fetchBaseQuery({
-        baseUrl: 'http://localhost/api',
+        baseUrl: 'http://localhost/api/auth',
     }),
     endpoints: (builder) => ({
         signUp: builder.mutation<{ msg: string }, IUserData>({
             query: (user) => {
                 return {
-                    url: '/auth/sign-up',
+                    url: '/sign-up',
                     method: 'POST',
                     body: user,
                 };
@@ -33,7 +33,7 @@ export const authApi = createApi({
         activateAccount: builder.mutation<{ msg: string }, string>({
             query: (activationToken: string) => {
                 return {
-                    url: `/auth/activate-account/${activationToken}`,
+                    url: `/activate-account/${activationToken}`,
                     method: 'PATCH',
                 };
             },
@@ -41,7 +41,7 @@ export const authApi = createApi({
         requestAccessToken: builder.query<{ accessToken: string }, void>({
             query: () => {
                 return {
-                    url: '/auth/refresh',
+                    url: '/refresh',
                     method: 'GET',
                     credentials: 'include',
                 };
@@ -50,7 +50,7 @@ export const authApi = createApi({
         signIn: builder.mutation<{ accessToken: string }, IUserCredentials>({
             query: (credentials) => {
                 return {
-                    url: '/auth/sign-in',
+                    url: '/sign-in',
                     method: 'POST',
                     body: credentials,
                 };
@@ -62,7 +62,7 @@ export const authApi = createApi({
         >({
             query: (credentials) => {
                 return {
-                    url: '/auth/resend-activation-link',
+                    url: '/resend-activation-link',
                     method: 'POST',
                     body: credentials,
                 };
