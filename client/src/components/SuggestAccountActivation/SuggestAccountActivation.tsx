@@ -155,9 +155,10 @@ const SuggestAccountActivation: FC<{ login: string; password: string }> = (
                                     <Fragment />
                                 )
                             }
-                            onClose={() =>
-                                dispatchModal({ type: ModalAction.HIDE_MODALS })
-                            }
+                            onClose={() => {
+                                dispatchModal({ type: ModalAction.HIDE_MODALS });
+                                formik.resetForm();
+                            }}
                         />
                     )}
                     <p className={classes['suggestion-paragraph']}>
