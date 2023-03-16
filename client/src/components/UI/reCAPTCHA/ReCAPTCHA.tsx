@@ -1,10 +1,10 @@
-import { FC } from 'react';
+import React, { FC, forwardRef } from 'react';
 import { useField } from 'formik';
 import NpmRecaptcha from 'react-google-recaptcha';
 
 import classes from './reCAPTCHA.module.css';
 
-const ReCAPTCHA: FC = () => {
+const ReCAPTCHA = forwardRef<NpmRecaptcha>((props, ref) => {
     const [field, meta, helpers] = useField('recaptchaToken');
 
     // Google reCAPTCHA API expects string the defines the name of the function in the global namespace that should be fired, so it's not possible to pass a callback to data-callback attribute
@@ -23,16 +23,17 @@ const ReCAPTCHA: FC = () => {
 
     return (
         <NpmRecaptcha
+            ref={ref}
             sitekey="6LciTjkkAAAAAFMcYF8Tu68clGCWGKrEy83GrsPz"
             onChange={onCaptchaVerify}
             onExpired={onCaptchaExpired}
             className={classes.recaptcha}
             // I tried changing the size dynamically (on window resize), but changing this prop won't re-render the captcha
             // so the only way is to set this value initially
-            // more about this issue here: https://github.com/dozoisch/react-google-recaptcha/issues/69 
+            // more about this issue here: https://github.com/dozoisch/react-google-recaptcha/issues/69
             size={document.body.clientWidth > 400 ? 'normal' : 'compact'}
         />
     );
-};
+});
 
 export default ReCAPTCHA;

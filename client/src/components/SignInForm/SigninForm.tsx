@@ -1,6 +1,7 @@
 import { Form, Formik } from 'formik';
-import { Fragment, useEffect } from 'react';
+import { Fragment, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
+import NpmRecaptcha from 'react-google-recaptcha';
 
 import FormInput from '../Input/FormInput';
 import ReCAPTCHABlock from '../ReCAPTCHABlock/ReCAPTCHABlock';
@@ -24,6 +25,7 @@ const SignInForm = () => {
         statusCode,
     } = useFetch('http://localhost/api/auth/sign-in', { method: 'POST' }, 200);
     const dispatch = useDispatch();
+    const recaptchaRef = useRef<NpmRecaptcha>(null);
 
     useEffect(() => {
         if (!unexpectedRequestError) return;
@@ -54,7 +56,7 @@ const SignInForm = () => {
             initialValues={initial}
             initialErrors={initial}
             validationSchema={schema}
-            onSubmit={async (values, { setSubmitting }) => {
+            onSubmit={async (values, { setSubmitting, setFieldValue }) => {
                 setSubmitting(true);
 
                 let { login, password, recaptchaToken } = values;
@@ -73,6 +75,9 @@ const SignInForm = () => {
 
                 await sendRequest({ login, password, recaptchaToken });
 
+                setFieldValue('recaptchaToken', '');
+                recaptchaRef.current?.reset();
+                
                 setSubmitting(false);
             }}
         >
@@ -95,7 +100,7 @@ const SignInForm = () => {
                             placeholder="Enter your password"
                             validationSchema={schema}
                         />
-                        <ReCAPTCHABlock />
+                        <ReCAPTCHABlock ref={recaptchaRef} />
                         {/* it can be null, so we check with the === operator */}
                         {wasLoginSuccessful === false &&
                             unexpectedRequestError === null && (
