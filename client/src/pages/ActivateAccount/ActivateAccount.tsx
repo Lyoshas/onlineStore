@@ -12,8 +12,10 @@ import { useActivateAccountMutation } from '../../store/apis/authApi';
 const ActivateAccount: FC = () => {
     const dispatch = useDispatch();
     const { activationToken } = useParams<{ activationToken: string }>();
-    const [activateAccount, { isError, isLoading, isSuccess, data, error }] =
-        useActivateAccountMutation();
+    const [
+        activateAccount,
+        { isError, isLoading, isSuccess, isUninitialized, error },
+    ] = useActivateAccountMutation();
 
     useEffect(() => {
         activateAccount(activationToken!);
@@ -56,8 +58,8 @@ const ActivateAccount: FC = () => {
     return (
         <div className="flex-wrapper">
             <Card className={classes['activation-block']}>
-                {isLoading && <Loading color="#273c99" />}
-                {!isLoading && (
+                {isUninitialized || isLoading && <Loading color="#273c99" />}
+                {!isUninitialized && !isLoading && (
                     <Fragment>
                         <img
                             src={
