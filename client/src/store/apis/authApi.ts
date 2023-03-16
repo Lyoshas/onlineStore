@@ -56,6 +56,18 @@ export const authApi = createApi({
                 };
             },
         }),
+        resendActivationLink: builder.mutation<
+            { targetEmail: string },
+            IUserCredentials
+        >({
+            query: (credentials) => {
+                return {
+                    url: '/auth/resend-activation-link',
+                    method: 'POST',
+                    body: credentials,
+                };
+            },
+        }),
     }),
 });
 
@@ -63,5 +75,6 @@ export const {
     useSignUpMutation,
     useActivateAccountMutation,
     useRequestAccessTokenQuery,
-    useSignInMutation
+    useSignInMutation,
+    useResendActivationLinkMutation
 } = authApi;

@@ -13,6 +13,7 @@ import schema from './signin-schema';
 import SuggestAccountActivation from '../SuggestAccountActivation/SuggestAccountActivation';
 import { errorActions } from '../../store/slices/error';
 import { useSignInMutation } from '../../store/apis/authApi';
+import deriveStatusCode from '../../util/deriveStatusCode';
 
 const SignInForm = () => {
     const initial = { login: '', password: '', recaptchaToken: '' };
@@ -23,10 +24,7 @@ const SignInForm = () => {
     const dispatch = useDispatch();
     const recaptchaRef = useRef<NpmRecaptcha>(null);
 
-    const statusCode: number | null =
-        error && 'data' in error && typeof error.status === 'number'
-            ? error.status
-            : null;
+    const statusCode = deriveStatusCode(error);
 
     useEffect(() => {
         if (!isError) return;

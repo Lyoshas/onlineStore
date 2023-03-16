@@ -3,13 +3,14 @@ import { FC, Fragment, useEffect, useReducer } from 'react';
 import * as Yup from 'yup';
 import { useDispatch } from 'react-redux';
 
-import useFetch from '../hooks/useFetch';
 import Button from '../UI/Button/Button';
 import Modal from '../UI/Modal/Modal';
 import classes from './SuggestAccountActivation.module.css';
 import ReCAPTCHABlock from '../ReCAPTCHABlock/ReCAPTCHABlock';
 import SubmitButton from '../UI/SubmitButton/SubmitButton';
 import { errorActions } from '../../store/slices/error';
+import { useResendActivationLinkMutation } from '../../store/apis/authApi';
+import deriveStatusCode from '../../util/deriveStatusCode';
 
 interface ModalState {
     isModalShown: boolean;
@@ -62,27 +63,27 @@ const SuggestAccountActivation: FC<{ login: string; password: string }> = (
         isActivationModalShown: false,
         isSuccessModalShown: false,
     });
+    const [
+        resendActivationLink,
+        { isSuccess, data, isError, error, isLoading },
+    ] = useResendActivationLinkMutation();
 
-    const {
-        statusCode,
-        isRequestLoading,
-        sendRequest,
-        JSONResponse,
-        unexpectedRequestError,
-        wasRequestSuccessful,
-        requestTimestamp,
-    } = useFetch(
-        '/api/auth/resend-activation-link',
-        {
-            method: 'POST',
-        },
-        200
-    );
+    const statusCode = deriveStatusCode(error);
 
     useEffect(() => {
-        if (wasRequestSuccessful === null) return;
+        if (!isError) return;
+        if (typeof statusCode === 'number' && statusCode < 500) return;
 
-        if (wasRequestSuccessful) {
+        dispatch(
+            errorActions.showNotificationError(
+                'Something went wrong while sending the link. Please reload the page.'
+            )
+        );
+    }, [isError, statusCode]);
+
+    useEffect(() => {
+        if (!data) return;
+        if (isSuccess) {
             dispatchModal({ type: ModalAction.SHOW_SUCCESS_MODAL });
             return;
         }
@@ -94,17 +95,7 @@ const SuggestAccountActivation: FC<{ login: string; password: string }> = (
                     : 'Something went wrong. We are working on solving this problem. Please try reloading the page.'
             )
         );
-    }, [wasRequestSuccessful, requestTimestamp]);
-
-    useEffect(() => {
-        if (!unexpectedRequestError) return;
-
-        dispatch(
-            errorActions.showNotificationError(
-                'Something went wrong. Please reload the page'
-            )
-        );
-    }, [unexpectedRequestError]);
+    }, [data, isSuccess, statusCode]);
 
     return (
         <Formik
@@ -117,7 +108,7 @@ const SuggestAccountActivation: FC<{ login: string; password: string }> = (
             onSubmit={async (values, { setSubmitting }) => {
                 setSubmitting(true);
 
-                await sendRequest({
+                await resendActivationLink({
                     login: props.login,
                     password: props.password,
                     recaptchaToken: values.recaptchaToken,
@@ -147,8 +138,8 @@ const SuggestAccountActivation: FC<{ login: string; password: string }> = (
                                     {modalState.isSuccessModalShown && (
                                         <p>
                                             Please check your email (
-                                            <b>{JSONResponse.targetEmail}</b>)
-                                            for further instructions.
+                                            <b>{data!.targetEmail}</b>) for
+                                            further instructions.
                                         </p>
                                     )}
                                 </Fragment>
@@ -157,7 +148,7 @@ const SuggestAccountActivation: FC<{ login: string; password: string }> = (
                                 modalState.isActivationModalShown ? (
                                     <SubmitButton
                                         label="Send"
-                                        isLoading={isRequestLoading}
+                                        isLoading={isLoading}
                                         onClick={() => formik.submitForm()}
                                     />
                                 ) : (
