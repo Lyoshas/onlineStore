@@ -467,11 +467,17 @@ export const isRecaptchaValid = async (
     return { success: data.success, errors: data['error-codes'] };
 };
 
+// "example.com/" => "example.com"
+// "example.com" => "example.com"
+const normalizeHostname = (hostname: string) => {
+    return hostname.endsWith('/') ? hostname.slice(0, -1) : hostname;
+}
+
 export const generateAccountActivationLink = (
     hostname: string,
     activationToken: string
 ) => {
-    hostname = hostname.endsWith('/') ? hostname.slice(0, -1) : hostname;
+    hostname = normalizeHostname(hostname);
     return `http://${hostname}/auth/activate-account/${activationToken}`;
 };
 
@@ -491,6 +497,6 @@ export const generateResetPasswordLink = (
     hostname: string,
     resetToken: string
 ): string => {
-    hostname = hostname.endsWith('/') ? hostname.slice(0, -1) : hostname;
+    hostname = normalizeHostname(hostname);
     return `http://${hostname}/auth/reset-password/${resetToken}`;
 };
