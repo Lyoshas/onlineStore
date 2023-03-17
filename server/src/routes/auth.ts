@@ -163,4 +163,17 @@ router.post(
     authController.resendActivationLink 
 );
 
+router.post(
+    '/send-reset-token',
+    recaptchaValidation,
+    body('email')
+        .trim()
+        .notEmpty()
+        .withMessage('email must not be empty')
+        .isEmail()
+        .withMessage('email is not correct'),
+    validateRequest,
+    authController.sendResetTokenToEmail
+);
+
 export default router;

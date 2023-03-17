@@ -487,3 +487,19 @@ export const generateAccountActivationLink = (
     hostname = hostname.endsWith('/') ? hostname.slice(0, -1) : hostname;
     return `http://${hostname}/auth/activate-account/${activationToken}`;
 };
+
+export const addResetTokenToDB = async (resetToken: string, userId: number) => {
+    await redis.hset(resetToken, { type: 'resetToken', userId });
+    await redis.expire(
+        resetToken,
+        +process.env.RESET_TOKEN_EXPIRATION_IN_SECONDS!
+    );
+};
+
+export const generateResetPasswordLink = (
+    hostname: string,
+    resetToken: string
+): string => {
+    hostname = hostname.endsWith('/') ? hostname.slice(0, -1) : hostname;
+    return `http://${hostname}/auth/reset-password/${resetToken}`;
+};

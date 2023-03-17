@@ -335,3 +335,45 @@ export const resendActivationLink: RequestHandler<
 
     res.status(200).json({ targetEmail: email });
 });
+
+// this route sends a so-called "reset token"
+// it will be used to reset the user's password
+// for this, "email" and "recaptchaToken" are needed in the request body
+export const sendResetTokenToEmail: RequestHandler<
+    {},
+    { msg: string },
+    { email: string; recaptchaToken: string }
+> = asyncHandler(async (req, res, next) => {
+    const { email } = req.body;
+    const userId = await userModel.getUserIdByEmail(email);
+
+    if (userId === null) {
+        throw new CustomValidationError({
+            message: 'There is no user with the corresponding email',
+            field: 'email'
+        });
+    }
+
+    const resetToken = await userModel.generateRandomString(32);
+    await authModel.addResetTokenToDB(resetToken, userId);
+
+    const resetLink = authModel.generateResetPasswordLink(
+        req.get('host')!,
+        resetToken
+    );
+
+    userModel.sendEmail(
+        email,
+        '[onlineStore] Змінення пароля',
+        `
+            <p>Ви запросили посилання для змінення пароля.</p>
+            <p>Будь ласка, перейдіть за посиланням:</p>
+            <a href="${resetLink}">${resetLink}</a>
+            <p>Це посилання дійсне лише протягом 1 години.</p>
+        `
+    );
+
+    res.status(200).json({
+        msg: 'The link has been sent to the corresponding email'
+    })
+});
