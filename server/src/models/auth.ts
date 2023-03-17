@@ -55,19 +55,6 @@ export const signUpUser = (
     `, [email, password, firstName, lastName, phoneNumber, withOAuth, avatarURL]);
 };
 
-export const addActivationTokenToDB = async (
-    userId: number,
-    activationToken: string
-) => {
-    // activationToken = { type: 'activationToken': userId: 123 }
-    // this entry will be automatically deleted after the specified amount of time
-    await redis.hset(activationToken, { type: 'activationToken', userId });
-    await redis.expire(
-        activationToken,
-        +process.env.ACTIVATION_TOKEN_EXPIRATION_IN_SECONDS!
-    );
-};
-
 export const getUserIdByActivationToken = async (
     token: string
 ): Promise<string | null> => {
@@ -488,12 +475,16 @@ export const generateAccountActivationLink = (
     return `http://${hostname}/auth/activate-account/${activationToken}`;
 };
 
-export const addResetTokenToDB = async (resetToken: string, userId: number) => {
-    await redis.hset(resetToken, { type: 'resetToken', userId });
-    await redis.expire(
-        resetToken,
-        +process.env.RESET_TOKEN_EXPIRATION_IN_SECONDS!
-    );
+// for activation tokens and reset tokens
+export const addTokenToRedis = async (options: {
+    tokenType: 'activationToken' | 'resetToken',
+    token: string,
+    userId: number,
+    expirationTimeInSeconds: number
+}) => {
+    const { tokenType, token, userId, expirationTimeInSeconds } = options;
+    await redis.hset(token, { type: tokenType, userId });
+    await redis.expire(token, expirationTimeInSeconds);
 };
 
 export const generateResetPasswordLink = (

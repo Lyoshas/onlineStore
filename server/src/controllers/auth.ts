@@ -47,10 +47,13 @@ export const postSignUp: RequestHandler = asyncHandler(
                 })
                 .then(({ rows }) => rows[0].id);
 
-            await authModel.addActivationTokenToDB(
-                insertedId,
-                activationToken
-            );
+            await authModel.addTokenToRedis({
+                tokenType: 'activationToken',
+                token: activationToken,
+                userId: insertedId,
+                expirationTimeInSeconds:
+                    +process.env.ACTIVATION_TOKEN_EXPIRATION_IN_SECONDS!
+            });
         } catch (e) {
             console.log(e);
             helperModel.rollbackTransaction(dbClient);
@@ -316,7 +319,13 @@ export const resendActivationLink: RequestHandler<
     }
 
     const activationToken = await userModel.generateRandomString(32);
-    await authModel.addActivationTokenToDB(userId, activationToken);
+    await authModel.addTokenToRedis({
+        tokenType: 'activationToken',
+        token: activationToken,
+        userId,
+        expirationTimeInSeconds:
+            +process.env.ACTIVATION_TOKEN_EXPIRATION_IN_SECONDS!
+    });
 
     const activationLink = authModel.generateAccountActivationLink(
         req.get('host')!,
@@ -355,7 +364,13 @@ export const sendResetTokenToEmail: RequestHandler<
     }
 
     const resetToken = await userModel.generateRandomString(32);
-    await authModel.addResetTokenToDB(resetToken, userId);
+    await authModel.addTokenToRedis({
+        tokenType: 'resetToken',
+        token: resetToken,
+        userId,
+        expirationTimeInSeconds:
+            +process.env.RESET_TOKEN_EXPIRATION_IN_SECONDS!
+    });
 
     const resetLink = authModel.generateResetPasswordLink(
         req.get('host')!,
