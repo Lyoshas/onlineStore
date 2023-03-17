@@ -59,19 +59,21 @@ export const addActivationTokenToDB = async (
     userId: number,
     activationToken: string
 ) => {
+    // activationToken = { type: 'activationToken': userId: 123 }
     // this entry will be automatically deleted after the specified amount of time
-    return redis.set(
+    await redis.hset(activationToken, { type: 'activationToken', userId });
+    await redis.expire(
         activationToken,
-        userId,
-        'EX',
         +process.env.ACTIVATION_TOKEN_EXPIRATION_IN_SECONDS!
     );
 };
 
-export const getUserIdByActivationToken = (
-    activationToken: string
+export const getUserIdByActivationToken = async (
+    token: string
 ): Promise<string | null> => {
-    return redis.get(activationToken);
+    const tokenType = await redis.hget(token, 'type');
+    if (tokenType !== 'activationToken') return null;
+    return redis.hget(token, 'userId');
 };
 
 export const activateAccount = (userId: number) => {
