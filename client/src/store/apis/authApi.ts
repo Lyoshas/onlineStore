@@ -68,6 +68,18 @@ export const authApi = createApi({
                 };
             },
         }),
+        requestResetToken: builder.mutation<
+            { msg: string },
+            { email: string; recaptchaToken: string }
+        >({
+            query: (data) => {
+                return {
+                    url: '/send-reset-token',
+                    method: 'POST',
+                    body: data,
+                };
+            },
+        }),
     }),
 });
 
@@ -76,5 +88,6 @@ export const {
     useActivateAccountMutation,
     useRequestAccessTokenQuery,
     useSignInMutation,
-    useResendActivationLinkMutation
+    useResendActivationLinkMutation,
+    useRequestResetTokenMutation,
 } = authApi;

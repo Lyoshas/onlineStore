@@ -12,6 +12,7 @@ import EnsureStatus from './components/EnsureStatus/EnsureStatus';
 import { RootState } from './store';
 import { errorActions } from './store/slices/error';
 import { useRequestAccessTokenQuery } from './store/apis/authApi';
+import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 
 const App: FC = () => {
     const { errorMessage, isErrorNotificationShown } = useSelector(
@@ -82,6 +83,7 @@ const App: FC = () => {
                         </EnsureStatus>
                     }
                 />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
             </Routes>
         </Fragment>
     );

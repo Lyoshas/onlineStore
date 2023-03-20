@@ -2,6 +2,7 @@ import { Form, Formik } from 'formik';
 import { Fragment, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import NpmRecaptcha from 'react-google-recaptcha';
+import { Link } from 'react-router-dom';
 
 import FormInput from '../Input/FormInput';
 import ReCAPTCHABlock from '../ReCAPTCHABlock/ReCAPTCHABlock';
@@ -14,6 +15,7 @@ import SuggestAccountActivation from '../SuggestAccountActivation/SuggestAccount
 import { errorActions } from '../../store/slices/error';
 import { useSignInMutation } from '../../store/apis/authApi';
 import deriveStatusCode from '../../util/deriveStatusCode';
+import classes from './SigninForm.module.css';
 
 const SignInForm = () => {
     const initial = { login: '', password: '', recaptchaToken: '' };
@@ -70,7 +72,7 @@ const SignInForm = () => {
 
                 setFieldValue('recaptchaToken', '');
                 recaptchaRef.current?.reset();
-                
+
                 setSubmitting(false);
             }}
         >
@@ -93,6 +95,14 @@ const SignInForm = () => {
                             placeholder="Enter your password"
                             validationSchema={schema}
                         />
+                        <p className={classes['sign-in__forgot-password-paragraph']}>
+                            <Link
+                                to="/forgot-password"
+                                className={`link ${classes['sign-in__forgot-password-link']}`}
+                            >
+                                Forgot password?
+                            </Link>
+                        </p>
                         <ReCAPTCHABlock ref={recaptchaRef} />
                         {isError && (
                             <Fragment>
