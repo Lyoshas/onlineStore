@@ -1,11 +1,12 @@
 import { FC } from 'react';
 
 import classes from './SuccessfulMessage.module.css';
+import SuccessIcon from '../UI/Icons/SuccessIcon';
 
 const SuccessfulSignupMessage: FC = () => {
     return (
         <div className={classes['success-message-block']}>
-            <img src="/success-icon.svg" alt="Success" />
+            <SuccessIcon />
             <p className={classes['success-message__text']}>
                 You've successfully signed up! Please check your email for
                 futher instructions.

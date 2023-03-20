@@ -8,6 +8,8 @@ import Loading from '../../components/UI/Loading/Loading';
 import ButtonLink from '../../components/UI/ButtonLink/ButtonLink';
 import { errorActions } from '../../store/slices/error';
 import { useActivateAccountMutation } from '../../store/apis/authApi';
+import SuccessIcon from '../../components/UI/Icons/SuccessIcon';
+import ErrorIcon from '../../components/UI/Icons/ErrorIcon';
 
 const ActivateAccount: FC = () => {
     const dispatch = useDispatch();
@@ -61,15 +63,7 @@ const ActivateAccount: FC = () => {
                 {isUninitialized || isLoading && <Loading color="#273c99" />}
                 {!isUninitialized && !isLoading && (
                     <Fragment>
-                        <img
-                            src={
-                                isSuccess
-                                    ? '/success-icon.svg'
-                                    : '/error-icon.png'
-                            }
-                            className={classes.icon}
-                            alt={`${isSuccess ? 'Success' : 'Error'} icon`}
-                        />
+                        {isSuccess ? <SuccessIcon /> : <ErrorIcon />}
                         <p className={classes.message}>{message}</p>
                         <ButtonLink to={`${isSuccess ? '/sign-in' : '/'}`}>
                             {isSuccess ? 'Sign In' : 'Home Page'}
