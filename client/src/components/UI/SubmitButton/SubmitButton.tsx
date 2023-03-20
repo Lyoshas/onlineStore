@@ -7,6 +7,7 @@ import Loading from '../Loading/Loading';
 const SubmitButton: FC<{
     label: string;
     isLoading: boolean;
+    className?: string;
     onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }> = (props) => {
     const { isSubmitting, dirty, errors } = useFormikContext();
@@ -24,6 +25,7 @@ const SubmitButton: FC<{
                 Object.keys(errors).length !== 0
             }
             onClick={props.onClick}
+            className={props.className}
         >
             {isLoading || isSubmitting ? (
                 <Loading width="30px" height="30px" />
