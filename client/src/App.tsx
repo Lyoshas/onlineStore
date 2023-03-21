@@ -13,6 +13,8 @@ import { RootState } from './store';
 import { errorActions } from './store/slices/error';
 import { useRequestAccessTokenQuery } from './store/apis/authApi';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
+import ResetPassword from './pages/ResetPassword/ResetPassword';
+import CheckResetToken from './pages/ResetPassword/CheckResetToken';
 
 const App: FC = () => {
     const { errorMessage, isErrorNotificationShown } = useSelector(
@@ -84,6 +86,14 @@ const App: FC = () => {
                     }
                 />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route
+                    path="/auth/reset-password/:resetToken"
+                    element={
+                        <CheckResetToken>
+                            <ResetPassword />
+                        </CheckResetToken>
+                    }
+                />
             </Routes>
         </Fragment>
     );

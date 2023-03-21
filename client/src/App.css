@@ -6,10 +6,15 @@
 }
 
 a.link {
-    text-decoration: none;
+    text-decoration: underline;
     transition: 0.3s color ease;
 }
 
 a.link:hover {
     color: #f00;
+}
+
+.icon {
+    width: 48px;
+    height: 48px;
 }

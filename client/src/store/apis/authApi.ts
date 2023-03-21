@@ -80,6 +80,33 @@ export const authApi = createApi({
                 };
             },
         }),
+        changePassword: builder.mutation<
+            { msg: string },
+            {
+                resetToken: string;
+                password: string;
+                recaptchaToken: string;
+            }
+        >({
+            query: (data) => {
+                return {
+                    url: '/change-password',
+                    method: 'PATCH',
+                    body: data,
+                };
+            },
+        }),
+        checkResetTokenValidity: builder.query<
+            { isValid: boolean },
+            { resetToken: string }
+        >({
+            query: (data) => {
+                return {
+                    url: `/is-reset-token-valid/${data.resetToken}`,
+                    method: 'GET',
+                };
+            },
+        }),
     }),
 });
 
@@ -90,4 +117,6 @@ export const {
     useSignInMutation,
     useResendActivationLinkMutation,
     useRequestResetTokenMutation,
+    useChangePasswordMutation,
+    useCheckResetTokenValidityQuery,
 } = authApi;
