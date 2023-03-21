@@ -4,7 +4,6 @@ import * as Yup from 'yup';
 import { useDispatch } from 'react-redux';
 import ReCAPTCHA from 'react-google-recaptcha';
 
-import Card from '../../components/UI/Card/Card';
 import classes from './ForgotPassword.module.css';
 import FormInput from '../../components/Input/FormInput';
 import ReCAPTCHABlock from '../../components/ReCAPTCHABlock/ReCAPTCHABlock';
@@ -14,6 +13,7 @@ import deriveStatusCode from '../../util/deriveStatusCode';
 import { errorActions } from '../../store/slices/error';
 import ErrorMessage from '../../components/UI/ErrorMessage/ErrorMessage';
 import SuccessMessage from './SuccessMessage';
+import CenterBlock from '../../components/UI/CenterBlock/CenterBlock';
 
 const schema = Yup.object().shape({
     email: Yup.string()
@@ -66,68 +66,65 @@ const ForgotPassword: FC = () => {
     }, [statusCode, isError, error]);
 
     return (
-        <div className="flex-wrapper">
-            <Card className={classes['forgot-password-block']}>
-                {isSuccess ? (
-                    <SuccessMessage />
-                ) : (
-                    <Fragment>
-                        <h1 className={classes['forgot-password__heading']}>
-                            Forgot Password
-                        </h1>
-                        <Formik
-                            initialValues={initialValues}
-                            initialErrors={initialValues}
-                            validationSchema={schema}
-                            onSubmit={async (
-                                values,
-                                { setSubmitting, setFieldValue }
-                            ) => {
-                                setSubmitting(true);
+        <CenterBlock>
+            {isSuccess ? (
+                <SuccessMessage />
+            ) : (
+                <Fragment>
+                    <h1 className={classes['forgot-password__heading']}>
+                        Forgot Password
+                    </h1>
+                    <Formik
+                        initialValues={initialValues}
+                        initialErrors={initialValues}
+                        validationSchema={schema}
+                        onSubmit={async (
+                            values,
+                            { setSubmitting, setFieldValue }
+                        ) => {
+                            setSubmitting(true);
 
-                                await sendResetToken(values);
-                                recaptchaRef.current?.reset();
-                                setFieldValue('recaptchaToken', '');
+                            await sendResetToken(values);
+                            recaptchaRef.current?.reset();
+                            setFieldValue('recaptchaToken', '');
 
-                                setSubmitting(false);
-                            }}
-                        >
-                            {(formik) => (
-                                <Form>
-                                    <FormInput
-                                        type="email"
-                                        isRequired={true}
-                                        placeholder="Enter your email"
-                                        validationSchema={schema}
-                                        label="Email"
-                                        name="email"
+                            setSubmitting(false);
+                        }}
+                    >
+                        {(formik) => (
+                            <Form>
+                                <FormInput
+                                    type="email"
+                                    isRequired={true}
+                                    placeholder="Enter your email"
+                                    validationSchema={schema}
+                                    label="Email"
+                                    name="email"
+                                />
+                                <ReCAPTCHABlock ref={recaptchaRef} />
+                                {serverErrorResponse && (
+                                    <ErrorMessage
+                                        message={serverErrorResponse}
+                                        centered={true}
                                     />
-                                    <ReCAPTCHABlock ref={recaptchaRef} />
-                                    {serverErrorResponse && (
-                                        <ErrorMessage
-                                            message={serverErrorResponse}
-                                            centered={true}
-                                        />
-                                    )}
-                                    <SubmitButton
-                                        label="Send a link"
-                                        isLoading={
-                                            formik.isSubmitting ||
-                                            isRequestLoading
-                                        }
-                                        className={
-                                            classes[
-                                                'forgot-password__submit-button_centered'
-                                            ]
-                                        }
-                                    />
-                                </Form>
-                            )}
-                        </Formik>
-                    </Fragment>
-                )}
-            </Card>
-        </div>
+                                )}
+                                <SubmitButton
+                                    label="Send a link"
+                                    isLoading={
+                                        formik.isSubmitting || isRequestLoading
+                                    }
+                                    className={
+                                        classes[
+                                            'forgot-password__submit-button_centered'
+                                        ]
+                                    }
+                                />
+                            </Form>
+                        )}
+                    </Formik>
+                </Fragment>
+            )}
+        </CenterBlock>
     );
 };
 

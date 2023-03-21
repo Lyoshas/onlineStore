@@ -3,13 +3,13 @@ import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 
 import classes from './ActivateAccount.module.css';
-import Card from '../../components/UI/Card/Card';
 import Loading from '../../components/UI/Loading/Loading';
 import ButtonLink from '../../components/UI/ButtonLink/ButtonLink';
 import { errorActions } from '../../store/slices/error';
 import { useActivateAccountMutation } from '../../store/apis/authApi';
 import SuccessIcon from '../../components/UI/Icons/SuccessIcon';
 import ErrorIcon from '../../components/UI/Icons/ErrorIcon';
+import CenterBlock from '../../components/UI/CenterBlock/CenterBlock';
 
 const ActivateAccount: FC = () => {
     const dispatch = useDispatch();
@@ -58,24 +58,22 @@ const ActivateAccount: FC = () => {
     }
 
     return (
-        <div className="flex-wrapper">
-            <Card className={classes['activation-block']}>
-                {isUninitialized || (isLoading && <Loading color="#273c99" />)}
-                {!isUninitialized && !isLoading && (
-                    <Fragment>
-                        {isSuccess ? (
-                            <SuccessIcon className={classes.icon} />
-                        ) : (
-                            <ErrorIcon className={classes.icon} />
-                        )}
-                        <p className={classes.message}>{message}</p>
-                        <ButtonLink to={`${isSuccess ? '/sign-in' : '/'}`}>
-                            {isSuccess ? 'Sign In' : 'Home Page'}
-                        </ButtonLink>
-                    </Fragment>
-                )}
-            </Card>
-        </div>
+        <CenterBlock className={classes['activation-block']}>
+            {isUninitialized || (isLoading && <Loading color="#273c99" />)}
+            {!isUninitialized && !isLoading && (
+                <Fragment>
+                    {isSuccess ? (
+                        <SuccessIcon className={classes.icon} />
+                    ) : (
+                        <ErrorIcon className={classes.icon} />
+                    )}
+                    <p className={classes.message}>{message}</p>
+                    <ButtonLink to={`${isSuccess ? '/sign-in' : '/'}`}>
+                        {isSuccess ? 'Sign In' : 'Home Page'}
+                    </ButtonLink>
+                </Fragment>
+            )}
+        </CenterBlock>
     );
 };
 
