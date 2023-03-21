@@ -60,10 +60,14 @@ const ActivateAccount: FC = () => {
     return (
         <div className="flex-wrapper">
             <Card className={classes['activation-block']}>
-                {isUninitialized || isLoading && <Loading color="#273c99" />}
+                {isUninitialized || (isLoading && <Loading color="#273c99" />)}
                 {!isUninitialized && !isLoading && (
                     <Fragment>
-                        {isSuccess ? <SuccessIcon /> : <ErrorIcon />}
+                        {isSuccess ? (
+                            <SuccessIcon className={classes.icon} />
+                        ) : (
+                            <ErrorIcon className={classes.icon} />
+                        )}
                         <p className={classes.message}>{message}</p>
                         <ButtonLink to={`${isSuccess ? '/sign-in' : '/'}`}>
                             {isSuccess ? 'Sign In' : 'Home Page'}
