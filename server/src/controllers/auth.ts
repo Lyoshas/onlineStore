@@ -392,3 +392,42 @@ export const sendResetTokenToEmail: RequestHandler<
         msg: 'The link has been sent to the corresponding email'
     })
 });
+
+export const changePassword: RequestHandler<
+    {},
+    { msg: string },
+    { resetToken: string; password: string }
+> = asyncHandler(async (req, res, next) => {
+    const { resetToken } = req.body;
+    const userId = await authModel.getUserIdByResetToken(resetToken);
+
+    if (!userId) {
+        throw new CustomValidationError({
+            message: 'resetToken is either invalid or has expired',
+            field: 'resetToken'
+        });
+    }
+
+    const client = await dbPool.connect();
+
+    try {
+        // The operation of changing the password and revoking the resetToken cannot be performed separately, so a transaction is required.
+        // Either both operations are successful, or none of them are persisted
+        await helperModel.beginTransaction(client);
+
+        await authModel.changePassword(
+            userId,
+            await bcryptjs.hash(req.body.password, 12),
+            client
+        );    
+    
+        await authModel.revokeResetToken(resetToken);
+
+        await helperModel.commitTransaction(client);
+
+        res.status(200).json({ msg: 'The password has been changed.' });
+    } catch (e) {
+        await helperModel.rollbackTransaction(client);
+        throw new UnexpectedError('Something went wrong');
+    }
+});
