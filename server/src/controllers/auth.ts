@@ -431,3 +431,14 @@ export const changePassword: RequestHandler<
         throw new UnexpectedError('Something went wrong');
     }
 });
+
+export const isResetTokenValid: RequestHandler<
+    { resetToken: string },
+    { isValid: boolean }
+> = asyncHandler(async (req, res, next) => {
+    const userId = await authModel.getUserIdByResetToken(
+        req.params.resetToken
+    );
+
+    res.status(200).json({ isValid: userId !== null});
+});

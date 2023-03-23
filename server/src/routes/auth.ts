@@ -194,4 +194,9 @@ router.patch(
     authController.changePassword 
 );
 
+router.get(
+    '/is-reset-token-valid/:resetToken',
+    authController.isResetTokenValid
+);
+
 export default router;
