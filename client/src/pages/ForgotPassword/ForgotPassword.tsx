@@ -103,10 +103,9 @@ const ForgotPassword: FC = () => {
                                 />
                                 <ReCAPTCHABlock ref={recaptchaRef} />
                                 {serverErrorResponse && (
-                                    <ErrorMessage
-                                        message={serverErrorResponse}
-                                        centered={true}
-                                    />
+                                    <ErrorMessage centered={true}>
+                                        {serverErrorResponse}
+                                    </ErrorMessage>
                                 )}
                                 <SubmitButton
                                     label="Send a link"

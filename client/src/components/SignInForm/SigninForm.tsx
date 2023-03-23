@@ -95,7 +95,11 @@ const SignInForm = () => {
                             placeholder="Enter your password"
                             validationSchema={schema}
                         />
-                        <p className={classes['sign-in__forgot-password-paragraph']}>
+                        <p
+                            className={
+                                classes['sign-in__forgot-password-paragraph']
+                            }
+                        >
                             <Link
                                 to="/forgot-password"
                                 className={`link ${classes['sign-in__forgot-password-link']}`}
@@ -106,18 +110,15 @@ const SignInForm = () => {
                         <ReCAPTCHABlock ref={recaptchaRef} />
                         {isError && (
                             <Fragment>
-                                <ErrorMessage
-                                    message={
-                                        statusCode === 403
-                                            ? 'The account is not activated'
-                                            : statusCode === 401
-                                            ? 'Invalid login or password'
-                                            : statusCode === 422
-                                            ? 'Wrong inputs'
-                                            : 'Something went wrong'
-                                    }
-                                    centered={true}
-                                />
+                                <ErrorMessage centered={true}>
+                                    {statusCode === 403
+                                        ? 'The account is not activated'
+                                        : statusCode === 401
+                                        ? 'Invalid login or password'
+                                        : statusCode === 422
+                                        ? 'Wrong inputs'
+                                        : 'Something went wrong'}
+                                </ErrorMessage>
                             </Fragment>
                         )}
                         <FormActions>

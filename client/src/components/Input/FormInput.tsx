@@ -175,7 +175,7 @@ const FormInput: FC<FormInputProps> = ({
                     />
                 )}
             </div>
-            {isInputInvalid && <ErrorMessage message={meta.error as string} />}
+            {isInputInvalid && <ErrorMessage>{meta.error as string}</ErrorMessage>}
             {TipComponent}
         </div>
     );
