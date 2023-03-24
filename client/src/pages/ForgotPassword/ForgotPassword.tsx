@@ -14,12 +14,13 @@ import { errorActions } from '../../store/slices/error';
 import ErrorMessage from '../../components/UI/ErrorMessage/ErrorMessage';
 import SuccessMessage from './SuccessMessage';
 import CenterBlock from '../../components/UI/CenterBlock/CenterBlock';
+import recaptchaTokenSchema from '../../util/recaptchaTokenSchema';
 
 const schema = Yup.object().shape({
     email: Yup.string()
         .required('Email must be provided')
         .email('Email must be correct'),
-    recaptchaToken: Yup.string().required('Captcha challenge must be solved'),
+    recaptchaToken: recaptchaTokenSchema,
 });
 const initialValues = { email: '', recaptchaToken: '' };
 

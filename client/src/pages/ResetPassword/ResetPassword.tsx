@@ -19,14 +19,13 @@ import ServerErrorResponse from '../../interfaces/ServerErrorResponse';
 import SuccessMessage from './SuccessMessage';
 import ReCAPTCHA from 'react-google-recaptcha';
 import InvalidLink from './InvalidLink';
+import recaptchaTokenSchema from '../../util/recaptchaTokenSchema';
 
 const initialValues = { password: '', confirmPassword: '', recaptchaToken: '' };
 const validationSchema = Yup.object().shape({
     password: passwordSchema,
     confirmPassword: confirmPasswordSchema,
-    recaptchaToken: Yup.string()
-        .required('Captcha verification is required')
-        .min(1),
+    recaptchaToken: recaptchaTokenSchema
 });
 
 const ResetPassword = () => {

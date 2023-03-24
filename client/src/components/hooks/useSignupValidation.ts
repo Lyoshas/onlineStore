@@ -4,6 +4,9 @@ import { useDispatch } from 'react-redux';
 
 import useDebounce from './useDebounce';
 import { errorActions } from '../../store/slices/error';
+import passwordSchema from '../../util/passwordSchema';
+import confirmPasswordSchema from '../../util/confirmPasswordSchema';
+import recaptchaTokenSchema from '../../util/recaptchaTokenSchema';
 
 const returnNameValidation = (field: 'First name' | 'Last name') => {
     return Yup.string()
@@ -64,22 +67,9 @@ const useSignupValidation = () => {
                     }
                 }
             ),
-        password: Yup.string()
-            .required('Password is required')
-            .min(8, 'Password must be at least 8 characters long')
-            .max(72, 'Password must not exceed 72 characters')
-            .matches(/[A-Z]/, 'Must have at least 1 uppercase letter')
-            .matches(/[a-z]/, 'Must have at least 1 lowercase letter')
-            .matches(/[0-9]/, 'Must have at least 1 number')
-            .matches(
-                /[-#!$@£%^&*()_+|~=`{}\[\]:";'<>?,.\/ ]/,
-                'Must have at least 1 special character (!, @, #, etc)'
-            ),
-        confirmPassword: Yup.string()
-            .required('Password confirmation is required')
-            .oneOf([Yup.ref('password')], 'Passwords must match'),
-        recaptchaToken: Yup.string()
-            .required('Captcha verification is required')
+        password: passwordSchema,
+        confirmPassword: confirmPasswordSchema,
+        recaptchaToken: recaptchaTokenSchema,
     });
 
     return { validationSchema, isValidatingEmail };

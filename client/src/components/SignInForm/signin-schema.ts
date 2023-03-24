@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import recaptchaTokenSchema from '../../util/recaptchaTokenSchema';
 
 const yupValidate = async (schema: Yup.StringSchema, value: string) => {
     try {
@@ -31,7 +32,7 @@ const validationSchema = Yup.object().shape({
             }
         ),
     password: Yup.string().min(1, 'Password must not be empty'),
-    recaptchaToken: Yup.string().required('Captcha verification is required'),
+    recaptchaToken: recaptchaTokenSchema,
 });
 
 export default validationSchema;
