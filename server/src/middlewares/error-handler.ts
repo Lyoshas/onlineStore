@@ -13,9 +13,13 @@ const errorHandler = (
         return res
             .status(err.statusCode)
             .json({ errors: err.serializeErrors() });
+    } else if (err.name === 'PayloadTooLargeError') {
+        return res
+            .status(413)
+            .json({ errors: [{ message: 'Request body is too large' }] });
     } else {
-        console.log('another error???')
-        console.log(err);
+        console.log('An unexpected error occurred');
+        console.error(err);
     }
 
     return res
