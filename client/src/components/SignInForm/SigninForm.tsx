@@ -107,6 +107,12 @@ const SignInForm = () => {
                                 Forgot password?
                             </Link>
                         </p>
+                        <p className={classes['sign-in__signup-paragraph']}>
+                            Don't have an account?{' '}
+                            <Link to="/sign-up" className="link">
+                                Sign up
+                            </Link>
+                        </p>
                         <ReCAPTCHABlock ref={recaptchaRef} />
                         {isError && (
                             <Fragment>

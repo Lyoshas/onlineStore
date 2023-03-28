@@ -1,6 +1,7 @@
 import { useEffect, FC } from 'react';
 import { Formik } from 'formik';
 import { useDispatch } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 import FormInput from '../Input/FormInput';
 import useSignupValidation from '../hooks/useSignupValidation';
@@ -10,6 +11,7 @@ import FormActions from '../FormActions/FormActions';
 import SubmitButton from '../UI/SubmitButton/SubmitButton';
 import { errorActions } from '../../store/slices/error';
 import { IUserData, useSignUpMutation } from '../../store/apis/authApi';
+import classes from './SignupForm.module.css';
 
 const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
     const dispatch = useDispatch();
@@ -112,6 +114,10 @@ const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
                         validationSchema={signupValidationSchema}
                     />
                     <ReCAPTCHABlock />
+                    <p className={classes['signup-form__signin-paragraph']}>
+                        Already have an account?{' '}
+                        <Link to="/sign-in" className="link">Sign in</Link>
+                    </p>
                     <FormActions>
                         <SubmitButton
                             isLoading={

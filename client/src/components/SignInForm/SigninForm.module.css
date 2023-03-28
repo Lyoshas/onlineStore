@@ -1,3 +1,4 @@
-.sign-in__forgot-password-paragraph {
+.sign-in__forgot-password-paragraph,
+.sign-in__signup-paragraph {
     text-align: center;
 }
