@@ -32,6 +32,7 @@ import identifyUser from './middlewares/identify-user';
 import { typeDefs, resolvers } from './graphql/schema';
 import ApolloServerContext from './interfaces/ApolloServerContext';
 import errorHandler from './middlewares/error-handler';
+import notFoundHandler from './middlewares/not-found-handler';
 
 const app = express();
 
@@ -74,6 +75,8 @@ startGraphQLServer();
 app.use('/user', cartRoutes);
 
 app.use('/user', orderRoutes);
+
+app.use(notFoundHandler);
 
 app.use(errorHandler);
 
