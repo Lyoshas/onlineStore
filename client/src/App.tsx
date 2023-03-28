@@ -15,6 +15,7 @@ import { useRequestAccessTokenQuery } from './store/apis/authApi';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import ResetPassword from './pages/ResetPassword/ResetPassword';
 import CheckResetToken from './pages/ResetPassword/CheckResetToken';
+import TopHeader from './components/TopHeader/TopHeader';
 
 const App: FC = () => {
     const { errorMessage, isErrorNotificationShown } = useSelector(
@@ -23,6 +24,7 @@ const App: FC = () => {
     const dispatch = useDispatch();
     const { data, isSuccess, isFetching, isError, error } =
         useRequestAccessTokenQuery();
+    const isAuthenticated = isFetching ? null : isSuccess;
 
     useEffect(() => {
         if (isFetching) return;
@@ -92,6 +94,15 @@ const App: FC = () => {
                         <CheckResetToken>
                             <ResetPassword />
                         </CheckResetToken>
+                    }
+                />
+                <Route
+                    path="/"
+                    element={
+                        <TopHeader
+                            isAuthenticated={isAuthenticated}
+                            RenderAfter={<p>Test</p>}
+                        />
                     }
                 />
             </Routes>

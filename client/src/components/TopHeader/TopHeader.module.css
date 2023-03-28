@@ -1,0 +1,30 @@
+.top-header {
+    width: 100%;
+    padding: 15px 0;
+    border-bottom: 3px solid white;
+    position: fixed;
+    top: 0;
+    background: #273c99;
+    transition: 0.5s background ease;
+    z-index: 999;
+}
+
+.top-header.darkened {
+    background: #14256f;
+}
+
+.top-header__layout {
+    display: flex;
+    justify-content: space-between;
+}
+
+@media screen and (max-width: 840px) {
+    .top-header__layout {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .top-header__layout > *:not(:last-child) {
+        margin-bottom: 20px;
+    }
+}

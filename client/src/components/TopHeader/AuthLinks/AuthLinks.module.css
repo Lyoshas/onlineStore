@@ -1,0 +1,8 @@
+.top-header__auth-links {
+    display: flex;
+    align-items: center;
+}
+
+.auth-links__item:not(:last-child) {
+    margin-right: 10px;
+}
