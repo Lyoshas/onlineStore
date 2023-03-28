@@ -10,7 +10,7 @@ const InvalidLink = () => {
             <p>The link is either invalid or has expired.</p>
             <p>
                 Please request another one{' '}
-                <Link to="/forgot-password" className="link">
+                <Link to="/auth/forgot-password" className="link">
                     here
                 </Link>
             </p>

@@ -101,7 +101,7 @@ const SignInForm = () => {
                             }
                         >
                             <Link
-                                to="/forgot-password"
+                                to="/auth/forgot-password"
                                 className={`link ${classes['sign-in__forgot-password-link']}`}
                             >
                                 Forgot password?
@@ -109,7 +109,7 @@ const SignInForm = () => {
                         </p>
                         <p className={classes['sign-in__signup-paragraph']}>
                             Don't have an account?{' '}
-                            <Link to="/sign-up" className="link">
+                            <Link to="/auth/sign-up" className="link">
                                 Sign up
                             </Link>
                         </p>

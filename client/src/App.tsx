@@ -66,7 +66,7 @@ const App: FC = () => {
             )}
             <Routes>
                 <Route
-                    path="/sign-up"
+                    path="/auth/sign-up"
                     element={
                         // the user must be unauthenticated to access this route
                         <EnsureStatus auth={false}>
@@ -79,7 +79,7 @@ const App: FC = () => {
                     element={<ActivateAccount />}
                 />
                 <Route
-                    path="/sign-in"
+                    path="/auth/sign-in"
                     element={
                         // the user must be unauthenticated to access this route
                         <EnsureStatus auth={false}>
@@ -87,7 +87,7 @@ const App: FC = () => {
                         </EnsureStatus>
                     }
                 />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/auth/forgot-password" element={<ForgotPassword />} />
                 <Route
                     path="/auth/reset-password/:resetToken"
                     element={

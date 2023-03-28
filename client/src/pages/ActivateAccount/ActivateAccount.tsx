@@ -68,7 +68,7 @@ const ActivateAccount: FC = () => {
                         <ErrorIcon className={classes.icon} />
                     )}
                     <p className={classes.message}>{message}</p>
-                    <ButtonLink to={`${isSuccess ? '/sign-in' : '/'}`}>
+                    <ButtonLink to={`${isSuccess ? '/auth/sign-in' : '/'}`}>
                         {isSuccess ? 'Sign In' : 'Home Page'}
                     </ButtonLink>
                 </Fragment>

@@ -20,7 +20,7 @@ const SuccessMessage = () => {
                 <div className={classes['success-block']}>
                     <SuccessIcon />
                     <p>The password has been changed successfully.</p>
-                    <ButtonLink to={isAuthenticated ? '/' : '/sign-in'}>
+                    <ButtonLink to={isAuthenticated ? '/' : '/auth/sign-in'}>
                         {isAuthenticated ? 'Home Page' : 'Sign In'}
                     </ButtonLink>
                 </div>

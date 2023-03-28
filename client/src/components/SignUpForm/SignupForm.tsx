@@ -116,7 +116,9 @@ const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
                     <ReCAPTCHABlock />
                     <p className={classes['signup-form__signin-paragraph']}>
                         Already have an account?{' '}
-                        <Link to="/sign-in" className="link">Sign in</Link>
+                        <Link to="/auth/sign-in" className="link">
+                            Sign in
+                        </Link>
                     </p>
                     <FormActions>
                         <SubmitButton
