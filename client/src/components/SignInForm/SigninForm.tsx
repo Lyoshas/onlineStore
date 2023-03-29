@@ -16,6 +16,7 @@ import { errorActions } from '../../store/slices/error';
 import { useSignInMutation } from '../../store/apis/authApi';
 import deriveStatusCode from '../../util/deriveStatusCode';
 import classes from './SigninForm.module.css';
+import SuggestAccountCreation from '../SuggestAccountCreation/SuggestAccountCreation';
 
 const SignInForm = () => {
     const initial = { login: '', password: '', recaptchaToken: '' };
@@ -107,12 +108,7 @@ const SignInForm = () => {
                                 Forgot password?
                             </Link>
                         </p>
-                        <p className={classes['sign-in__signup-paragraph']}>
-                            Don't have an account?{' '}
-                            <Link to="/auth/sign-up" className="link">
-                                Sign up
-                            </Link>
-                        </p>
+                        <SuggestAccountCreation />
                         <ReCAPTCHABlock ref={recaptchaRef} />
                         {isError && (
                             <Fragment>

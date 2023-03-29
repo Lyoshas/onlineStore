@@ -16,6 +16,8 @@ import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import ResetPassword from './pages/ResetPassword/ResetPassword';
 import CheckResetToken from './pages/ResetPassword/CheckResetToken';
 import TopHeader from './components/TopHeader/TopHeader';
+import OAuthLogin from './pages/OAuthLogin/OAuthLogin';
+import OAuthCallback from './pages/OAuthCallback/OAuthCallback';
 
 const App: FC = () => {
     const { errorMessage, isErrorNotificationShown } = useSelector(
@@ -66,6 +68,10 @@ const App: FC = () => {
             )}
             <Routes>
                 <Route
+                    path="/"
+                    element={<TopHeader RenderAfter={<p>Test</p>} />}
+                />
+                <Route
                     path="/auth/sign-up"
                     element={
                         // the user must be unauthenticated to access this route
@@ -87,7 +93,10 @@ const App: FC = () => {
                         </EnsureStatus>
                     }
                 />
-                <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+                <Route
+                    path="/auth/forgot-password"
+                    element={<ForgotPassword />}
+                />
                 <Route
                     path="/auth/reset-password/:resetToken"
                     element={
@@ -97,11 +106,19 @@ const App: FC = () => {
                     }
                 />
                 <Route
-                    path="/"
+                    path="/auth/log-in-with/:oauthProvider"
                     element={
-                        <TopHeader
-                            RenderAfter={<p>Test</p>}
-                        />
+                        <EnsureStatus auth={false}>
+                            <OAuthLogin />
+                        </EnsureStatus>
+                    }
+                />
+                <Route
+                    path="/auth/oauth-callback"
+                    element={
+                        <EnsureStatus auth={false}>
+                            <OAuthCallback />
+                        </EnsureStatus>
                     }
                 />
             </Routes>

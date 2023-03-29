@@ -107,6 +107,28 @@ export const authApi = createApi({
                 };
             },
         }),
+        getOAuthLink: builder.query<{ URL: string }, { oauthProvider: string }>(
+            {
+                query: (data) => {
+                    return {
+                        url: `/oauth-link/${data.oauthProvider}`,
+                        method: 'GET',
+                    };
+                },
+            }
+        ),
+        OAuthCallback: builder.mutation<
+            { accessToken: string },
+            { queryString: string }
+        >({
+            query: (data) => {
+                console.log(data.queryString);
+                return {
+                    url: `/oauth-callback?${data.queryString}`,
+                    method: 'POST',
+                };
+            },
+        }),
     }),
 });
 
@@ -119,4 +141,6 @@ export const {
     useRequestResetTokenMutation,
     useChangePasswordMutation,
     useCheckResetTokenValidityQuery,
+    useGetOAuthLinkQuery,
+    useOAuthCallbackMutation,
 } = authApi;

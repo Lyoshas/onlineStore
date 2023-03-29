@@ -12,6 +12,7 @@ import SubmitButton from '../UI/SubmitButton/SubmitButton';
 import { errorActions } from '../../store/slices/error';
 import { IUserData, useSignUpMutation } from '../../store/apis/authApi';
 import classes from './SignupForm.module.css';
+import SuggestLoggingIn from '../SuggestLoggingIn/SuggestLoggingIn';
 
 const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
     const dispatch = useDispatch();
@@ -114,12 +115,7 @@ const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
                         validationSchema={signupValidationSchema}
                     />
                     <ReCAPTCHABlock />
-                    <p className={classes['signup-form__signin-paragraph']}>
-                        Already have an account?{' '}
-                        <Link to="/auth/sign-in" className="link">
-                            Sign in
-                        </Link>
-                    </p>
+                    <SuggestLoggingIn /> 
                     <FormActions>
                         <SubmitButton
                             isLoading={

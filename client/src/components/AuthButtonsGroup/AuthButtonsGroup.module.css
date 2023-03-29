@@ -1,0 +1,12 @@
+.auth-container__auth-buttons {
+    display: flex;
+    flex-direction: column;
+}
+
+.auth-container__auth-buttons > * {
+    margin: 0 auto;
+}
+
+.auth-container__auth-buttons > *:not(:last-child) {
+    margin-bottom: 10px;
+}

@@ -1,0 +1,17 @@
+.auth-button {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.auth-button.flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-button__provider-img {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    filter: invert(100%);
+}
