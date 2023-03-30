@@ -127,8 +127,9 @@ router.get(
     authController.getURLToOAuthAuthorizationServer
 );
 
-// if the user consented, they will be redirected here
-router.get(
+// if the user consented, they will be redirected to the React page,
+// and from that page the client will make a request to this endpoint
+router.post(
     '/oauth-callback', 
     query('state')
         .isString()
