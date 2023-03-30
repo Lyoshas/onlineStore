@@ -100,7 +100,6 @@ const App: FC = () => {
                     path="/"
                     element={
                         <TopHeader
-                            isAuthenticated={isAuthenticated}
                             RenderAfter={<p>Test</p>}
                         />
                     }

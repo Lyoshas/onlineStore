@@ -9,13 +9,17 @@ import MyCartButton from './MyCartButton/MyCartButton';
 import Loading from '../UI/Loading/Loading';
 import MainBlock from './MainBlock/MainBlock';
 import Layout from '../Layout/Layout';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
 
 // "isAuthenticated: null" means that the client hasn't sent the request yet
 const TopHeader: FC<{
-    isAuthenticated: boolean | null;
     RenderAfter: JSX.Element;
-}> = ({ isAuthenticated, RenderAfter }) => {
+}> = ({ RenderAfter }) => {
     const [isScrolled, setIsScrolled] = useState<boolean>(false);
+    const isAuthenticated = useSelector(
+        (state: RootState) => state.auth.isAuthenticated
+    );
 
     useEffect(() => {
         const handleScroll = () => {
