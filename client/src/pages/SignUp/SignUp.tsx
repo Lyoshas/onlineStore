@@ -9,6 +9,7 @@ import GoogleButton from '../../components/AuthButton/GoogleButton/GoogleButton'
 import AuthButtonsGroup from '../../components/AuthButtonsGroup/AuthButtonsGroup';
 import EmailButton from '../../components/AuthButton/EmailButton/EmailButton';
 import SuggestLoggingIn from '../../components/SuggestLoggingIn/SuggestLoggingIn';
+import FacebookButton from '../../components/AuthButton/FacebookButton/FacebookButton';
 
 const SignUp: FC = () => {
     const [showSignupForm, setShowSignupForm] = useState<boolean>(false);
@@ -25,6 +26,7 @@ const SignUp: FC = () => {
                     onClick={() => setShowSignupForm(true)}
                 />
                 <GoogleButton textContent="Sign up with Google" />
+                <FacebookButton textContent="Sign up with Facebook" />
                 <SuggestLoggingIn />
             </AuthButtonsGroup>
         );

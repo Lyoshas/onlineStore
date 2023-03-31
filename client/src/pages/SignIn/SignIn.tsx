@@ -8,6 +8,7 @@ import GoogleButton from '../../components/AuthButton/GoogleButton/GoogleButton'
 import EmailButton from '../../components/AuthButton/EmailButton/EmailButton';
 import AuthButtonsGroup from '../../components/AuthButtonsGroup/AuthButtonsGroup';
 import SuggestAccountCreation from '../../components/SuggestAccountCreation/SuggestAccountCreation';
+import FacebookButton from '../../components/AuthButton/FacebookButton/FacebookButton';
 
 // make sure the CSS classes don't clash
 const classes = { ...signInClasses, ...signUpClasses };
@@ -30,6 +31,7 @@ const SignIn = () => {
                 <AuthButtonsGroup>
                     <EmailButton textContent={'Sign in with an email'} onClick={handleClick} />
                     <GoogleButton textContent={'Sign in with Google'} />
+                    <FacebookButton textContent={'Sign in with Facebook'} />
                     <SuggestAccountCreation />
                 </AuthButtonsGroup>
             )}
