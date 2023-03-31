@@ -25,7 +25,11 @@ dotenv.config({
     )
 });
 
-import authRoutes from './routes/auth';
+import signinRoutes from './routes/signin';
+import signupRoutes from './routes/signup';
+import accountActivationRoutes from './routes/account-activation';
+import resetPasswordRoutes from './routes/reset-password';
+import oauthRoutes from './routes/oauth';
 import cartRoutes from './routes/cart';
 import orderRoutes from './routes/order';
 import identifyUser from './middlewares/identify-user';
@@ -46,7 +50,13 @@ app.use(express.static(path.join(process.cwd(), 'src', 'public')));
 
 app.use(identifyUser);
 
-app.use('/auth', authRoutes);
+app.use('/auth', [
+    signinRoutes,
+    signupRoutes,
+    accountActivationRoutes,
+    resetPasswordRoutes,
+    oauthRoutes,
+]);
 
 const startGraphQLServer = async () => {
     const server = new ApolloServer<ApolloServerContext>({

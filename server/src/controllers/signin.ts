@@ -1,0 +1,57 @@
+import { RequestHandler } from 'express';
+import asyncHandler from 'express-async-handler';
+
+import * as authModel from '../models/auth';
+import InvalidCredentialsError from '../errors/InvalidPasswordError';
+import AccountNotActivatedError from '../errors/AccountNotActivatedError';
+import CustomValidationError from '../errors/CustomValidationError';
+
+export const postSignIn: RequestHandler<
+    {},
+    { accessToken: string },
+    { login: string; password: string }
+> = asyncHandler(async (req, res, next) => {
+    const userId = await authModel.getUserIdByCredentials(
+        // the login can be either a mobile phone (+380-XX-XXX-XX-XX) or an email
+        req.body.login,
+        req.body.password
+    );
+
+    if (userId === null) {
+        throw new InvalidCredentialsError();
+    }
+
+    if (!(await authModel.isAccountActivated(userId))) {
+        throw new AccountNotActivatedError();
+    }
+
+    const { refreshToken, expiresAt } = await authModel.generateRefreshToken(
+        userId
+    );
+
+    authModel.attachRefreshTokenAsCookie(res, refreshToken, expiresAt);
+
+    res.status(200).json({
+        accessToken: await authModel.generateAccessToken(userId),
+    });
+});
+
+export const acquireNewAccessToken: RequestHandler<
+    {},
+    { accessToken: string }
+> = asyncHandler(async (req, res, next) => {
+    // refreshToken exists because we made sure it's the case by using express-validator
+    const refreshToken: string = req.cookies.refreshToken;
+    const userId = await authModel.getUserIdByRefreshToken(refreshToken);
+
+    if (userId === null) {
+        throw new CustomValidationError({
+            message: 'Invalid refresh token',
+            field: 'refreshToken',
+        });
+    }
+
+    res.json({
+        accessToken: await authModel.generateAccessToken(userId),
+    });
+});

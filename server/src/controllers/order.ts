@@ -2,7 +2,6 @@ import { RequestHandler } from 'express';
 import asyncHandler from 'express-async-handler';
 
 import VerifiedUserInfo from '../interfaces/VerifiedUserInfo';
-
 import * as orderModel from '../models/order';
 import * as cartModel from '../models/cart';
 import * as helperModel from '../models/helper';
