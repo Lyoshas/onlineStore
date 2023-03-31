@@ -229,17 +229,17 @@ export const verifyAccessToken = (
 export const getUserIdByRefreshToken = async (
     refreshToken: string
 ): Promise<number | null> => {
-    const refreshTokenTypeId = await getRefreshTokenTypeId();
-
     const userId = await dbPool.query<{ user_id?: number }>(`
-        SELECT user_id
+        SELECT tokens.user_id
         FROM tokens
-        WHERE token = $1
-            AND token_type_id = $2
+        INNER JOIN token_types ON tokens.token_type_id = token_types.id
+        WHERE
+            token = $1
+            AND token_types.type = 'refresh'
             AND expires_at > CURRENT_TIMESTAMP
-    `, [refreshToken, refreshTokenTypeId])
-        .then(({ rows }) => rows[0]?.user_id);
-
+    `, [refreshToken])
+        .then(({ rows }) => rows[0].user_id);
+    
     if (!userId) return null;
 
     return userId;
