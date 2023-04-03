@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import fetch from 'node-fetch';
 
-import dbPool from '../util/database';
+import dbPool from '../services/postgres.service';
 import OAuthUserData from '../interfaces/OAuthUserData';
 
 export const getAuthorizationServerIdByName = (

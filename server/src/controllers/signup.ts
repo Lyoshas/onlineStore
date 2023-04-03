@@ -8,7 +8,7 @@ import * as accountActivationModel from '../models/account-activation';
 import { addTokenToRedis } from '../models/redis-utils';
 import { generateRandomString } from '../util/generateRandomString';
 import { sendEmail } from '../services/email.service';
-import dbPool from '../util/database';
+import dbPool from '../services/postgres.service';
 import UnexpectedError from '../errors/UnexpectedError';
 
 export const postSignUp: RequestHandler = asyncHandler(

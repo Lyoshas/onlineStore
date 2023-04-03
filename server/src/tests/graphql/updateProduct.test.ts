@@ -4,7 +4,7 @@ import {
     describe,
 } from 'vitest';
 
-import dbPool from '../../util/database';
+import dbPool from '../../services/postgres.service';
 import loadEnvVariables from '../util/loadEnv';
 import { createUserAndReturnAccessToken } from '../util/createUser';
 import makeGraphQLRequest from '../util/makeGraphQLRequest';

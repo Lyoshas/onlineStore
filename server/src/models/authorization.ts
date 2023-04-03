@@ -1,5 +1,5 @@
 import UserPrivileges from '../interfaces/UserPrivileges';
-import dbPool from '../util/database';
+import dbPool from '../services/postgres.service';
 
 // it returns an object with { isAdmin: boolean }
 // or, if the user doesn't exist, it returns null

@@ -1,5 +1,5 @@
-import redis from '../util/redis';
-import dbPool from '../util/database';
+import redis from '../services/redis.service';
+import dbPool from '../services/postgres.service';
 import { normalizeHostname } from './hostname';
 
 export const getUserIdByActivationToken = async (

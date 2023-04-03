@@ -7,7 +7,7 @@ import * as cartModel from '../models/cart';
 import * as transactionModel from '../models/pg-transaction';
 import EmptyCartError from '../errors/EmptyCartError';
 import UnexpectedError from '../errors/UnexpectedError';
-import dbPool from '../util/database';
+import dbPool from '../services/postgres.service';
 
 export const createOrder: RequestHandler = asyncHandler(
     async (req, res, next) => {

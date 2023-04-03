@@ -1,5 +1,5 @@
 import validateUser from '../helpers/validateUser';
-import dbPool from '../../util/database';
+import dbPool from '../../services/postgres.service';
 import ApolloServerContext from '../../interfaces/ApolloServerContext';
 
 export default async (

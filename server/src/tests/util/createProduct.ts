@@ -1,5 +1,5 @@
 import DBProduct from '../../interfaces/DBProduct';
-import dbPool from '../../util/database';
+import dbPool from '../../services/postgres.service';
 
 // it should return the id of the newly created product
 export default async function createProduct(

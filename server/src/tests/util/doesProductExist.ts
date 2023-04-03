@@ -1,5 +1,5 @@
 import loadEnvVariables from './loadEnv';
-import dbPool from '../../util/database';
+import dbPool from '../../services/postgres.service';
 
 loadEnvVariables();
 

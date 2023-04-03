@@ -1,6 +1,6 @@
 import bcryptjs from 'bcryptjs';
 
-import dbPool from '../util/database';
+import dbPool from '../services/postgres.service';
 import UserCredentials from '../interfaces/UserCredentials';
 
 export const getUserIdByEmail = (email: string): Promise<number | null> => {

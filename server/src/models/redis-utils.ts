@@ -1,4 +1,4 @@
-import redis from '../util/redis';
+import redis from '../services/redis.service';
 
 // for activation tokens and reset tokens
 export const addTokenToRedis = async (options: {

@@ -1,6 +1,6 @@
 import { Response } from 'express';
 
-import dbPool from '../util/database';
+import dbPool from '../services/postgres.service';
 import { generateRandomString } from '../util/generateRandomString';
 
 // there is a table in the database called 'token_types' that stores available token names

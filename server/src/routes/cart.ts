@@ -4,7 +4,7 @@ import { body } from 'express-validator';
 import * as cartController from '../controllers/cart';
 import ensureAuthentication from '../middlewares/ensure-authentication';
 import validateRequest from '../middlewares/validate-request';
-import dbPool from '../util/database';
+import dbPool from '../services/postgres.service';
 
 const router = express.Router();
 

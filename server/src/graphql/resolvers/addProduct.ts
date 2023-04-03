@@ -1,6 +1,6 @@
 import DBProduct from '../../interfaces/DBProduct';
 import validateUser from '../helpers/validateUser';
-import dbPool from '../../util/database';
+import dbPool from '../../services/postgres.service';
 import DisplayProduct from '../../interfaces/DisplayProduct';
 import isProductAvailable from '../helpers/isProductAvailable';
 import isProductRunningOut from '../helpers/isProductRunningOut';

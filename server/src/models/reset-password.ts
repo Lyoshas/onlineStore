@@ -1,8 +1,8 @@
 import { PoolClient } from 'pg';
 
 import { normalizeHostname } from './hostname';
-import redis from '../util/redis';
-import dbPool from '../util/database';
+import redis from '../services/redis.service';
+import dbPool from '../services/postgres.service';
 
 export const generateResetPasswordLink = (
     hostname: string,

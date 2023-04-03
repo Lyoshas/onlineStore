@@ -5,7 +5,7 @@ import fetch from 'node-fetch';
 import * as orderController from '../controllers/order';
 import * as orderModel from '../models/order';
 import ensureAuthentication from '../middlewares/ensure-authentication';
-import dbPool from '../util/database';
+import dbPool from '../services/postgres.service';
 import validateRequest from '../middlewares/validate-request';
 
 const router = express.Router();

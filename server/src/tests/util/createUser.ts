@@ -1,5 +1,5 @@
 import { generateAccessToken } from '../../models/access-token';
-import dbPool from '../../util/database';
+import dbPool from '../../services/postgres.service';
 import CreateUserOptions from '../interfaces/CreateUserOptions';
 import { randomString } from './random';
 

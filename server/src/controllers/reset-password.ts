@@ -7,7 +7,7 @@ import * as transactionModel from '../models/pg-transaction';
 import * as resetPasswordModel from '../models/reset-password';
 import { addTokenToRedis } from '../models/redis-utils';
 import CustomValidationError from '../errors/CustomValidationError';
-import dbPool from '../util/database';
+import dbPool from '../services/postgres.service';
 import UnexpectedError from '../errors/UnexpectedError';
 import { generateRandomString } from '../util/generateRandomString';
 import { sendEmail } from '../services/email.service';

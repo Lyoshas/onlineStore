@@ -6,7 +6,7 @@ import {
     afterEach
 } from 'vitest';
 
-import dbPool from '../../util/database';
+import dbPool from '../../services/postgres.service';
 import loadEnvVariables from '../util/loadEnv';
 import { createUserAndReturnId } from '../util/createUser';
 import { getUserPrivileges } from '../../models/authorization';
