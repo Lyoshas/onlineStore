@@ -3,10 +3,14 @@ import asyncHandler from 'express-async-handler';
 import bcryptjs from 'bcryptjs';
 
 import * as userModel from '../models/user';
-import * as authModel from '../models/auth';
+import * as oauthModel from '../models/oauth';
+import { signUpUser } from '../models/signup';
+import { generateAccessToken } from '../models/access-token';
+import * as refreshTokenModel from '../models/refresh-token';
 import CustomValidationError from '../errors/CustomValidationError';
 import UnexpectedError from '../errors/UnexpectedError';
 import OAuthUserData from '../interfaces/OAuthUserData';
+import { generateRandomString } from '../util/generateRandomString';
 
 export const getURLToOAuthAuthorizationServer: RequestHandler = asyncHandler(
     async (req, res, next) => {
@@ -23,9 +27,9 @@ export const getURLToOAuthAuthorizationServer: RequestHandler = asyncHandler(
             });
         }
 
-        const state = (await userModel.generateRandomString(32)) as string;
+        const state = (await generateRandomString(32)) as string;
         const authorizationServerId =
-            await authModel.getAuthorizationServerIdByName(
+            await oauthModel.getAuthorizationServerIdByName(
                 authorizationServerName
             );
 
@@ -35,13 +39,13 @@ export const getURLToOAuthAuthorizationServer: RequestHandler = asyncHandler(
             );
         }
 
-        await authModel.addOAuthStateToDB(state, authorizationServerId);
+        await oauthModel.addOAuthStateToDB(state, authorizationServerId);
 
         res.status(200).json({
             URL:
                 authorizationServerName === 'google'
-                    ? authModel.getURLToGoogleAuthorizationServer(state)
-                    : authModel.getURLToFacebookAuthorizationServer(state),
+                    ? oauthModel.getURLToGoogleAuthorizationServer(state)
+                    : oauthModel.getURLToFacebookAuthorizationServer(state),
         });
     }
 );
@@ -54,7 +58,7 @@ export const OAuthCallback: RequestHandler<
 > = asyncHandler(async (req, res, next) => {
     const { state, code } = req.query;
 
-    const authServerName = await authModel.getAuthorizationServerNameByState(
+    const authServerName = await oauthModel.getAuthorizationServerNameByState(
         state
     );
 
@@ -65,12 +69,12 @@ export const OAuthCallback: RequestHandler<
         });
     }
 
-    await authModel.deleteOAuthState(state);
+    await oauthModel.deleteOAuthState(state);
 
     let userData: OAuthUserData;
 
     if (authServerName === 'google') {
-        const idToken = await authModel.getGoogleIdToken(
+        const idToken = await oauthModel.getGoogleIdToken(
             process.env.GOOGLE_CLIENT_ID as string,
             process.env.GOOGLE_CLIENT_SECRET as string,
             code,
@@ -78,10 +82,10 @@ export const OAuthCallback: RequestHandler<
             process.env.OAUTH_REDIRECT_URI as string
         );
 
-        userData = authModel.getUserDataFromGoogleIdToken(idToken);
+        userData = oauthModel.getUserDataFromGoogleIdToken(idToken);
     } else if (authServerName === 'facebook') {
-        userData = await authModel.getUserDataFromFacebookAccessToken(
-            await authModel.getFacebookAccessTokenByCode(code)
+        userData = await oauthModel.getUserDataFromFacebookAccessToken(
+            await oauthModel.getFacebookAccessTokenByCode(code)
         );
     } else {
         throw new UnexpectedError('Invalid authorization server name');
@@ -95,32 +99,29 @@ export const OAuthCallback: RequestHandler<
 
     if (userId === null) {
         // the user is new, so perform a signup
-        userId = (await authModel
-            .signUpUser({
-                firstName,
-                lastName,
-                email,
-                password: await bcryptjs.hash(
-                    authModel.generateStrongPassword(),
-                    12
-                ),
-                phoneNumber: null,
-                avatarURL,
-                withOAuth: true,
-            })
-            .then(({ rows }) => rows[0].id)) as number;
+        userId = (await signUpUser({
+            firstName,
+            lastName,
+            email,
+            password: await bcryptjs.hash(
+                oauthModel.generateStrongPassword(),
+                12
+            ),
+            phoneNumber: null,
+            avatarURL,
+            withOAuth: true,
+        }).then(({ rows }) => rows[0].id)) as number;
 
         responseStatus = 201;
     }
 
-    const { refreshToken, expiresAt } = await authModel.generateRefreshToken(
-        userId
-    );
+    const { refreshToken, expiresAt } =
+        await refreshTokenModel.generateRefreshToken(userId);
 
-    authModel.attachRefreshTokenAsCookie(res, refreshToken, expiresAt);
+    refreshTokenModel.attachRefreshTokenAsCookie(res, refreshToken, expiresAt);
 
     // if we make it here, the user is already signed up, so just sign them in
     res.status(responseStatus).json({
-        accessToken: await authModel.generateAccessToken(userId),
+        accessToken: await generateAccessToken(userId),
     });
 });

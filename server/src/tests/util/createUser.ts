@@ -1,4 +1,4 @@
-import { generateAccessToken } from '../../models/auth';
+import { generateAccessToken } from '../../models/access-token';
 import dbPool from '../../util/database';
 import CreateUserOptions from '../interfaces/CreateUserOptions';
 import { randomString } from './random';

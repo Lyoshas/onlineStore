@@ -4,7 +4,7 @@ import asyncHandler from 'express-async-handler';
 import VerifiedUserInfo from '../interfaces/VerifiedUserInfo';
 import * as orderModel from '../models/order';
 import * as cartModel from '../models/cart';
-import * as helperModel from '../models/helper';
+import * as transactionModel from '../models/pg-transaction';
 import EmptyCartError from '../errors/EmptyCartError';
 import UnexpectedError from '../errors/UnexpectedError';
 import dbPool from '../util/database';
@@ -21,7 +21,7 @@ export const createOrder: RequestHandler = asyncHandler(
         const dbClient = await dbPool.connect();
 
         try {
-            await helperModel.beginTransaction(dbClient);
+            await transactionModel.beginTransaction(dbClient);
 
             const orderId: number = await orderModel.createOrder(
                 userId,
@@ -44,11 +44,11 @@ export const createOrder: RequestHandler = asyncHandler(
 
             await cartModel.cleanCart(userId, dbClient);
 
-            await helperModel.commitTransaction(dbClient);
+            await transactionModel.commitTransaction(dbClient);
 
             res.status(201).json({ orderId });
         } catch (e) {
-            await helperModel.rollbackTransaction(dbClient);
+            await transactionModel.rollbackTransaction(dbClient);
 
             if (e === 'OrderCreationError: User cart is empty') {
                 // you can't create an order if there's nothing to order

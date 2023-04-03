@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 
-import * as authModel from '../models/auth';
+import * as accessTokenModel from '../models/access-token';
 import VerifiedUserInfo from '../interfaces/VerifiedUserInfo';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import UnexpectedError from '../errors/UnexpectedError';
@@ -23,7 +23,7 @@ const identifyUser: RequestHandler = asyncHandler(async (req, res, next) => {
         }
 
         // if the access token is valid, set the user info in req.user and go to the next middleware
-        req.user = await authModel.verifyAccessToken(accessToken);
+        req.user = await accessTokenModel.verifyAccessToken(accessToken);
     } catch (e) {
         // if the access token has expired
         if (e instanceof TokenExpiredError) {

@@ -2,9 +2,12 @@ import { RequestHandler } from 'express';
 import asyncHandler from 'express-async-handler';
 import bcryptjs from 'bcryptjs';
 
-import * as userModel from '../models/user';
-import * as helperModel from '../models/helper';
-import * as authModel from '../models/auth';
+import * as transactionModel from '../models/pg-transaction';
+import * as signupModel from '../models/signup';
+import * as accountActivationModel from '../models/account-activation';
+import { addTokenToRedis } from '../models/redis-utils';
+import { generateRandomString } from '../util/generateRandomString';
+import { sendEmail } from '../services/email.service';
 import dbPool from '../util/database';
 import UnexpectedError from '../errors/UnexpectedError';
 
@@ -18,7 +21,7 @@ export const postSignUp: RequestHandler = asyncHandler(
             phoneNumber,
         } = req.body;
 
-        const activationToken = await userModel.generateRandomString(32);
+        const activationToken = await generateRandomString(32);
 
         // You must use the same client instance for all statements within a transaction.
         // PostgreSQL isolates a transaction to individual clients.
@@ -27,10 +30,10 @@ export const postSignUp: RequestHandler = asyncHandler(
         // more: https://node-postgres.com/features/transactions
         const dbClient = await dbPool.connect();
 
-        await helperModel.beginTransaction(dbClient);
+        await transactionModel.beginTransaction(dbClient);
 
         try {
-            const insertedId = await authModel
+            const insertedId = await signupModel
                 .signUpUser({
                     firstName,
                     lastName,
@@ -42,7 +45,7 @@ export const postSignUp: RequestHandler = asyncHandler(
                 })
                 .then(({ rows }) => rows[0].id);
 
-            await authModel.addTokenToRedis({
+            await addTokenToRedis({
                 tokenType: 'activationToken',
                 token: activationToken,
                 userId: insertedId,
@@ -51,18 +54,19 @@ export const postSignUp: RequestHandler = asyncHandler(
             });
         } catch (e) {
             console.log(e);
-            helperModel.rollbackTransaction(dbClient);
+            transactionModel.rollbackTransaction(dbClient);
             throw new UnexpectedError();
         }
 
-        await helperModel.commitTransaction(dbClient);
+        await transactionModel.commitTransaction(dbClient);
 
-        const activationLink = authModel.generateAccountActivationLink(
-            req.get('host')!,
-            activationToken
-        );
+        const activationLink =
+            accountActivationModel.generateAccountActivationLink(
+                req.get('host')!,
+                activationToken
+            );
 
-        userModel.sendEmail(
+        sendEmail(
             email,
             '[onlineStore] Підтвердження email',
             `
@@ -87,6 +91,6 @@ export const isEmailAvailable: RequestHandler<
     const email = req.query.email;
 
     res.json({
-        isEmailAvailable: await authModel.isEmailAvailable(email),
+        isEmailAvailable: await signupModel.isEmailAvailable(email),
     });
 });

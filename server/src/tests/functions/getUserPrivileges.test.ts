@@ -9,7 +9,7 @@ import {
 import dbPool from '../../util/database';
 import loadEnvVariables from '../util/loadEnv';
 import { createUserAndReturnId } from '../util/createUser';
-import { getUserPrivileges } from '../../models/auth';
+import { getUserPrivileges } from '../../models/authorization';
 import CreateUserOptions from '../interfaces/CreateUserOptions';
 import UserPrivileges from '../../interfaces/UserPrivileges';
 

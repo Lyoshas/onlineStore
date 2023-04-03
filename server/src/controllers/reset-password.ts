@@ -3,11 +3,14 @@ import asyncHandler from 'express-async-handler';
 import bcryptjs from 'bcryptjs';
 
 import * as userModel from '../models/user';
-import * as authModel from '../models/auth';
-import * as helperModel from '../models/helper';
+import * as transactionModel from '../models/pg-transaction';
+import * as resetPasswordModel from '../models/reset-password';
+import { addTokenToRedis } from '../models/redis-utils';
 import CustomValidationError from '../errors/CustomValidationError';
 import dbPool from '../util/database';
 import UnexpectedError from '../errors/UnexpectedError';
+import { generateRandomString } from '../util/generateRandomString';
+import { sendEmail } from '../services/email.service';
 
 // this route sends a so-called "reset token"
 // it will be used to reset the user's password
@@ -27,8 +30,8 @@ export const sendResetTokenToEmail: RequestHandler<
         });
     }
 
-    const resetToken = await userModel.generateRandomString(32);
-    await authModel.addTokenToRedis({
+    const resetToken = await generateRandomString(32);
+    await addTokenToRedis({
         tokenType: 'resetToken',
         token: resetToken,
         userId,
@@ -36,12 +39,12 @@ export const sendResetTokenToEmail: RequestHandler<
             +process.env.RESET_TOKEN_EXPIRATION_IN_SECONDS!,
     });
 
-    const resetLink = authModel.generateResetPasswordLink(
+    const resetLink = resetPasswordModel.generateResetPasswordLink(
         req.get('host')!,
         resetToken
     );
 
-    userModel.sendEmail(
+    sendEmail(
         email,
         '[onlineStore] Змінення пароля',
         `
@@ -63,7 +66,7 @@ export const changePassword: RequestHandler<
     { resetToken: string; password: string }
 > = asyncHandler(async (req, res, next) => {
     const { resetToken } = req.body;
-    const userId = await authModel.getUserIdByResetToken(resetToken);
+    const userId = await resetPasswordModel.getUserIdByResetToken(resetToken);
 
     if (!userId) {
         throw new CustomValidationError({
@@ -77,21 +80,21 @@ export const changePassword: RequestHandler<
     try {
         // The operation of changing the password and revoking the resetToken cannot be performed separately, so a transaction is required.
         // Either both operations are successful, or none of them are persisted
-        await helperModel.beginTransaction(client);
+        await transactionModel.beginTransaction(client);
 
-        await authModel.changePassword(
+        await resetPasswordModel.changePassword(
             userId,
             await bcryptjs.hash(req.body.password, 12),
             client
         );
 
-        await authModel.revokeResetToken(resetToken);
+        await resetPasswordModel.revokeResetToken(resetToken);
 
-        await helperModel.commitTransaction(client);
+        await transactionModel.commitTransaction(client);
 
         res.status(200).json({ msg: 'The password has been changed.' });
     } catch (e) {
-        await helperModel.rollbackTransaction(client);
+        await transactionModel.rollbackTransaction(client);
         throw new UnexpectedError('Something went wrong');
     }
 });
@@ -100,7 +103,9 @@ export const isResetTokenValid: RequestHandler<
     { resetToken: string },
     { isValid: boolean }
 > = asyncHandler(async (req, res, next) => {
-    const userId = await authModel.getUserIdByResetToken(req.params.resetToken);
+    const userId = await resetPasswordModel.getUserIdByResetToken(
+        req.params.resetToken
+    );
 
     res.status(200).json({ isValid: userId !== null });
 });

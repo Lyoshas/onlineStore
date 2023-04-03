@@ -3,7 +3,7 @@ import { body, query } from 'express-validator';
 
 import recaptchaValidation from './util/recaptchaValidation';
 import passwordValidation from './util/passwordValidation';
-import { isEmailAvailable } from '../models/auth';
+import { isEmailAvailable } from '../models/signup';
 import dbPool from '../util/database';
 import validateRequest from '../middlewares/validate-request';
 import * as signupController from '../controllers/signup';

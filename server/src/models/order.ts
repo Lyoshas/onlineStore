@@ -3,7 +3,6 @@ import crypto from 'crypto';
 import { PoolClient } from 'pg';
 
 import dbPool from '../util/database';
-import * as helperModel from './helper';
 import * as userModel from './user';
 
 const getIdByNameFromDB = (

@@ -1,7 +1,10 @@
 import { RequestHandler } from 'express';
 import asyncHandler from 'express-async-handler';
 
-import * as authModel from '../models/auth';
+import * as userModel from '../models/user';
+import * as activationModel from '../models/account-activation';
+import * as refreshTokenModel from '../models/refresh-token';
+import * as accessTokenModel from '../models/access-token';
 import InvalidCredentialsError from '../errors/InvalidPasswordError';
 import AccountNotActivatedError from '../errors/AccountNotActivatedError';
 import CustomValidationError from '../errors/CustomValidationError';
@@ -11,7 +14,7 @@ export const postSignIn: RequestHandler<
     { accessToken: string },
     { login: string; password: string }
 > = asyncHandler(async (req, res, next) => {
-    const userId = await authModel.getUserIdByCredentials(
+    const userId = await userModel.getUserIdByCredentials(
         // the login can be either a mobile phone (+380-XX-XXX-XX-XX) or an email
         req.body.login,
         req.body.password
@@ -21,18 +24,17 @@ export const postSignIn: RequestHandler<
         throw new InvalidCredentialsError();
     }
 
-    if (!(await authModel.isAccountActivated(userId))) {
+    if (!(await activationModel.isAccountActivated(userId))) {
         throw new AccountNotActivatedError();
     }
 
-    const { refreshToken, expiresAt } = await authModel.generateRefreshToken(
-        userId
-    );
+    const { refreshToken, expiresAt } =
+        await refreshTokenModel.generateRefreshToken(userId);
 
-    authModel.attachRefreshTokenAsCookie(res, refreshToken, expiresAt);
+    refreshTokenModel.attachRefreshTokenAsCookie(res, refreshToken, expiresAt);
 
     res.status(200).json({
-        accessToken: await authModel.generateAccessToken(userId),
+        accessToken: await accessTokenModel.generateAccessToken(userId),
     });
 });
 
@@ -42,7 +44,9 @@ export const acquireNewAccessToken: RequestHandler<
 > = asyncHandler(async (req, res, next) => {
     // refreshToken exists because we made sure it's the case by using express-validator
     const refreshToken: string = req.cookies.refreshToken;
-    const userId = await authModel.getUserIdByRefreshToken(refreshToken);
+    const userId = await refreshTokenModel.getUserIdByRefreshToken(
+        refreshToken
+    );
 
     if (userId === null) {
         throw new CustomValidationError({
@@ -52,6 +56,6 @@ export const acquireNewAccessToken: RequestHandler<
     }
 
     res.json({
-        accessToken: await authModel.generateAccessToken(userId),
+        accessToken: await accessTokenModel.generateAccessToken(userId),
     });
 });
