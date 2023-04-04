@@ -74,7 +74,7 @@ export const getUserIdByRefreshToken = async (
             `,
             [refreshToken]
         )
-        .then(({ rows }) => rows[0].user_id);
+        .then(({ rows }) => rows[0]?.user_id);
 
     if (!userId) return null;
 
