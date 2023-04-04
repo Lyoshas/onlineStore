@@ -32,6 +32,7 @@ import resetPasswordRoutes from './routes/reset-password';
 import oauthRoutes from './routes/oauth';
 import cartRoutes from './routes/cart';
 import orderRoutes from './routes/order';
+import logoutRoutes from './routes/logout';
 import identifyUser from './middlewares/identify-user';
 import { typeDefs, resolvers } from './graphql/schema';
 import ApolloServerContext from './interfaces/ApolloServerContext';
@@ -56,6 +57,7 @@ app.use('/auth', [
     accountActivationRoutes,
     resetPasswordRoutes,
     oauthRoutes,
+    logoutRoutes,
 ]);
 
 const startGraphQLServer = async () => {

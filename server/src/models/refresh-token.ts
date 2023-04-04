@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { CookieOptions, Response } from 'express';
 
 import dbPool from '../services/postgres.service';
 import { generateRandomString } from '../util/generateRandomString';
@@ -41,6 +41,12 @@ export const generateRefreshToken = async (
     return { refreshToken, expiresAt };
 };
 
+const cookieStaticOptions: CookieOptions = {
+    path: '/api/auth',
+    httpOnly: true,
+    sameSite: 'strict',
+};
+
 // this function will be used in multiple places
 // to not copy paste this stuff, it's better to make a separate function for this
 export const attachRefreshTokenAsCookie = (
@@ -51,10 +57,12 @@ export const attachRefreshTokenAsCookie = (
     // add the 'secure' option once you have an SSL certificate
     res.cookie('refreshToken', refreshToken, {
         expires: expiresAt,
-        path: '/api/auth/refresh',
-        httpOnly: true,
-        sameSite: 'strict',
+        ...cookieStaticOptions,
     });
+};
+
+export const detachRefreshTokenAsCookie = (res: Response) => {
+    res.clearCookie('refreshToken', cookieStaticOptions);
 };
 
 // if the refreshToken is expired or it doesn't exist, it will return null
@@ -79,4 +87,18 @@ export const getUserIdByRefreshToken = async (
     if (!userId) return null;
 
     return userId;
+};
+
+export const deleteRefreshTokenFromDB = (refreshToken: string) => {
+    return dbPool.query(
+        `
+            DELETE FROM tokens
+            USING token_types
+            WHERE
+                tokens.token_type_id = token_types.id
+                AND token_types.type = 'refresh'
+                AND tokens.token = $1
+        `,
+        [refreshToken]
+    );
 };
