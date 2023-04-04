@@ -1,9 +1,10 @@
 import Router from 'express';
-import { body, cookie } from 'express-validator';
+import { body } from 'express-validator';
 
 import recaptchaValidation from './util/recaptchaValidation';
 import validateRequest from '../middlewares/validate-request';
 import * as signinController from '../controllers/signin';
+import refreshTokenValidation from './util/refreshTokenValidation';
 
 const router = Router();
 
@@ -26,10 +27,7 @@ router.post(
 
 router.get(
     '/refresh',
-    cookie('refreshToken')
-        .trim()
-        .notEmpty()
-        .withMessage('refreshToken must not be empty'),
+    refreshTokenValidation,
     validateRequest,
     signinController.acquireNewAccessToken
 );
