@@ -45,7 +45,7 @@ const App: FC = () => {
         if (!isError) return;
 
         if (
-            ('data' in error && error.status >= 500) ||
+            ('data' in error && (error.status as number) >= 500) ||
             ('originalStatus' in error && error.originalStatus >= 500)
         ) {
             dispatch(
