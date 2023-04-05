@@ -1,13 +1,22 @@
-import Button from '../../UI/Button/Button';
-import Image from '../Image/Image';
-import classes from './MyCartButton.module.css';
+import { Fragment } from 'react';
+import ActionButton from '../ActionButton/ActionButton';
 
 const MyCartButton = () => {
+    const handleClick = () => {
+        console.log('showing the cart...');
+    };
+
     return (
-        <Button className={classes['cart-button']}>
-            <Image src="/cart-icon.svg" alt="Cart" />
-            My Cart (<span>0</span>)
-        </Button>
+        <ActionButton
+            content={
+                <Fragment>
+                    My Cart (<span>0</span>)
+                </Fragment>
+            }
+            imageURL="/cart-icon.svg"
+            imageAlt="Cart icon"
+            onClick={handleClick}
+        />
     );
 };
 

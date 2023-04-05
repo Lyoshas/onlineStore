@@ -18,6 +18,7 @@ import CheckResetToken from './pages/ResetPassword/CheckResetToken';
 import TopHeader from './components/TopHeader/TopHeader';
 import OAuthLogin from './pages/OAuthLogin/OAuthLogin';
 import OAuthCallback from './pages/OAuthCallback/OAuthCallback';
+import Logout from './pages/Logout/Logout';
 
 const App: FC = () => {
     const { errorMessage, isErrorNotificationShown } = useSelector(
@@ -118,6 +119,14 @@ const App: FC = () => {
                     element={
                         <EnsureStatus auth={false}>
                             <OAuthCallback />
+                        </EnsureStatus>
+                    }
+                />
+                <Route
+                    path="/auth/logout"
+                    element={
+                        <EnsureStatus auth={true}>
+                            <Logout />                            
                         </EnsureStatus>
                     }
                 />

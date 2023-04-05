@@ -4,8 +4,7 @@ import classNames from 'classnames';
 import classes from './TopHeader.module.css';
 import Logo from './Logo/Logo';
 import Navigation from './Navigation/Navigation';
-import AuthLinks from './AuthLinks/AuthLinks';
-import MyCartButton from './MyCartButton/MyCartButton';
+import HeaderButtons from './HeaderButtons/HeaderButtons';
 import Loading from '../UI/Loading/Loading';
 import MainBlock from './MainBlock/MainBlock';
 import Layout from '../Layout/Layout';
@@ -46,7 +45,7 @@ const TopHeader: FC<{
                 <Layout className={classes['top-header__layout']}>
                     <Logo />
                     <Navigation />
-                    {isAuthenticated ? <MyCartButton /> : <AuthLinks />}
+                    <HeaderButtons isAuth={isAuthenticated} /> 
                 </Layout>
             </header>
             <MainBlock>

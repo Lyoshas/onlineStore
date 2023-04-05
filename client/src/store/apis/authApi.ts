@@ -129,6 +129,14 @@ export const authApi = createApi({
                 };
             },
         }),
+        logout: builder.mutation<void, void>({
+            query: () => {
+                return {
+                    url: `/logout`,
+                    method: 'POST',
+                };
+            },
+        }),
     }),
 });
 
@@ -143,4 +151,5 @@ export const {
     useCheckResetTokenValidityQuery,
     useGetOAuthLinkQuery,
     useOAuthCallbackMutation,
+    useLogoutMutation,
 } = authApi;

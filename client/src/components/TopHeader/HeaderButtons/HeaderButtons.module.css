@@ -1,0 +1,19 @@
+.top-header__side-links {
+    display: flex;
+    align-items: center;
+}
+
+.top-header__side-links > *:not(:last-child) {
+    margin-right: 10px;
+}
+
+@media screen and (max-width: 380px) {
+    .top-header__side-links {
+        flex-direction: column;
+    }
+
+    .top-header__side-links > *:not(:last-child) {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+}
