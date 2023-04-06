@@ -18,7 +18,7 @@ const useApiError = (
     // an array of numbers, where each number is an expected status code
     // for example [403, 422]. If the status code is not in this array,
     // a generic error will shown to the user (like "Something went wrong")
-    expectedStatusCodes: number[]
+    expectedErrorStatusCodes: number[]
 ) => {
     const dispatch = useDispatch();
     const [expectedErrorResponse, setExpectedErrorResponse] =
@@ -29,7 +29,7 @@ const useApiError = (
 
         const statusCode = deriveStatusCode(error);
 
-        if ('data' in error! && expectedStatusCodes.includes(statusCode!)) {
+        if ('data' in error! && expectedErrorStatusCodes.includes(statusCode!)) {
             setExpectedErrorResponse({
                 statusCode: statusCode!,
                 serverResponse: error.data as ServerErrorResponse,
