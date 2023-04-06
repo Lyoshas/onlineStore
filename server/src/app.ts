@@ -60,6 +60,10 @@ app.use('/auth', [
     logoutRoutes,
 ]);
 
+app.use('/user', cartRoutes);
+
+app.use('/user', orderRoutes);
+
 const startGraphQLServer = async () => {
     const server = new ApolloServer<ApolloServerContext>({
         typeDefs,
@@ -80,16 +84,12 @@ const startGraphQLServer = async () => {
     app.use('/graphql', expressMiddleware(server, {
         context: async ({ req }) => ({ user: req.user })
     }));
+
+    app.use(notFoundHandler);
+
+    app.use(errorHandler);
 };
 
 startGraphQLServer();
-
-app.use('/user', cartRoutes);
-
-app.use('/user', orderRoutes);
-
-app.use(notFoundHandler);
-
-app.use(errorHandler);
 
 export default app;
