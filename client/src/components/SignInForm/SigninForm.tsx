@@ -110,12 +110,11 @@ const SignInForm = () => {
                         </p>
                         <SuggestAccountCreation />
                         <ReCAPTCHABlock ref={recaptchaRef} />
-                        {isError && (
+                        {/* we will show the error associated with 403 in some other place */}
+                        {isError && statusCode !== 403 && (
                             <Fragment>
                                 <ErrorMessage centered={true}>
-                                    {statusCode === 403
-                                        ? 'The account is not activated'
-                                        : statusCode === 401
+                                    {statusCode === 401
                                         ? 'Invalid login or password'
                                         : statusCode === 422
                                         ? 'Wrong inputs'
@@ -131,10 +130,15 @@ const SignInForm = () => {
                         </FormActions>
                     </Form>
                     {statusCode === 403 && (
-                        <SuggestAccountActivation
-                            login={formik.values.login}
-                            password={formik.values.password}
-                        />
+                        <Fragment>
+                            <ErrorMessage centered={true}>
+                                The account is not activated
+                            </ErrorMessage>
+                            <SuggestAccountActivation
+                                login={formik.values.login}
+                                password={formik.values.password}
+                            />
+                        </Fragment>
                     )}
                 </Fragment>
             )}
