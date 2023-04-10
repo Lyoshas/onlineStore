@@ -10,7 +10,7 @@ import ReCAPTCHABlock from '../ReCAPTCHABlock/ReCAPTCHABlock';
 import SubmitButton from '../UI/SubmitButton/SubmitButton';
 import { errorActions } from '../../store/slices/error';
 import { useResendActivationLinkMutation } from '../../store/apis/authApi';
-import deriveStatusCode from '../../util/deriveStatusCode';
+import useApiError from '../hooks/useApiError';
 
 interface ModalState {
     isModalShown: boolean;
@@ -67,32 +67,21 @@ const SuggestAccountActivation: FC<{ login: string; password: string }> = (
         resendActivationLink,
         { isSuccess, data, isError, error, isLoading },
     ] = useResendActivationLinkMutation();
+    const expectedErrorResponse = useApiError(isError, error, [409]);
 
-    const statusCode = deriveStatusCode(error);
-
-    useEffect(() => {
-        if (!isError) return;
-        if (typeof statusCode === 'number' && statusCode < 500) return;
-
-        dispatch(
-            errorActions.showNotificationError(
-                'Something went wrong while sending the link. Please reload the page.'
-            )
-        );
-    }, [isError, statusCode]);
+    const statusCode = expectedErrorResponse && expectedErrorResponse.statusCode;
 
     useEffect(() => {
-        if (!data) return;
         if (isSuccess) {
             dispatchModal({ type: ModalAction.SHOW_SUCCESS_MODAL });
             return;
         }
 
+        if (statusCode !== 409) return;
+
         dispatch(
             errorActions.showNotificationError(
-                statusCode === 409
-                    ? 'Your account is already activated'
-                    : 'Something went wrong. We are working on solving this problem. Please try reloading the page.'
+                'Your account is already activated'
             )
         );
     }, [data, isSuccess, statusCode]);

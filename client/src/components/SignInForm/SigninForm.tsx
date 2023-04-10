@@ -12,11 +12,10 @@ import { authActions } from '../../store/slices/auth';
 import ErrorMessage from '../UI/ErrorMessage/ErrorMessage';
 import schema from './signin-schema';
 import SuggestAccountActivation from '../SuggestAccountActivation/SuggestAccountActivation';
-import { errorActions } from '../../store/slices/error';
 import { useSignInMutation } from '../../store/apis/authApi';
-import deriveStatusCode from '../../util/deriveStatusCode';
 import classes from './SigninForm.module.css';
 import SuggestAccountCreation from '../SuggestAccountCreation/SuggestAccountCreation';
+import useApiError from '../hooks/useApiError';
 
 const SignInForm = () => {
     const initial = { login: '', password: '', recaptchaToken: '' };
@@ -24,21 +23,13 @@ const SignInForm = () => {
         signIn,
         { isSuccess, data, isError, error, isLoading, isUninitialized },
     ] = useSignInMutation();
+    // if an API error occurs, and the server doesn't return 401, 403, or 422 status codes,
+    // the 'something went wrong' message will be shown
+    const errorResponse = useApiError(isError, error, [401, 403, 422]);
     const dispatch = useDispatch();
     const recaptchaRef = useRef<NpmRecaptcha>(null);
 
-    const statusCode = deriveStatusCode(error);
-
-    useEffect(() => {
-        if (!isError) return;
-        if (typeof statusCode === 'number' && statusCode < 500) return;
-
-        dispatch(
-            errorActions.showNotificationError(
-                'Something went wrong while signing in. Please reload the page.'
-            )
-        );
-    }, [isError, statusCode]);
+    const statusCode = errorResponse && errorResponse.statusCode;
 
     useEffect(() => {
         if (!isSuccess) return;

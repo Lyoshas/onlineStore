@@ -1,7 +1,6 @@
 import { useEffect, FC } from 'react';
 import { Formik } from 'formik';
 import { useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
 
 import FormInput from '../Input/FormInput';
 import useSignupValidation from '../hooks/useSignupValidation';
@@ -11,38 +10,37 @@ import FormActions from '../FormActions/FormActions';
 import SubmitButton from '../UI/SubmitButton/SubmitButton';
 import { errorActions } from '../../store/slices/error';
 import { IUserData, useSignUpMutation } from '../../store/apis/authApi';
-import classes from './SignupForm.module.css';
 import SuggestLoggingIn from '../SuggestLoggingIn/SuggestLoggingIn';
+import useApiError from '../hooks/useApiError';
 
 const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
     const dispatch = useDispatch();
     const { validationSchema: signupValidationSchema, isValidatingEmail } =
         useSignupValidation();
-    const [signUp, signupResults] = useSignUpMutation();
+    const [signUp, { isSuccess, isError, error, isLoading }] =
+        useSignUpMutation();
+    const expectedErrorResponse = useApiError(isError, error, [422]);
 
     useEffect(() => {
-        if (!signupResults.isSuccess) return;
+        if (!isSuccess) return;
 
         props.onSuccessfulSignUp();
-    }, [signupResults.isSuccess]);
+    }, [isSuccess]);
 
     useEffect(() => {
-        if (!signupResults.isError) return;
+        if (!isError || expectedErrorResponse === null) return;
 
-        let errorMessage = 'Something went wrong. Please reload the page.';
-
-        if ('data' in signupResults.error) {
-            // this error is very unlikely to occur,
-            // becausebackend and frontend are synchronized
-            // in terms of signup validation requirements
-            if (signupResults.error?.status === 422) {
-                errorMessage =
-                    'Invalid input data. Please double-check your inputs or the captcha.';
-            }
+        // this error is very unlikely to occur,
+        // because backend and frontend are synchronized
+        // in terms of signup validation requirements
+        if (expectedErrorResponse!.statusCode === 422) {
+            dispatch(
+                errorActions.showNotificationError(
+                    'Invalid input data. Please double-check your inputs or the captcha.'
+                )
+            );
         }
-
-        dispatch(errorActions.showNotificationError(errorMessage));
-    }, [signupResults.isError, signupResults.error, errorActions]);
+    }, [isError, expectedErrorResponse, errorActions]);
 
     const initialValues: IUserData = {
         firstName: '',
@@ -115,11 +113,11 @@ const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
                         validationSchema={signupValidationSchema}
                     />
                     <ReCAPTCHABlock />
-                    <SuggestLoggingIn /> 
+                    <SuggestLoggingIn />
                     <FormActions>
                         <SubmitButton
                             isLoading={
-                                signupResults.isLoading || isValidatingEmail
+                                isLoading || isValidatingEmail
                             }
                             label="Sign Up"
                         />

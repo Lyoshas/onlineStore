@@ -8,31 +8,18 @@ import classes from './OAuthLogin.module.css';
 import CenterBlock from '../../components/UI/CenterBlock/CenterBlock';
 import ButtonLink from '../../components/UI/ButtonLink/ButtonLink';
 import { useGetOAuthLinkQuery } from '../../store/apis/authApi';
-import deriveStatusCode from '../../util/deriveStatusCode';
-import { errorActions } from '../../store/slices/error';
 import ServerErrorResponse from '../../interfaces/ServerErrorResponse';
+import useApiError from '../../components/hooks/useApiError';
 
 const OAuthLogin = () => {
     const { oauthProvider } = useParams<{ oauthProvider: string }>();
-    const dispatch = useDispatch();
     const { isError, error, data, isLoading, isSuccess } = useGetOAuthLinkQuery(
         {
             oauthProvider: oauthProvider!,
         }
     );
-    const statusCode = deriveStatusCode(error);
-
-    useEffect(() => {
-        if (!isError) return;
-
-        if (typeof statusCode === 'number' && statusCode > 500) {
-            dispatch(
-                errorActions.showNotificationError(
-                    'Something went wrong. Please try reloading the page.'
-                )
-            );
-        }
-    }, [isError, statusCode]);
+    const expectedErrorResponse = useApiError(isError, error, [422]);
+    const statusCode = expectedErrorResponse && expectedErrorResponse.statusCode;
 
     useEffect(() => {
         if (isSuccess) location.href = data.URL;

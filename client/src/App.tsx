@@ -19,6 +19,7 @@ import TopHeader from './components/TopHeader/TopHeader';
 import OAuthLogin from './pages/OAuthLogin/OAuthLogin';
 import OAuthCallback from './pages/OAuthCallback/OAuthCallback';
 import Logout from './pages/Logout/Logout';
+import useApiError from './components/hooks/useApiError';
 
 const App: FC = () => {
     const { errorMessage, isErrorNotificationShown } = useSelector(
@@ -27,7 +28,7 @@ const App: FC = () => {
     const dispatch = useDispatch();
     const { data, isSuccess, isFetching, isError, error } =
         useRequestAccessTokenQuery();
-    const isAuthenticated = isFetching ? null : isSuccess;
+    const serverErrorResponse = useApiError(isError, error, [422]);
 
     useEffect(() => {
         if (isFetching) return;
@@ -41,21 +42,6 @@ const App: FC = () => {
                 : authActions.invalidateUser()
         );
     }, [isSuccess, isFetching]);
-
-    useEffect(() => {
-        if (!isError) return;
-
-        if (
-            ('data' in error && (error.status as number) >= 500) ||
-            ('originalStatus' in error && error.originalStatus >= 500)
-        ) {
-            dispatch(
-                errorActions.showNotificationError(
-                    'Something went wrong while authenticating. Please reload the page.'
-                )
-            );
-        }
-    }, [isError, error]);
 
     return (
         <Fragment>
@@ -126,7 +112,7 @@ const App: FC = () => {
                     path="/auth/logout"
                     element={
                         <EnsureStatus auth={true}>
-                            <Logout />                            
+                            <Logout />
                         </EnsureStatus>
                     }
                 />

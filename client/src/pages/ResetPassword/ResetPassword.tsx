@@ -9,57 +9,45 @@ import ReCAPTCHABlock from '../../components/ReCAPTCHABlock/ReCAPTCHABlock';
 import SubmitButton from '../../components/UI/SubmitButton/SubmitButton';
 import { useChangePasswordMutation } from '../../store/apis/authApi';
 import confirmPasswordSchema from '../../util/confirmPasswordSchema';
-import deriveStatusCode from '../../util/deriveStatusCode';
 import passwordSchema from '../../util/passwordSchema';
 import classes from './ResetPassword.module.css';
 import { Fragment, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { errorActions } from '../../store/slices/error';
-import ServerErrorResponse from '../../interfaces/ServerErrorResponse';
 import SuccessMessage from './SuccessMessage';
 import ReCAPTCHA from 'react-google-recaptcha';
 import InvalidLink from './InvalidLink';
 import recaptchaTokenSchema from '../../util/recaptchaTokenSchema';
+import useApiError from '../../components/hooks/useApiError';
 
 const initialValues = { password: '', confirmPassword: '', recaptchaToken: '' };
 const validationSchema = Yup.object().shape({
     password: passwordSchema,
     confirmPassword: confirmPasswordSchema,
-    recaptchaToken: recaptchaTokenSchema
+    recaptchaToken: recaptchaTokenSchema,
 });
 
 const ResetPassword = () => {
     const { resetToken } = useParams<{ resetToken: string }>();
     const [changePassword, { isLoading, isError, error, isSuccess }] =
         useChangePasswordMutation();
-    const dispatch = useDispatch();
     const [showSuccessMessage, setShowSuccessMessage] =
         useState<boolean>(false);
     const recaptchaRef = useRef<ReCAPTCHA>(null);
     const [hasResetTokenExpired, setHasResetTokenExpired] =
         useState<boolean>(false);
-
-    const statusCode = deriveStatusCode(error);
+    const serverErrorResponse = useApiError(isError, error, [422]);
 
     useEffect(() => {
-        if (!isError || statusCode === null) return;
+        if (!isError || !serverErrorResponse) return;
 
         if (
-            statusCode === 422 &&
-            'data' in error! &&
-            (error.data as ServerErrorResponse).errors[0].message ===
+            serverErrorResponse.statusCode === 422 &&
+            serverErrorResponse.serverResponse.errors[0].message ===
                 'resetToken is either invalid or has expired'
         ) {
             setHasResetTokenExpired(true);
             return;
         }
-
-        dispatch(
-            errorActions.showNotificationError(
-                'Something went wrong. Please try reloading the page.'
-            )
-        );
-    }, [isError, statusCode, error]);
+    }, [isError, serverErrorResponse]);
 
     useEffect(() => {
         if (isSuccess) setShowSuccessMessage(true);

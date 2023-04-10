@@ -1,7 +1,6 @@
 import { Form, Formik } from 'formik';
 import { FC, Fragment, useEffect, useState, useRef } from 'react';
 import * as Yup from 'yup';
-import { useDispatch } from 'react-redux';
 import ReCAPTCHA from 'react-google-recaptcha';
 
 import classes from './ForgotPassword.module.css';
@@ -9,12 +8,11 @@ import FormInput from '../../components/Input/FormInput';
 import ReCAPTCHABlock from '../../components/ReCAPTCHABlock/ReCAPTCHABlock';
 import SubmitButton from '../../components/UI/SubmitButton/SubmitButton';
 import { useRequestResetTokenMutation } from '../../store/apis/authApi';
-import deriveStatusCode from '../../util/deriveStatusCode';
-import { errorActions } from '../../store/slices/error';
 import ErrorMessage from '../../components/UI/ErrorMessage/ErrorMessage';
 import SuccessMessage from './SuccessMessage';
 import CenterBlock from '../../components/UI/CenterBlock/CenterBlock';
 import recaptchaTokenSchema from '../../util/recaptchaTokenSchema';
+import useApiError from '../../components/hooks/useApiError';
 
 const schema = Yup.object().shape({
     email: Yup.string()
@@ -29,42 +27,29 @@ const ForgotPassword: FC = () => {
         sendResetToken,
         { isError, error, isLoading: isRequestLoading, isSuccess },
     ] = useRequestResetTokenMutation();
+    const expectedErrorResponse = useApiError(isError, error, [422]);
     const [serverErrorResponse, setServerErrorResponse] = useState<
         string | null
     >();
-    const dispatch = useDispatch();
     const recaptchaRef = useRef<ReCAPTCHA>(null);
 
-    const statusCode = deriveStatusCode(error);
+    const statusCode =
+        expectedErrorResponse && expectedErrorResponse.statusCode;
 
     useEffect(() => {
-        if (!isError) return;
-
-        interface ServerErrorResponse {
-            errors: {
-                message: string;
-                field: string;
-            }[];
-        }
+        if (!isError || statusCode === null) return;
 
         const errorMessage = 'There is no user with the corresponding email';
         if (
             statusCode === 422 &&
-            'data' in error! && // if error is of type 'FetchBaseQueryError'
-            (error.data as ServerErrorResponse).errors.some((error) =>
+            expectedErrorResponse?.serverResponse.errors.some((error) =>
                 error.message.includes(errorMessage)
             )
         ) {
             setServerErrorResponse(errorMessage);
             return;
         }
-
-        dispatch(
-            errorActions.showNotificationError(
-                'Something went wrong. Please try reloading the page.'
-            )
-        );
-    }, [statusCode, isError, error]);
+    }, [statusCode, isError]);
 
     return (
         <CenterBlock>
