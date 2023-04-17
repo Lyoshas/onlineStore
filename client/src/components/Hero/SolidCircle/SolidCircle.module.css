@@ -1,0 +1,13 @@
+.solid-circle {
+    background: linear-gradient(to bottom left, #6a7ccc, rgb(255, 149, 149));
+    right: 5%;
+    top: 50%;
+    width: 300px;
+    height: 300px;
+}
+
+@media screen and (max-width: 420px) {
+    .solid-circle {
+        display: none;
+    }
+}

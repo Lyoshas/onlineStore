@@ -1,18 +1,6 @@
 .main-block {
     width: 100%;
+    height: 100%;
     position: absolute;
-    top: 107px;
     color: #fff;
-}
-
-@media screen and (max-width: 940px) {
-    .main-block {
-        top: 227px;
-    }
-}
-
-@media screen and (max-width: 420px) {
-    .main-block {
-        top: 402px;
-    }
 }

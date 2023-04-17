@@ -20,6 +20,7 @@ import OAuthLogin from './pages/OAuthLogin/OAuthLogin';
 import OAuthCallback from './pages/OAuthCallback/OAuthCallback';
 import Logout from './pages/Logout/Logout';
 import useApiError from './components/hooks/useApiError';
+import LandingPage from './components/LandingPage/LandingPage';
 
 const App: FC = () => {
     const { errorMessage, isErrorNotificationShown } = useSelector(
@@ -56,7 +57,7 @@ const App: FC = () => {
             <Routes>
                 <Route
                     path="/"
-                    element={<TopHeader RenderAfter={<p>Test</p>} />}
+                    element={<TopHeader RenderAfter={<LandingPage />} />}
                 />
                 <Route
                     path="/auth/sign-up"

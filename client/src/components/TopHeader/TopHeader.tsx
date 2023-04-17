@@ -70,9 +70,7 @@ const TopHeader: FC<{
                     )}
                 </Layout>
             </header>
-            <MainBlock>
-                <Layout>{RenderAfter}</Layout>
-            </MainBlock>
+            <MainBlock>{RenderAfter}</MainBlock>
         </Fragment>
     );
 };

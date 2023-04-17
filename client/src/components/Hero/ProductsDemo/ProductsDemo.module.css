@@ -1,0 +1,80 @@
+.demo-products__img {
+    width: 300px;
+    transform: rotate(-45deg);
+    filter: drop-shadow(0 0 4px #6c6c6c);
+    position: absolute;
+    z-index: 5;
+    transition: 1s transform cubic-bezier(.27, .53, .3, 1);
+    pointer-events: none;
+}
+
+.demo-products__img.laptop {
+    width: 350px;
+}
+
+.demo-products__img.smartphone {
+    width: 100px;
+}
+
+.demo-products__img:first-of-type {
+    right: 0%;
+    bottom: 40%;
+}
+
+.demo-products__img:nth-of-type(2) {
+    right: 22%;
+    bottom: 22%;
+}
+
+.demo-products__img:nth-of-type(3) {
+    right: 28%;
+    bottom: 3%;
+}
+
+.demo-products__img:nth-of-type(4) {
+    right: 5%;
+    bottom: -10%;
+}
+
+@media screen and (max-width: 1100px) {
+    .demo-products__img:first-of-type {
+        bottom: 15%;
+        right: 20%;
+    }
+
+    .demo-products__img:nth-of-type(2) {
+        right: 10%;
+    }
+
+    .demo-products__img:nth-of-type(3) {
+        right: 40%;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .demo-products__img:first-of-type {
+        display: none;
+    }
+
+    .demo-products__img:nth-of-type(3) {
+        bottom: 10%;
+        right: 20%;
+    }
+}
+
+@media screen and (max-width: 420px) {
+    .demo-products__img:nth-of-type(2) {
+        bottom: 10%;
+        z-index: 10;
+    }
+
+    .demo-products__img:nth-of-type(3) {
+        bottom: 2%;
+    }
+}
+
+@media screen and (max-width: 330px) {
+    .demo-products__img:nth-of-type(2) {
+        bottom: 5%;
+    }
+}

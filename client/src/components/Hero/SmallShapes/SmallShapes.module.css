@@ -1,0 +1,106 @@
+.hero__triangle-item_lightred {
+    border-bottom-color: rgb(255, 149, 149);
+    transform: rotate(-10deg);
+    bottom: 20%;
+    left: 10%;
+}
+
+.hero__triangle-item_lightblue {
+    border-bottom-color: rgb(99, 112, 255);
+    left: 55%;
+    top: 30%;
+}
+
+.hero__triangle-item_lightgreen {
+    border-bottom-color: lightgreen;
+    top: 80%;
+    left: 40%;
+    transform-origin: bottom right;
+}
+
+@keyframes PulsatingCircle {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(2);
+        opacity: 1;
+    }
+}
+
+.pulsating-circle-block {
+    position: absolute;
+    top: 20%;
+    left: 60%;
+    transition: 1s transform ease;
+}
+
+.hero__pulsating-circle {
+    position: static;
+    width: 15px;
+    height: 15px;
+    background: rgb(255, 149, 149);
+    animation: PulsatingCircle alternate infinite 3s;
+}
+
+.hero__circle-item_purple {
+    width: 15px;
+    height: 15px;
+    background: rgb(197, 2, 197);
+    top: 30%;
+    left: 20%;
+}
+
+.circle-grid-block {
+    transition: 1s transform ease;
+    position: absolute;
+    top: 60%;
+    right: 20%;
+}
+
+@media screen and (max-width: 1100px) {
+    .circle-grid-block {
+        left: 20%;
+        top: 65%;
+    }
+
+    .hero__triangle-item_lightblue {
+        top: 27%;
+        left: 40%;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    .hero__circle-item_purple {
+        left: auto;
+        right: 20%;
+    }
+}
+
+@media screen and (max-width: 490px) {
+    .hero__triangle-item_lightred {
+        left: 10%;
+        bottom: 30%;
+    }
+}
+
+@media screen and (max-width: 420px) {
+    .hero__triangle-item_lightgreen {
+        top: 65%;
+        left: auto;
+        right: 5%;
+    }
+
+    .pulsating-circle-block {
+        top: 41%; 
+        left: auto;
+        right: 5%;
+    }
+
+    .hero__triangle-item_lightblue {
+        left: 55%;
+        top: 15%;
+    }
+}

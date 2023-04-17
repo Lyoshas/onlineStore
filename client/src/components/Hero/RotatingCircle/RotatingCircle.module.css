@@ -1,0 +1,35 @@
+@keyframes rotateCircle {
+    from {
+        transform: rotate(0);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.rotating-circle-block {
+    position: absolute;
+    top: 20%;
+    left: -130px;
+    transition: 1s transform ease;
+}
+
+.rotating-circle {
+    background: linear-gradient(#6a7ccc, rgb(255, 149, 149));
+    padding: 30px;
+    animation-duration: 2s;
+    animation-name: rotateCircle;
+    animation-iteration-count: infinite;
+    animation-direction: normal;
+    animation-timing-function: linear;
+}
+
+.rotating-circle::after {
+    content: '';
+    display: block;
+    background: #273c99;
+    width: 200px;
+    height: 200px; 
+    border-radius: 50%;
+}
