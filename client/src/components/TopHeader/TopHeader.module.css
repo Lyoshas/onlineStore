@@ -7,6 +7,8 @@
     background: #273c99;
     transition: 0.5s background ease;
     z-index: 999;
+    display: flex;
+    align-items: center;
 }
 
 .top-header.darkened {
@@ -18,13 +20,23 @@
     justify-content: space-between;
 }
 
+.top-header-layout__logo {
+    margin-right: 30px;
+}
+
 @media screen and (max-width: 940px) {
     .top-header__layout {
-        flex-direction: column;
-        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .top-header__layout .top-header-layout__navigation,
+    .top-header__layout > *:nth-child(4) {
+        flex-basis: 100%;
+        display: flex;
+        justify-content: center;
     }
 
-    .top-header__layout > *:not(:last-child) {
-        margin-bottom: 20px;
+    .top-header-layout__navigation {
+        margin-bottom: 30px !important;
     }
 }

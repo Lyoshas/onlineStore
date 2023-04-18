@@ -1,0 +1,22 @@
+.hamburger-block {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    align-self: center;
+    display: none;
+}
+
+.hamburger-block__line {
+    width: 100%;
+    height: 10%;
+    background: white;
+}
+
+@media screen and (max-width: 940px) {
+    .hamburger-block {
+        display: flex;
+    }
+}

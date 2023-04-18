@@ -26,9 +26,9 @@ const NavigationLink: FC<{ label: string; to: string; imageURL: string }> = (
     );
 };
 
-const Navigation = () => {
+const Navigation: FC<{ className?: string }> = (props) => {
     return (
-        <nav>
+        <nav className={props.className}>
             <ul className={classes['navigation-ul']}>
                 <NavigationLink to="/" label="Home" imageURL="/home-icon.svg" />
                 <NavigationLink

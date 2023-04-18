@@ -7,7 +7,7 @@
     margin-right: 10px;
 }
 
-@media screen and (max-width: 380px) {
+@media screen and (max-width: 420px) {
     .top-header__side-links {
         flex-direction: column;
     }
