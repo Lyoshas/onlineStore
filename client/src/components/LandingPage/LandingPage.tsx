@@ -1,33 +1,16 @@
+import ExploreProductsBlock from '../ExploreProductsBlock/ExploreProductsBlock';
 import Hero from '../Hero/Hero';
+import Layout from '../Layout/Layout';
 
 const LandingPage = () => {
-    return <>
-        <Hero />
-        <p>5</p>
-        <p>5</p>
-        <p>5</p>
-        <p>5</p>
-        <p>5</p>
-        <p>5</p>
-        <p>5</p>
-        <p>5</p>
-        <p>5</p>
-        <p>5</p>
-        <p>5</p>
-        <p>5</p>
-        <p>5</p>
-        <p>5</p>
-        <p>5</p>
-        <p>5</p>
-        <p>5</p>
-        <p>5</p>
-        <p>5</p>
-        <p>5</p>
-        <p>5</p>
-        <p>5</p>
-        <p>5</p>
-        <p>5</p>
-    </>;
+    return (
+        <>
+            <Hero />
+            <Layout>
+                <ExploreProductsBlock />
+            </Layout>
+        </>
+    );
 };
 
 export default LandingPage;

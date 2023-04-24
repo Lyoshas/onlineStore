@@ -3,4 +3,6 @@ WORKDIR /app
 COPY ./package*.json ./
 RUN npm install
 COPY . .
-CMD ["npm", "run", "dev"]
+RUN chmod +x wait-for-api.sh
+RUN apk add --no-cache curl
+CMD ["./wait-for-api.sh", "npm", "run", "dev"]

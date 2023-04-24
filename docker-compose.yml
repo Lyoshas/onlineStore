@@ -16,6 +16,7 @@ services:
     ports:
       - '80:80'
   client:
+    restart: on-failure
     build:
       dockerfile: Dockerfile.dev
       context: ./client

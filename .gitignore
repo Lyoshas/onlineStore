@@ -4,4 +4,6 @@ server/node_modules/
 server/test.sql
 server/src/config/
 client/node_modules/
+# graphql-codegen generates files to __generated__ to ensure type safety while using GraphQL on the client side
+client/src/__generated__
 redis/redis.conf

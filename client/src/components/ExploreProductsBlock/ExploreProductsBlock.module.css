@@ -1,0 +1,16 @@
+.explore-products {
+    text-align: center;
+}
+
+.explore-products__heading {
+    font-size: 2rem;
+}
+
+.explore-products__more-btn {
+    margin-top: 5px;
+    margin-bottom: 25px;
+}
+
+.explore-products__request-status {
+    margin-bottom: 20px;
+}
