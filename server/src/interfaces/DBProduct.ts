@@ -1,5 +1,10 @@
-import BaseProduct from './BaseProduct';
-
-export default interface DBProduct extends BaseProduct {
-    quantityInStock: number;
-};
+// PostgreSQL stores products in this format
+export default interface DBProduct {
+    id: number;
+    title: string;
+    price: number;
+    initial_image_url: string;
+    additional_image_url: string;
+    quantity_in_stock: number;
+    short_description: string;
+}

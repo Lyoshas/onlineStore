@@ -6,9 +6,14 @@ import isProductAvailable from '../helpers/isProductAvailable';
 import isProductRunningOut from '../helpers/isProductRunningOut';
 import ApolloServerContext from '../../interfaces/ApolloServerContext';
 
+type AddProductArguments = Omit<
+    DisplayProduct,
+    'id' | 'isAvailable' | 'isRunningOut'
+> & { quantityInStock: number };
+
 export default async (
     _: any,
-    args: Omit<DBProduct, 'id'>,
+    args: AddProductArguments,
     context: ApolloServerContext
 ): Promise<DisplayProduct> => {
     await validateUser(context.user);
@@ -17,23 +22,29 @@ export default async (
         `INSERT INTO products (
             title,
             price,
-            preview_url,
-            quantity_in_stock
-        ) VALUES ($1, $2, $3, $4) RETURNING id`,
+            initial_image_url,
+            additional_image_url,
+            quantity_in_stock,
+            short_description
+        ) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
         [
             args.title,
             args.price,
-            args.previewURL,
-            args.quantityInStock
+            args.initialImageUrl,
+            args.additionalImageUrl,
+            args.quantityInStock,
+            args.shortDescription,
         ]
     );
 
     return {
-        id: rows[0].id as number,
+        id: rows[0].id as DBProduct['id'],
         title: args.title,
         price: args.price,
-        previewURL: args.previewURL,
+        initialImageUrl: args.initialImageUrl,
+        additionalImageUrl: args.additionalImageUrl,
+        shortDescription: args.shortDescription,
         isAvailable: isProductAvailable(args.quantityInStock),
-        isRunningOut: isProductRunningOut(args.quantityInStock)
+        isRunningOut: isProductRunningOut(args.quantityInStock),
     };
 };

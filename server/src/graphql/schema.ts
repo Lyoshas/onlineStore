@@ -16,16 +16,20 @@ export const typeDefs = `#graphql
         addProduct(
             title: String!,
             price: Float!,
-            previewURL: String!,
-            quantityInStock: Int!
+            initialImageUrl: String!,
+            additionalImageUrl: String!,
+            quantityInStock: Int!,
+            shortDescription: String!
         ): Product!
 
         updateProduct(
             id: Int!,
             title: String!,
             price: Float!,
-            previewURL: String!,
-            quantityInStock: Int!
+            initialImageUrl: String!,
+            additionalImageUrl: String!,
+            quantityInStock: Int!,
+            shortDescription: String!
         ): Product!
 
         deleteProduct(id: Int!): DeleteProductReturnValue
@@ -39,7 +43,9 @@ export const typeDefs = `#graphql
         id: Int!
         title: String!
         price: Float!
-        previewURL: String!
+        initialImageUrl: String!
+        additionalImageUrl: String!
+        shortDescription: String!
         isAvailable: Boolean!
         isRunningOut: Boolean!
     }

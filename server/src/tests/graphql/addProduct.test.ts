@@ -16,8 +16,10 @@ describe('adding a new product with GraphQL', async () => {
             addProduct(
                 title: "Test Product",
                 price: 24999,
-                previewURL: "http://randomURL.com"
-                quantityInStock: 6
+                initialImageUrl: "http://randomURL.com",
+                additionalImageUrl: "http://randomURL.com",
+                quantityInStock: 6,
+                shortDescription: "Test description"
             ) {
                 id
             }

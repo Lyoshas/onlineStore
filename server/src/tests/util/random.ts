@@ -1,4 +1,5 @@
 import DBProduct from '../../interfaces/DBProduct';
+import CamelCaseProperties from '../../interfaces/CamelCaseProperties';
 
 export function randomInteger(min: number, max: number): number {
     let rand = min - 0.5 + Math.random() * (max - min + 1);
@@ -31,14 +32,19 @@ export function randomFloat(
         mantissa += randomInteger(1, 9);
     }
 
-    return +(+mantissa * (10 ** (-exponentLength))).toFixed(exponentLength);
+    return +(+mantissa * 10 ** -exponentLength).toFixed(exponentLength);
 }
 
-export function randomProductInfo(): Omit<DBProduct, 'id'> {
+export function randomProductInfo(): Omit<
+    CamelCaseProperties<DBProduct>,
+    'id'
+> {
     return {
         title: randomString(25),
         price: randomFloat(randomInteger(1, 7), 2),
-        previewURL: `http://${randomString(50)}`,
-        quantityInStock: randomInteger(1, 50)
+        initialImageUrl: `http://${randomString(50)}`,
+        additionalImageUrl: `http://${randomString(50)}`,
+        quantityInStock: randomInteger(1, 50),
+        shortDescription: randomString(50),
     };
-};
+}
