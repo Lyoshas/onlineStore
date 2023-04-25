@@ -3,6 +3,7 @@ import getProductsByPage from './resolvers/getProductsByPage';
 import addProduct from './resolvers/addProduct';
 import updateProduct from './resolvers/updateProduct';
 import deleteProduct from './resolvers/deleteProduct';
+import getFeaturedProducts from './resolvers/getFeaturedProducts';
 
 export const typeDefs = `#graphql
     type Query {
@@ -10,6 +11,8 @@ export const typeDefs = `#graphql
         products(page: Int!): [Product]!
         "Get a single product by its id"
         product(id: Int!): Product
+        "Get featured products"
+        featuredProducts: [Product]!
     }
 
     type Mutation {
@@ -55,10 +58,11 @@ export const resolvers = {
     Query: {
         products: getProductsByPage,
         product: getProduct,
+        featuredProducts: getFeaturedProducts,
     },
     Mutation: {
         addProduct,
         updateProduct,
-        deleteProduct
+        deleteProduct,
     },
 };
