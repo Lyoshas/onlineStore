@@ -10,7 +10,21 @@ function getProduct(
 ): Promise<DisplayProduct> {
     // code to get data from the DB
     return dbPool
-        .query<DBProduct>('SELECT * FROM products WHERE id = $1', [args.id])
+        .query<DBProduct>(
+            `
+                SELECT
+                    id,
+                    title,
+                    price,
+                    initial_image_url,
+                    additional_image_url,
+                    quantity_in_stock,
+                    short_description
+                FROM products
+                WHERE id = $1
+            `,
+            [args.id]
+        )
         .then(({ rows }) => {
             const product = rows[0];
             return {

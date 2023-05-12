@@ -13,7 +13,19 @@ function getProductsByPage(
     );
 
     return dbPool
-        .query<DBProduct>('SELECT * FROM products OFFSET $1 LIMIT $2', [
+        .query<DBProduct>(`
+            SELECT
+                id,
+                title,
+                price,
+                initial_image_url,
+                additional_image_url,
+                quantity_in_stock,
+                short_description
+            FROM products
+            OFFSET $1
+            LIMIT $2
+        `, [
             productsPerPage * (+args.page - 1),
             productsPerPage,
         ])
