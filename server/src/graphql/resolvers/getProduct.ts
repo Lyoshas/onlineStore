@@ -26,6 +26,10 @@ function getProduct(
             [args.id]
         )
         .then(({ rows }) => {
+            if (rows.length === 0) {
+                throw new Error('Product not found');
+            }
+
             const product = rows[0];
             return {
                 id: product.id,
