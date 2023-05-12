@@ -16,7 +16,11 @@ import HamburgerMenuIcon from './HambugerMenuIcon/HamburgerMenuIcon';
 // "isAuthenticated: null" means that the client hasn't sent the request yet
 const TopHeader: FC<{
     RenderAfter: JSX.Element;
-}> = ({ RenderAfter }) => {
+    // since the top header has 'position: fixed', every sibling of the header will "overlap" with the heder
+    // if "props.addOffset" is set to true, a new block will be added that will be adjusted such that the "RenderAfter" element is visible
+    // by default props.addOffset will be set to false
+    addOffset: boolean;
+}> = ({ RenderAfter, addOffset = false }) => {
     const [isScrolled, setIsScrolled] = useState<boolean>(false);
     const [showResponsiveMenu, setShowResponsiveMenu] = useState<boolean>(true);
     const isAuthenticated = useSelector(
@@ -70,7 +74,13 @@ const TopHeader: FC<{
                     )}
                 </Layout>
             </header>
-            <MainBlock>{RenderAfter}</MainBlock>
+            <MainBlock
+                className={
+                    addOffset ? classes['position-adjustable-block'] : null
+                }
+            >
+                {RenderAfter}
+            </MainBlock>
         </Fragment>
     );
 };

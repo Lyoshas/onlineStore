@@ -24,6 +24,12 @@
     margin-right: 30px;
 }
 
+main.position-adjustable-block {
+    position: relative;
+    top: 107px;
+    height: calc(100% - 107px);
+}
+
 @media screen and (max-width: 940px) {
     .top-header__layout {
         flex-wrap: wrap;

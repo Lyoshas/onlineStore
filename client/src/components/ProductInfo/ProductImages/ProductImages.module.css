@@ -1,0 +1,29 @@
+.product-info__photos {
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    /* background: blue; */
+    padding: 20px;
+}
+
+.product-photos__img {
+    width: auto;
+    height: auto;
+    max-width: 80px;
+    max-height: 80px;
+    opacity: .6;
+    transition: 0.5s opacity ease;
+    cursor: pointer;
+}
+
+.product-photos__img:hover {
+    opacity: 1;
+}
+
+.product-photos__img:not(:last-child) {
+    margin-bottom: 20px;
+}
+
+.product-photos__img.selected {
+    opacity: 1;
+}
