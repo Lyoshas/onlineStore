@@ -23,7 +23,7 @@ const TopHeader: FC<{
         (state: RootState) => state.auth.isAuthenticated
     );
     const shouldResetResponsiveMenu = useMediaQuery({
-        query: '(min-width: 940px)',
+        query: '(min-width: 941px)',
     });
 
     useEffect(() => {
