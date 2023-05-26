@@ -5,9 +5,14 @@ import { NavLink } from 'react-router-dom';
 import classes from './Navigation.module.css';
 import Image from '../Image/Image';
 
-const NavigationLink: FC<{ label: string; to: string; imageURL: string }> = (
-    props
-) => {
+interface NavigationLinkProps {
+    label: string;
+    to: string;
+    imageURL: string;
+    onClick?: () => void;
+}
+
+const NavigationLink: FC<NavigationLinkProps> = (props) => {
     return (
         <li className={classes['navigation__li']}>
             <NavLink
@@ -18,6 +23,7 @@ const NavigationLink: FC<{ label: string; to: string; imageURL: string }> = (
                         isActive && classes.active
                     );
                 }}
+                onClick={props.onClick}
             >
                 <Image src={props.imageURL} alt={props.label} />
                 {props.label}
@@ -26,21 +32,26 @@ const NavigationLink: FC<{ label: string; to: string; imageURL: string }> = (
     );
 };
 
-const Navigation: FC<{ className?: string }> = (props) => {
+// onNavItemClick will be used to reset the hamburger menu upon navigation item click
+const Navigation: FC<{ className?: string; onNavItemClick: () => void }> = (
+    props
+) => {
     return (
         <nav className={props.className}>
             <ul className={classes['navigation-ul']}>
-                <NavigationLink to="/" label="Home" imageURL="/home-icon.svg" />
-                <NavigationLink
-                    to="/products"
-                    label="Products"
-                    imageURL="/product-icon.svg"
-                />
-                <NavigationLink
-                    to="/orders"
-                    label="Orders"
-                    imageURL="/order-icon.svg"
-                />
+                {[
+                    ['/', 'Home', '/home-icon.svg'],
+                    ['/products', 'Products', '/product-icon.svg'],
+                    ['/orders', 'Orders', '/order-icon.svg'],
+                ].map(([to, label, imageURL], i) => (
+                    <NavigationLink
+                        key={i}
+                        to={to}
+                        label={label}
+                        imageURL={imageURL}
+                        onClick={props.onNavItemClick}
+                    />
+                ))}
             </ul>
         </nav>
     );

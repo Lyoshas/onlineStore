@@ -26,7 +26,7 @@ const TopHeader: FC<{
     const isAuthenticated = useSelector(
         (state: RootState) => state.auth.isAuthenticated
     );
-    const shouldResetResponsiveMenu = useMediaQuery({
+    const isLargeScreen = useMediaQuery({
         query: '(min-width: 941px)',
     });
 
@@ -41,11 +41,16 @@ const TopHeader: FC<{
     }, []);
 
     useLayoutEffect(() => {
-        if (shouldResetResponsiveMenu) setShowResponsiveMenu(true);
+        if (isLargeScreen) setShowResponsiveMenu(true);
         else setShowResponsiveMenu(false);
-    }, [shouldResetResponsiveMenu]);
+    }, [isLargeScreen]);
 
     const handleHamburgerClick = () => setShowResponsiveMenu((prev) => !prev);
+    const handleNavItemClick = () => {
+        // if the screen size is >= 941px, do nothing
+        if (isLargeScreen) return;
+        setShowResponsiveMenu(false);
+    }
 
     return isAuthenticated === null ? (
         <div className="flex-wrapper">
@@ -68,6 +73,7 @@ const TopHeader: FC<{
                                 className={
                                     classes['top-header-layout__navigation']
                                 }
+                                onNavItemClick={handleNavItemClick}
                             />
                             <HeaderButtons isAuth={isAuthenticated} />
                         </Fragment>
