@@ -11,6 +11,7 @@ type FormInputProps = {
     isRequired: boolean;
     type: string;
     placeholder: string;
+    value?: string | number;
     validateOnChange?: boolean; // it validates only this field
     validateOnBlur?: boolean; // it validates only this field
     validationSchema: OptionalObjectSchema<ObjectShape>;
@@ -23,6 +24,7 @@ const FormInput: FC<FormInputProps> = ({
     type,
     placeholder,
     TipComponent,
+    value,
     validationSchema,
     validateOnChange = true,
     validateOnBlur = true,
@@ -158,6 +160,7 @@ const FormInput: FC<FormInputProps> = ({
                     className={classes['form-input']}
                     onChange={handleChange}
                     onBlur={handleBlur}
+                    defaultValue={value}
                 />
                 {type === 'password' && (
                     <img

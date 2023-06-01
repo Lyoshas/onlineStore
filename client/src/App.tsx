@@ -22,6 +22,7 @@ import Logout from './pages/Logout/Logout';
 import useApiError from './components/hooks/useApiError';
 import LandingPage from './components/LandingPage/LandingPage';
 import ProductInfo from './components/ProductInfo/ProductInfo';
+import EditProduct from './components/EditProduct/EditProduct';
 
 const App: FC = () => {
     const { errorMessage, isErrorNotificationShown } = useSelector(
@@ -130,6 +131,18 @@ const App: FC = () => {
                             RenderAfter={<ProductInfo />}
                             addOffset={true}
                         />
+                    }
+                />
+                <Route
+                    path="/edit-product/:productId"
+                    element={
+                        // ensure the user is logged in and is an admin
+                        <EnsureStatus auth={true} admin={true}>
+                            <TopHeader
+                                RenderAfter={<EditProduct />}
+                                addOffset={true}
+                            />
+                        </EnsureStatus>
                     }
                 />
             </Routes>

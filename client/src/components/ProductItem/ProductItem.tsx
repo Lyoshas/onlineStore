@@ -1,9 +1,12 @@
 import { FC, useState } from 'react';
+import { useSelector } from 'react-redux';
+import classNames from 'classnames';
+import { Link } from 'react-router-dom';
 
 import classes from './ProductItem.module.css';
-import { Link } from 'react-router-dom';
 import Button from '../UI/Button/Button';
-import classNames from 'classnames';
+import { RootState } from '../../store';
+import ButtonLink from '../UI/ButtonLink/ButtonLink';
 
 interface ProductItemProps {
     id: number;
@@ -20,6 +23,7 @@ interface ProductItemProps {
 
 const ProductItem: FC<ProductItemProps> = (props) => {
     const [showMainImage, setShowMainImage] = useState<boolean>(true);
+    const isAdmin = useSelector((state: RootState) => state.auth.isAdmin);
 
     const handleMouseEnter = () => setShowMainImage(false);
     const handleMouseLeave = () => setShowMainImage(true);
@@ -68,13 +72,28 @@ const ProductItem: FC<ProductItemProps> = (props) => {
                 <p className={classes['product-item__price']}>
                     {props.price} ₴
                 </p>
-                <Button className={classes['product-item__cart-btn']}>
-                    <img
-                        className={classes['cart-btn__icon']}
-                        src="/cart-icon.svg"
-                        alt="Cart"
-                    />
-                </Button>
+                <div
+                    className={classNames(
+                        classes['product-item__actions'],
+                        isAdmin && classes['keep-separate']
+                    )}
+                >
+                    <Button className={classes['product-item__cart-btn']}>
+                        <img
+                            className={classes['cart-btn__icon']}
+                            src="/cart-icon.svg"
+                            alt="Cart"
+                        />
+                    </Button>
+                    {isAdmin && (
+                        <ButtonLink
+                            to={`/edit-product/${props.id}`}
+                            className={classes['product-item__edit-btn']}
+                        >
+                            Edit
+                        </ButtonLink>
+                    )}
+                </div>
             </div>
             {props.isAvailable && (
                 <div className={classes['product-item__description']}>
