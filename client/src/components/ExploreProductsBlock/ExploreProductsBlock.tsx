@@ -49,7 +49,7 @@ const ExploreProductsBlock = () => {
                 {loading && <Loading />}
                 {error && (
                     <Fragment>
-                        <ErrorIcon />
+                        <ErrorIcon className="icon" />
                         <p>An error occurred while loading products.</p>
                     </Fragment>
                 )}
