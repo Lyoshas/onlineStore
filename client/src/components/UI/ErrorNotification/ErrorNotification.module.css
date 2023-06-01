@@ -1,8 +1,8 @@
 .error-notification {
     max-width: 40%;
-    position: absolute;
+    position: fixed;
     z-index: 1000;
-    top: 50px;
+    top: 15%;
     border-radius: 0 15px 0 0;
     background: white;
     text-align: center;
