@@ -5,6 +5,7 @@ import updateProduct from './resolvers/updateProduct';
 import deleteProduct from './resolvers/deleteProduct';
 import getFeaturedProducts from './resolvers/getFeaturedProducts';
 import getAdminProduct from './resolvers/getAdminProduct';
+import getSimilarProducts from './resolvers/getSimilarProducts';
 
 export const typeDefs = `#graphql
     type Query {
@@ -16,6 +17,8 @@ export const typeDefs = `#graphql
         featuredProducts: [Product]!
         "Get product info including 'quantity_in_stock' (only for admins)"
         adminProduct(productId: Int!): AdminProduct!
+        "Get similar products"
+        similarProducts(productId: Int!): [Product]!
     }
 
     type Mutation {
@@ -73,6 +76,7 @@ export const resolvers = {
         product: getProduct,
         featuredProducts: getFeaturedProducts,
         adminProduct: getAdminProduct,
+        similarProducts: getSimilarProducts,
     },
     Mutation: {
         addProduct,
