@@ -1,6 +1,7 @@
 import DBProduct from '../../interfaces/DBProduct';
 import DisplayProduct from '../../interfaces/DisplayProduct';
 import dbPool from '../../services/postgres.service';
+import getProductQuery from '../helpers/getProductQuery';
 import isProductAvailable from '../helpers/isProductAvailable';
 import isProductRunningOut from '../helpers/isProductRunningOut';
 
@@ -10,21 +11,7 @@ function getProduct(
 ): Promise<DisplayProduct> {
     // code to get data from the DB
     return dbPool
-        .query<DBProduct>(
-            `
-                SELECT
-                    id,
-                    title,
-                    price,
-                    initial_image_url,
-                    additional_image_url,
-                    quantity_in_stock,
-                    short_description
-                FROM products
-                WHERE id = $1
-            `,
-            [args.id]
-        )
+        .query<DBProduct>(getProductQuery('WHERE id = $1'), [args.id])
         .then(({ rows }) => {
             if (rows.length === 0) {
                 throw new Error('Product not found');
