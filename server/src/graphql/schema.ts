@@ -4,6 +4,7 @@ import addProduct from './resolvers/addProduct';
 import updateProduct from './resolvers/updateProduct';
 import deleteProduct from './resolvers/deleteProduct';
 import getFeaturedProducts from './resolvers/getFeaturedProducts';
+import getAdminProduct from './resolvers/getAdminProduct';
 
 export const typeDefs = `#graphql
     type Query {
@@ -13,6 +14,8 @@ export const typeDefs = `#graphql
         product(id: Int!): Product
         "Get featured products"
         featuredProducts: [Product]!
+        "Get product info including 'quantity_in_stock' (only for admins)"
+        adminProduct(productId: Int!): AdminProduct!
     }
 
     type Mutation {
@@ -52,6 +55,16 @@ export const typeDefs = `#graphql
         isAvailable: Boolean!
         isRunningOut: Boolean!
     }
+
+    type AdminProduct {
+        id: Int!
+        title: String!
+        price: Float!
+        initialImageUrl: String!
+        additionalImageUrl: String!
+        quantityInStock: Int!
+        shortDescription: String!
+    }
 `;
 
 export const resolvers = {
@@ -59,6 +72,7 @@ export const resolvers = {
         products: getProductsByPage,
         product: getProduct,
         featuredProducts: getFeaturedProducts,
+        adminProduct: getAdminProduct,
     },
     Mutation: {
         addProduct,
