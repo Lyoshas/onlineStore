@@ -8,8 +8,16 @@ const SubmitButton: FC<{
     label: string;
     isLoading: boolean;
     className?: string;
+    considerDirtyProp?: boolean;
     onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-}> = (props) => {
+}> = ({
+    // "considerDirtyProp" specifies whether to make the submit button disabled if the form is dirty
+    // form "dirtiness" specifies whether the form was edited or not
+    // if a user edited the form, the form is dirty
+    // "considerDirtyProp" is true by default, so by default is the form is NOT dirty, the submit button will be disabled
+    considerDirtyProp = true,
+    ...props
+}) => {
     const { isSubmitting, dirty, errors } = useFormikContext();
     const { isLoading } = props;
 
@@ -20,7 +28,8 @@ const SubmitButton: FC<{
                 isSubmitting ||
                 isLoading ||
                 // dirty indicates whether the form fields have been modified or not
-                !dirty ||
+                // if "considerDirtyProp" is set to true, the "dirty" attribute will be considered
+                (considerDirtyProp && !dirty) ||
                 // or disable the button when there are validation errors
                 Object.keys(errors).length !== 0
             }
