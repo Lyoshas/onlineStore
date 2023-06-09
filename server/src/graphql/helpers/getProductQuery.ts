@@ -6,6 +6,7 @@ const getProductQuery = (additionalQuery?: string) => {
             id,
             title,
             price,
+            category,
             initial_image_url,
             additional_image_url,
             quantity_in_stock,

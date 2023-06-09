@@ -60,6 +60,7 @@ export const typeDefs = `#graphql
         id: Int!
         title: String!
         price: Float!
+        category: String!
         initialImageUrl: String!
         additionalImageUrl: String!
         quantityInStock: Int!

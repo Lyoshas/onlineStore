@@ -22,6 +22,7 @@ function getProduct(
                 id: product.id,
                 title: product.title,
                 price: product.price,
+                category: product.category,
                 initialImageUrl: product.initial_image_url,
                 additionalImageUrl: product.additional_image_url,
                 shortDescription: product.short_description,
