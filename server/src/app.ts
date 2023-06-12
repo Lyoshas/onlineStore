@@ -38,6 +38,7 @@ import { typeDefs, resolvers } from './graphql/schema';
 import ApolloServerContext from './interfaces/ApolloServerContext';
 import errorHandler from './middlewares/error-handler';
 import notFoundHandler from './middlewares/not-found-handler';
+import productCategoriesRoutes from './routes/product-category';
 
 const app = express();
 
@@ -63,6 +64,8 @@ app.use('/auth', [
 app.use('/user', cartRoutes);
 
 app.use('/user', orderRoutes);
+
+app.use('/product', productCategoriesRoutes);
 
 const startGraphQLServer = async () => {
     const server = new ApolloServer<ApolloServerContext>({
