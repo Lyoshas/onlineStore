@@ -25,8 +25,9 @@ export default async (
             initial_image_url,
             additional_image_url,
             quantity_in_stock,
-            short_description
-        ) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+            short_description,
+            category
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
         [
             args.title,
             args.price,
@@ -34,6 +35,7 @@ export default async (
             args.additionalImageUrl,
             args.quantityInStock,
             args.shortDescription,
+            args.category,
         ]
     );
 
@@ -41,6 +43,7 @@ export default async (
         id: rows[0].id as DBProduct['id'],
         title: args.title,
         price: args.price,
+        category: args.category,
         initialImageUrl: args.initialImageUrl,
         additionalImageUrl: args.additionalImageUrl,
         shortDescription: args.shortDescription,

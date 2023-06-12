@@ -18,6 +18,7 @@ export default async (
         id,
         title,
         price,
+        category,
         initialImageUrl,
         additionalImageUrl,
         shortDescription,
@@ -27,6 +28,7 @@ export default async (
 
     const isTitleCorrect = typeof title === 'string';
     const isPriceCorrect = typeof price === 'number';
+    const isCategoryCorrect = typeof category === 'string';
     const isInitialImageUrlCorrect = typeof initialImageUrl === 'string';
     const isAdditionalImageUrlCorrect = typeof additionalImageUrl === 'string';
     const isShortDescriptionCorrect = typeof shortDescription === 'string';
@@ -52,6 +54,7 @@ export default async (
         SET
             ${isTitleCorrect ? `title = $${++i},` : ''}
             ${isPriceCorrect ? `price = $${++i},` : ''}
+            ${isCategoryCorrect ? `category = $${++i},` : ''}
             ${isInitialImageUrlCorrect ? `initial_image_url = $${++i},` : ''}
             ${isAdditionalImageUrlCorrect ? `additional_image_url = $${++i},` : ''}
             ${isShortDescriptionCorrect ? `short_description = $${++i},` : ''}
@@ -60,6 +63,7 @@ export default async (
         [
             isTitleCorrect ? title : null,
             isPriceCorrect ? price : null,
+            isCategoryCorrect ? category : null,
             isInitialImageUrlCorrect ? initialImageUrl : null,
             isAdditionalImageUrlCorrect ? additionalImageUrl : null,
             isShortDescriptionCorrect ? shortDescription : null,
@@ -76,6 +80,7 @@ export default async (
         id,
         title,
         price,
+        category,
         initialImageUrl,
         additionalImageUrl,
         shortDescription,

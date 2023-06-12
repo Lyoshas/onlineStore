@@ -22,6 +22,7 @@ export const typeDefs = `#graphql
         addProduct(
             title: String!,
             price: Float!,
+            category: String!,
             initialImageUrl: String!,
             additionalImageUrl: String!,
             quantityInStock: Int!,
@@ -32,6 +33,7 @@ export const typeDefs = `#graphql
             id: Int!,
             title: String!,
             price: Float!,
+            category: String!,
             initialImageUrl: String!,
             additionalImageUrl: String!,
             quantityInStock: Int!,
@@ -49,6 +51,7 @@ export const typeDefs = `#graphql
         id: Int!
         title: String!
         price: Float!
+        category: String!
         initialImageUrl: String!
         additionalImageUrl: String!
         shortDescription: String!
