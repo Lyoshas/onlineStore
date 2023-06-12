@@ -5,6 +5,7 @@ const GET_PRODUCT_DETAILS = gql(`
         adminProduct(productId: $productId) {
             title
             price
+            category
             initialImageUrl
             additionalImageUrl
             shortDescription

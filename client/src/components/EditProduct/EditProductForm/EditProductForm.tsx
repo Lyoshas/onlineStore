@@ -7,9 +7,11 @@ import DBProduct from '../../../interfaces/DBProduct';
 import FormInput from '../../Input/FormInput';
 import FormActions from '../../FormActions/FormActions';
 import SubmitButton from '../../UI/SubmitButton/SubmitButton';
+import FormSelect from '../../FormSelect/FormSelect';
 
 interface EditProductFormProps {
     product: DBProduct;
+    availableCategories: string[];
     // if the user has sent the form, this component will show the loading progress
     isUpdateRequestLoading: boolean;
     onEditProduct: (options: { variables: DBProduct }) => unknown;
@@ -26,6 +28,7 @@ const EditProductForm: FC<EditProductFormProps> = (props) => {
             initialValues={{
                 title: product.title,
                 price: product.price,
+                category: product.category,
                 quantityInStock: product.quantityInStock,
                 initialImageUrl: product.initialImageUrl,
                 additionalImageUrl: product.additionalImageUrl,
@@ -38,6 +41,7 @@ const EditProductForm: FC<EditProductFormProps> = (props) => {
                         id: props.product.id,
                         title: values.title,
                         price: values.price,
+                        category: values.category,
                         quantityInStock: values.quantityInStock,
                         initialImageUrl: values.initialImageUrl,
                         additionalImageUrl: values.additionalImageUrl,
@@ -69,6 +73,13 @@ const EditProductForm: FC<EditProductFormProps> = (props) => {
                         validationSchema={editProductSchema}
                         isRequired={true}
                         value={product.price}
+                    />
+                    <FormSelect
+                        label="Category"
+                        name="category"
+                        options={props.availableCategories}
+                        defaultOption={product.category}
+                        isRequired={true}
                     />
                     <FormInput
                         type="number"

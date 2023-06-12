@@ -11,6 +11,8 @@ import CenterBlock from '../UI/CenterBlock/CenterBlock';
 import classes from './EditProduct.module.css';
 import GET_PRODUCT_DETAILS from './GraphQL/getProductRequest';
 import UPDATE_PRODUCT from './GraphQL/updateProductRequest';
+import { useProductCategoriesQuery } from '../../store/apis/productCategoryApi';
+import DBProduct from '../../interfaces/DBProduct';
 
 const EditProduct = () => {
     const { productId } = useParams();
@@ -32,6 +34,11 @@ const EditProduct = () => {
         variables: { productId: +productId! },
         ...additionalQueryProperties,
     });
+    const {
+        isLoading: areProductCategoriesLoading,
+        error: productCategoriesError,
+        data: productCategories,
+    } = useProductCategoriesQuery();
     let [
         updateProduct,
         {
@@ -41,7 +48,7 @@ const EditProduct = () => {
         },
     ] = useMutation(UPDATE_PRODUCT, { ...additionalQueryProperties });
 
-    if (isProductInfoLoading) {
+    if (isProductInfoLoading || areProductCategoriesLoading) {
         return (
             <div className="flex-wrapper">
                 <Loading />
@@ -49,15 +56,19 @@ const EditProduct = () => {
         );
     }
 
-    if (productInfoError || updateProductError) {
+    if (productInfoError || updateProductError || productCategoriesError) {
         const message = `Something went wrong while ${
             productInfoError
                 ? 'loading the product data'
-                : 'editing the product'
+                : updateProductError
+                ? 'editing the product'
+                : 'loading product categories'
         }.\n${
             productInfoError
                 ? productInfoError.message
-                : updateProductError!.message
+                : updateProductError
+                ? updateProductError!.message
+                : productCategoriesError
         }`;
 
         return <ErrorMessage message={message} />;
@@ -71,15 +82,20 @@ const EditProduct = () => {
     // by this point we have the product details
     const product = productDetailsData!.adminProduct!;
 
+    const handleEditProduct = async (options: { variables: DBProduct }) => {
+        await updateProduct(options);
+    };
+
     return (
         <CenterBlock className={classes['edit-product-block']}>
             <EditProductForm
                 // passing information about the product
                 product={{ id: +productId!, ...product }}
+                availableCategories={productCategories!.categories}
                 // passing whether the edit request is loading
                 isUpdateRequestLoading={isUpdateRequestLoading}
                 // passing the function that will be called to initiate the API request
-                onEditProduct={updateProduct}
+                onEditProduct={handleEditProduct}
             />
         </CenterBlock>
     );
