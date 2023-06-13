@@ -4,7 +4,9 @@ import ProductItem from '../ProductItem/ProductItem';
 import classes from './ProductList.module.css';
 import { Product } from '../../__generated__/graphql';
 
-const ProductList: FC<{ products: (Product | null)[] }> = (props) => {
+const ProductList: FC<{ products: (Omit<Product, 'category'> | null)[] }> = (
+    props
+) => {
     return (
         <section className={classes['product-list']}>
             {props.products.map((product) => (
