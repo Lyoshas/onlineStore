@@ -30,6 +30,7 @@ const EditProduct = () => {
         loading: isProductInfoLoading,
         error: productInfoError,
         data: productDetailsData,
+        refetch: refetchProductDetails,
     } = useQuery(GET_PRODUCT_DETAILS, {
         variables: { productId: +productId! },
         ...additionalQueryProperties,
@@ -84,6 +85,9 @@ const EditProduct = () => {
 
     const handleEditProduct = async (options: { variables: DBProduct }) => {
         await updateProduct(options);
+        // after the product was updated it's necessary to refetch product details,
+        // otherwise the product data will be stale
+        await refetchProductDetails();
     };
 
     return (
