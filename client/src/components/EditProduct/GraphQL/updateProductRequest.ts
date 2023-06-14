@@ -22,6 +22,8 @@ const UPDATE_PRODUCT = gql(`
             shortDescription: $shortDescription
         ) {
             id
+            isAvailable
+            isRunningOut
         }
     }
 `);

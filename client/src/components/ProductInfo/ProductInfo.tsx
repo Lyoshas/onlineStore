@@ -3,7 +3,6 @@ import { useQuery } from '@apollo/client';
 import classNames from 'classnames';
 import { useState } from 'react';
 
-import { gql } from '../../__generated__/gql';
 import classes from './ProductInfo.module.css';
 import ButtonLink from '../UI/ButtonLink/ButtonLink';
 import ErrorIcon from '../UI/Icons/ErrorIcon';
@@ -12,20 +11,7 @@ import Layout from '../Layout/Layout';
 import ProductImages from './ProductImages/ProductImages';
 import SelectedImage from './SelectedImage/SelectedImage';
 import ProductDescription from './ProductDescription/ProductDescription';
-
-const GET_PRODUCT_BY_ID = gql(`
-    query GetProductById($productId: Int!) {
-        product(id: $productId) {
-            title
-            price
-            initialImageUrl
-            additionalImageUrl
-            shortDescription
-            isAvailable
-            isRunningOut
-        }
-    } 
-`);
+import GET_PRODUCT_BY_ID from './GraphQL/GetProductByIdRequest';
 
 const createErrorBlock = (errorMessage: string) => {
     return (

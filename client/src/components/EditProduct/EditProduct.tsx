@@ -14,6 +14,7 @@ import UPDATE_PRODUCT from './GraphQL/updateProductRequest';
 import { useProductCategoriesQuery } from '../../store/apis/productCategoryApi';
 import DBProduct from '../../interfaces/DBProduct';
 import apolloClient from '../../graphql/client';
+import GET_PRODUCT_BY_ID from '../ProductInfo/GraphQL/GetProductByIdRequest';
 
 const EditProduct = () => {
     const { productId } = useParams();
@@ -84,13 +85,26 @@ const EditProduct = () => {
     const product = productDetailsData!.adminProduct!;
 
     const handleEditProduct = async (options: { variables: DBProduct }) => {
-        await updateProduct(options);
+        const updatedProductResult = await updateProduct(options);
+        const updatedProduct = updatedProductResult.data!.updateProduct;
+
         // after the product was updated it's necessary to update the cache
         // otherwise the product data will be stale
+        const product = options.variables;
+        const variables = { productId: product.id };
+
+        // updating cache associated with "query AdminProduct($productId: Int!)"
         apolloClient.writeQuery({
             query: GET_ADMIN_PRODUCT_DETAILS,
-            data: { adminProduct: options.variables },
-            variables: { productId: options.variables.id },
+            data: { adminProduct: product },
+            variables,
+        });
+        // updating cache associated with "query Product($productId: Int!)" if it exists
+        // this query is used when the user tries to go to the product details page
+        apolloClient.writeQuery({
+            query: GET_PRODUCT_BY_ID,
+            data: { product: { ...product, ...updatedProduct } },
+            variables,
         });
     };
 
