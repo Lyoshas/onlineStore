@@ -13,6 +13,7 @@ import GET_PRODUCT_DETAILS from './GraphQL/getProductRequest';
 import UPDATE_PRODUCT from './GraphQL/updateProductRequest';
 import { useProductCategoriesQuery } from '../../store/apis/productCategoryApi';
 import DBProduct from '../../interfaces/DBProduct';
+import apolloClient from '../../graphql/client';
 
 const EditProduct = () => {
     const { productId } = useParams();
@@ -30,7 +31,6 @@ const EditProduct = () => {
         loading: isProductInfoLoading,
         error: productInfoError,
         data: productDetailsData,
-        refetch: refetchProductDetails,
     } = useQuery(GET_PRODUCT_DETAILS, {
         variables: { productId: +productId! },
         ...additionalQueryProperties,
@@ -85,9 +85,13 @@ const EditProduct = () => {
 
     const handleEditProduct = async (options: { variables: DBProduct }) => {
         await updateProduct(options);
-        // after the product was updated it's necessary to refetch product details,
+        // after the product was updated it's necessary to update the cache
         // otherwise the product data will be stale
-        await refetchProductDetails();
+        apolloClient.writeQuery({
+            query: GET_PRODUCT_DETAILS,
+            data: { adminProduct: options.variables },
+            variables: { productId: options.variables.id },
+        });
     };
 
     return (
