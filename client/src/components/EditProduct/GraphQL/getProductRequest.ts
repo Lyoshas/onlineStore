@@ -1,6 +1,6 @@
 import { gql } from '../../../__generated__/gql';
 
-const GET_PRODUCT_DETAILS = gql(`
+const GET_ADMIN_PRODUCT_DETAILS = gql(`
     query ProductDetails($productId: Int!) {
         adminProduct(productId: $productId) {
             title
@@ -14,4 +14,4 @@ const GET_PRODUCT_DETAILS = gql(`
     }
 `);
 
-export default GET_PRODUCT_DETAILS;
+export default GET_ADMIN_PRODUCT_DETAILS;

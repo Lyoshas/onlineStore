@@ -9,7 +9,7 @@ import SuccessMessage from './SuccessMessage/SuccessMessage';
 import EditProductForm from './EditProductForm/EditProductForm';
 import CenterBlock from '../UI/CenterBlock/CenterBlock';
 import classes from './EditProduct.module.css';
-import GET_PRODUCT_DETAILS from './GraphQL/getProductRequest';
+import GET_ADMIN_PRODUCT_DETAILS from './GraphQL/getProductRequest';
 import UPDATE_PRODUCT from './GraphQL/updateProductRequest';
 import { useProductCategoriesQuery } from '../../store/apis/productCategoryApi';
 import DBProduct from '../../interfaces/DBProduct';
@@ -31,7 +31,7 @@ const EditProduct = () => {
         loading: isProductInfoLoading,
         error: productInfoError,
         data: productDetailsData,
-    } = useQuery(GET_PRODUCT_DETAILS, {
+    } = useQuery(GET_ADMIN_PRODUCT_DETAILS, {
         variables: { productId: +productId! },
         ...additionalQueryProperties,
     });
@@ -88,7 +88,7 @@ const EditProduct = () => {
         // after the product was updated it's necessary to update the cache
         // otherwise the product data will be stale
         apolloClient.writeQuery({
-            query: GET_PRODUCT_DETAILS,
+            query: GET_ADMIN_PRODUCT_DETAILS,
             data: { adminProduct: options.variables },
             variables: { productId: options.variables.id },
         });
