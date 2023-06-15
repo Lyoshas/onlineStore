@@ -1,9 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@apollo/client';
-import { useSelector } from 'react-redux';
 
 import Loading from '../UI/Loading/Loading';
-import { RootState } from '../../store';
 import ErrorMessage from './ErrorMessage/ErrorMessage';
 import SuccessMessage from './SuccessMessage/SuccessMessage';
 import EditProductForm from './EditProductForm/EditProductForm';
@@ -18,23 +16,12 @@ import GET_PRODUCT_BY_ID from '../ProductInfo/GraphQL/GetProductByIdRequest';
 
 const EditProduct = () => {
     const { productId } = useParams();
-    const accessToken = useSelector(
-        (state: RootState) => state.auth.accessToken
-    );
-    const additionalQueryProperties = {
-        context: {
-            headers: {
-                authorization: `Bearer ${accessToken}`,
-            },
-        },
-    };
     let {
         loading: isProductInfoLoading,
         error: productInfoError,
         data: productDetailsData,
     } = useQuery(GET_ADMIN_PRODUCT_DETAILS, {
         variables: { productId: +productId! },
-        ...additionalQueryProperties,
     });
     const {
         isLoading: areProductCategoriesLoading,
@@ -48,7 +35,7 @@ const EditProduct = () => {
             error: updateProductError,
             data: updateProductData,
         },
-    ] = useMutation(UPDATE_PRODUCT, { ...additionalQueryProperties });
+    ] = useMutation(UPDATE_PRODUCT);
 
     if (isProductInfoLoading || areProductCategoriesLoading) {
         return (
