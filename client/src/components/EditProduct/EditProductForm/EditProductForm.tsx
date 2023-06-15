@@ -40,9 +40,9 @@ const EditProductForm: FC<EditProductFormProps> = (props) => {
                     variables: {
                         id: props.product.id,
                         title: values.title,
-                        price: values.price,
+                        price: +values.price,
                         category: values.category,
-                        quantityInStock: values.quantityInStock,
+                        quantityInStock: +values.quantityInStock,
                         initialImageUrl: values.initialImageUrl,
                         additionalImageUrl: values.additionalImageUrl,
                         shortDescription: values.shortDescription,
