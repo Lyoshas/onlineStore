@@ -11,8 +11,8 @@ services:
   nginx:
     restart: always
     build:
-      dockerfile: ./nginx/Dockerfile.dev
-      context: ./ # we will make use of web-client, so we need to include it too
+      dockerfile: Dockerfile.dev
+      context: ./nginx
     ports:
       - '80:80'
   client:
