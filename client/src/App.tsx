@@ -20,7 +20,7 @@ import OAuthLogin from './pages/OAuthLogin/OAuthLogin';
 import OAuthCallback from './pages/OAuthCallback/OAuthCallback';
 import Logout from './pages/Logout/Logout';
 import useApiError from './components/hooks/useApiError';
-import LandingPage from './components/LandingPage/LandingPage';
+import LandingPage from './pages/LandingPage/LandingPage';
 import ProductInfo from './components/ProductInfo/ProductInfo';
 import EditProduct from './components/EditProduct/EditProduct';
 

@@ -1,6 +1,6 @@
-import ExploreProductsBlock from '../ExploreProductsBlock/ExploreProductsBlock';
-import Hero from '../Hero/Hero';
-import Layout from '../Layout/Layout';
+import ExploreProductsBlock from '../../components/ExploreProductsBlock/ExploreProductsBlock';
+import Hero from '../../components/Hero/Hero';
+import Layout from '../../components/Layout/Layout';
 
 const LandingPage = () => {
     return (
