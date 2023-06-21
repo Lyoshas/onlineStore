@@ -8,6 +8,7 @@ import FormInput from '../../Input/FormInput';
 import FormActions from '../../FormActions/FormActions';
 import SubmitButton from '../../UI/SubmitButton/SubmitButton';
 import FormSelect from '../../FormSelect/FormSelect';
+import SchemaContext from '../../../context/validationSchema';
 
 interface EditProductFormProps {
     product: DBProduct;
@@ -56,49 +57,47 @@ const EditProductForm: FC<EditProductFormProps> = (props) => {
                     <h2 className={classes['edit-product-form__heading']}>
                         Edit Product Data
                     </h2>
-                    <FormInput
-                        type="text"
-                        label="Title"
-                        name="title"
-                        placeholder="Enter product title"
-                        validationSchema={editProductSchema}
-                        isRequired={true}
-                        value={product.title}
-                    />
-                    <FormInput
-                        type="number"
-                        label="Price"
-                        name="price"
-                        placeholder="Enter product price"
-                        validationSchema={editProductSchema}
-                        isRequired={true}
-                        value={product.price}
-                    />
-                    <FormSelect
-                        label="Category"
-                        name="category"
-                        options={props.availableCategories}
-                        defaultOption={product.category}
-                        isRequired={true}
-                    />
-                    <FormInput
-                        type="number"
-                        label="Quantity in stock"
-                        name="quantityInStock"
-                        placeholder="Enter how many products are available"
-                        validationSchema={editProductSchema}
-                        isRequired={true}
-                        value={product.quantityInStock}
-                    />
-                    <FormInput
-                        type="text"
-                        label="Short description"
-                        name="shortDescription"
-                        placeholder="Enter product description"
-                        validationSchema={editProductSchema}
-                        isRequired={true}
-                        value={product.shortDescription}
-                    />
+                    <SchemaContext.Provider value={editProductSchema}>
+                        <FormInput
+                            type="text"
+                            label="Title"
+                            name="title"
+                            placeholder="Enter product title"
+                            isRequired={true}
+                            value={product.title}
+                        />
+                        <FormInput
+                            type="number"
+                            label="Price"
+                            name="price"
+                            placeholder="Enter product price"
+                            isRequired={true}
+                            value={product.price}
+                        />
+                        <FormSelect
+                            label="Category"
+                            name="category"
+                            options={props.availableCategories}
+                            defaultOption={product.category}
+                            isRequired={true}
+                        />
+                        <FormInput
+                            type="number"
+                            label="Quantity in stock"
+                            name="quantityInStock"
+                            placeholder="Enter how many products are available"
+                            isRequired={true}
+                            value={product.quantityInStock}
+                        />
+                        <FormInput
+                            type="text"
+                            label="Short description"
+                            name="shortDescription"
+                            placeholder="Enter product description"
+                            isRequired={true}
+                            value={product.shortDescription}
+                        />
+                    </SchemaContext.Provider>
                     <FormActions>
                         <SubmitButton
                             isLoading={props.isUpdateRequestLoading}

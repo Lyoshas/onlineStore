@@ -13,6 +13,7 @@ import SuccessMessage from './SuccessMessage';
 import CenterBlock from '../../components/UI/CenterBlock/CenterBlock';
 import recaptchaTokenSchema from '../../util/recaptchaTokenSchema';
 import useApiError from '../../components/hooks/useApiError';
+import SchemaContext from '../../context/validationSchema';
 
 const schema = Yup.object().shape({
     email: Yup.string()
@@ -79,14 +80,15 @@ const ForgotPassword: FC = () => {
                     >
                         {(formik) => (
                             <Form>
-                                <FormInput
-                                    type="email"
-                                    isRequired={true}
-                                    placeholder="Enter your email"
-                                    validationSchema={schema}
-                                    label="Email"
-                                    name="email"
-                                />
+                                <SchemaContext.Provider value={schema}>
+                                    <FormInput
+                                        type="email"
+                                        isRequired={true}
+                                        placeholder="Enter your email"
+                                        label="Email"
+                                        name="email"
+                                    />
+                                </SchemaContext.Provider>
                                 <ReCAPTCHABlock ref={recaptchaRef} />
                                 {serverErrorResponse && (
                                     <ErrorMessage centered={true}>

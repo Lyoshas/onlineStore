@@ -16,6 +16,7 @@ import { useSignInMutation } from '../../store/apis/authApi';
 import classes from './SigninForm.module.css';
 import SuggestAccountCreation from '../SuggestAccountCreation/SuggestAccountCreation';
 import useApiError from '../hooks/useApiError';
+import SchemaContext from '../../context/validationSchema';
 
 const SignInForm = () => {
     const initial = { login: '', password: '', recaptchaToken: '' };
@@ -71,22 +72,22 @@ const SignInForm = () => {
             {(formik) => (
                 <Fragment>
                     <Form>
-                        <FormInput
-                            type="text"
-                            label="Email or phone number (e.g. +380-50-123-45-67)"
-                            isRequired={true}
-                            name="login"
-                            placeholder="Enter your email or phone number"
-                            validationSchema={schema}
-                        />
-                        <FormInput
-                            type="password"
-                            label="Password"
-                            isRequired={true}
-                            name="password"
-                            placeholder="Enter your password"
-                            validationSchema={schema}
-                        />
+                        <SchemaContext.Provider value={schema}>
+                            <FormInput
+                                type="text"
+                                label="Email or phone number (e.g. +380-50-123-45-67)"
+                                isRequired={true}
+                                name="login"
+                                placeholder="Enter your email or phone number"
+                            />
+                            <FormInput
+                                type="password"
+                                label="Password"
+                                isRequired={true}
+                                name="password"
+                                placeholder="Enter your password"
+                            />
+                        </SchemaContext.Provider>
                         <p
                             className={
                                 classes['sign-in__forgot-password-paragraph']

@@ -17,6 +17,7 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import InvalidLink from './InvalidLink';
 import recaptchaTokenSchema from '../../util/recaptchaTokenSchema';
 import useApiError from '../../components/hooks/useApiError';
+import SchemaContext from '../../context/validationSchema';
 
 const initialValues = { password: '', confirmPassword: '', recaptchaToken: '' };
 const validationSchema = Yup.object().shape({
@@ -88,22 +89,22 @@ const ResetPassword = () => {
                 >
                     {(formik) => (
                         <Form>
-                            <FormInput
-                                isRequired={true}
-                                label="New password"
-                                name="password"
-                                type="password"
-                                placeholder="Enter your new password"
-                                validationSchema={validationSchema}
-                            />
-                            <FormInput
-                                isRequired={true}
-                                label="Confirm password"
-                                name="confirmPassword"
-                                type="password"
-                                placeholder="Enter your new password again"
-                                validationSchema={validationSchema}
-                            />
+                            <SchemaContext.Provider value={validationSchema}>
+                                <FormInput
+                                    isRequired={true}
+                                    label="New password"
+                                    name="password"
+                                    type="password"
+                                    placeholder="Enter your new password"
+                                />
+                                <FormInput
+                                    isRequired={true}
+                                    label="Confirm password"
+                                    name="confirmPassword"
+                                    type="password"
+                                    placeholder="Enter your new password again"
+                                />
+                            </SchemaContext.Provider>
                             <ReCAPTCHABlock ref={recaptchaRef} />
                             <FormActions>
                                 <SubmitButton

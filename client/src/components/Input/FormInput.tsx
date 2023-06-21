@@ -1,7 +1,8 @@
-import React, { FC, Fragment, useState } from 'react';
+import React, { FC, useState } from 'react';
 import { FieldHookConfig, useField, useFormikContext } from 'formik';
-import { ObjectShape, OptionalObjectSchema } from 'yup/lib/object';
 import { ValidationError } from 'yup';
+import { useContext } from 'react';
+import SchemaContext from '../../context/validationSchema';
 
 import classes from './FormInput.module.css';
 import ErrorMessage from '../UI/ErrorMessage/ErrorMessage';
@@ -14,7 +15,6 @@ type FormInputProps = {
     value?: string | number;
     validateOnChange?: boolean; // it validates only this field
     validateOnBlur?: boolean; // it validates only this field
-    validationSchema: OptionalObjectSchema<ObjectShape>;
     TipComponent?: React.ReactNode;
 } & FieldHookConfig<string>;
 
@@ -25,7 +25,6 @@ const FormInput: FC<FormInputProps> = ({
     placeholder,
     TipComponent,
     value,
-    validationSchema,
     validateOnChange = true,
     validateOnBlur = true,
     ...props
@@ -33,6 +32,7 @@ const FormInput: FC<FormInputProps> = ({
     const [field, meta, helpers] = useField(props);
     const { values: formikValues, setFieldError } = useFormikContext();
     const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
+    const validationSchema = useContext(SchemaContext);
 
     const isInputInvalid = meta.touched && !!meta.error;
 
