@@ -6,6 +6,7 @@ import SchemaContext from '../../context/validationSchema';
 
 import classes from './FormInput.module.css';
 import ErrorMessage from '../UI/ErrorMessage/ErrorMessage';
+import FileInfo from '../../interfaces/FileInfo';
 
 type FormInputProps = {
     label: string | React.ReactNode;
@@ -37,7 +38,7 @@ const FormInput: FC<FormInputProps> = ({
     ...props
 }) => {
     const [field, meta, helpers] = useField(props);
-    const { values: formikValues, setFieldError } = useFormikContext();
+    const { values: formikValues, setFieldError, setFieldValue } = useFormikContext();
     const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
     const validationSchema = useContext(SchemaContext);
 
@@ -80,7 +81,7 @@ const FormInput: FC<FormInputProps> = ({
         }
     };
 
-    const returnObjectToValidate = (fieldName: string, fieldValue: string) => {
+    const returnObjectToValidate = (fieldName: string, fieldValue: any) => {
         const objectToValidate = { [fieldName]: fieldValue };
 
         if (fieldName === 'confirmPassword') {
@@ -105,9 +106,19 @@ const FormInput: FC<FormInputProps> = ({
     };
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { name: fieldName, value: fieldValue } = event.target;
+        let fieldName = event.target.name;
+        let fieldValue: string | FileInfo = event.target.value;
+        
+        if (
+            type === 'file' &&
+            event.target.files &&
+            event.target.files.length > 0
+        ) {
+            const { size, type } = event.target.files[0];
+            fieldValue = { size, type };
+        }
 
-        helpers.setValue(fieldValue, false);
+        setFieldValue(fieldName, fieldValue);
 
         if (validateOnChange) {
             validateFields(
@@ -120,7 +131,18 @@ const FormInput: FC<FormInputProps> = ({
     };
 
     const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
-        const { name: fieldName, value: fieldValue } = event.target;
+        // const { name: fieldName, value: fieldValue } = event.target;
+        let fieldName = event.target.name;
+        let fieldValue: string | FileInfo = event.target.value;
+        
+        if (
+            type === 'file' &&
+            event.target.files &&
+            event.target.files.length > 0
+        ) {
+            const { size, type } = event.target.files[0];
+            fieldValue = { size, type };
+        }
 
         helpers.setTouched(true, false);
 
