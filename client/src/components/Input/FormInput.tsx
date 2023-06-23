@@ -2,11 +2,11 @@ import React, { FC, useState } from 'react';
 import { FieldHookConfig, useField, useFormikContext } from 'formik';
 import { ValidationError } from 'yup';
 import { useContext } from 'react';
-import SchemaContext from '../../context/validationSchema';
 
 import classes from './FormInput.module.css';
 import ErrorMessage from '../UI/ErrorMessage/ErrorMessage';
 import FileInfo from '../../interfaces/FileInfo';
+import SchemaContext from '../../context/validationSchema';
 
 type FormInputProps = {
     label: string | React.ReactNode;
@@ -105,54 +105,57 @@ const FormInput: FC<FormInputProps> = ({
         return objectToValidate;
     };
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        let fieldName = event.target.name;
-        let fieldValue: string | FileInfo = event.target.value;
-        
+    // if we're dealing with a basic input (e.g. type="text"), this function is going to return the input name and value
+    // if we're dealing with a file input, it's going to return the input value as { size: number; type: string }
+    const getInputData = (
+        inputElement: HTMLInputElement
+    ): { inputName: string; inputValue: string | FileInfo } => {
+        let inputName = inputElement.name;
+        let inputValue: string | FileInfo = inputElement.value;
+
         if (
             type === 'file' &&
-            event.target.files &&
-            event.target.files.length > 0
+            inputElement.files &&
+            inputElement.files.length > 0
         ) {
-            const { size, type } = event.target.files[0];
-            fieldValue = { size, type };
+            const { size, type } = inputElement.files[0];
+            inputValue = { size, type };
         }
 
-        setFieldValue(fieldName, fieldValue);
+        return { inputName, inputValue };
+    };
+
+    // this function is used to validate an input separately, not the whole form
+    // however, if we are dealing with passwords, the 'password' and 'confirmPassword' fields will be validated together
+    const validateSeparateInput = (
+        inputName: string,
+        inputValue: string | FileInfo
+    ) => {
+        validateFields(
+            returnObjectToValidate(inputName, inputValue),
+            ['password', 'confirmPassword'].includes(inputName)
+                ? ['password', 'confirmPassword']
+                : [inputName]
+        );
+    };
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { inputName, inputValue } = getInputData(event.target);
+
+        setFieldValue(inputName, inputValue);
 
         if (validateOnChange) {
-            validateFields(
-                returnObjectToValidate(fieldName, fieldValue),
-                ['password', 'confirmPassword'].includes(fieldName)
-                    ? ['password', 'confirmPassword']
-                    : [fieldName]
-            );
+            validateSeparateInput(inputName, inputValue);
         }
     };
 
     const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
-        // const { name: fieldName, value: fieldValue } = event.target;
-        let fieldName = event.target.name;
-        let fieldValue: string | FileInfo = event.target.value;
-        
-        if (
-            type === 'file' &&
-            event.target.files &&
-            event.target.files.length > 0
-        ) {
-            const { size, type } = event.target.files[0];
-            fieldValue = { size, type };
-        }
+        const { inputName, inputValue } = getInputData(event.target);
 
         helpers.setTouched(true, false);
 
         if (validateOnBlur) {
-            validateFields(
-                returnObjectToValidate(fieldName, fieldValue),
-                ['password', 'confirmPassword'].includes(fieldName)
-                    ? ['password', 'confirmPassword']
-                    : [fieldName]
-            );
+            validateSeparateInput(inputName, inputValue);
         }
     };
 
@@ -210,7 +213,9 @@ const FormInput: FC<FormInputProps> = ({
                     />
                 )}
             </div>
-            {isInputInvalid && <ErrorMessage>{meta.error as string}</ErrorMessage>}
+            {isInputInvalid && (
+                <ErrorMessage>{meta.error as string}</ErrorMessage>
+            )}
             {TipComponent}
         </div>
     );
