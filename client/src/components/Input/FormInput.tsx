@@ -15,6 +15,9 @@ type FormInputProps = {
     value?: string | number;
     validateOnChange?: boolean; // it validates only this field
     validateOnBlur?: boolean; // it validates only this field
+    min?: number;
+    max?: number;
+    step?: number;
     TipComponent?: React.ReactNode;
 } & FieldHookConfig<string>;
 
@@ -27,6 +30,10 @@ const FormInput: FC<FormInputProps> = ({
     value,
     validateOnChange = true,
     validateOnBlur = true,
+    // min, max, and step are used for input[type="number"]
+    min,
+    max,
+    step,
     ...props
 }) => {
     const [field, meta, helpers] = useField(props);
@@ -161,6 +168,9 @@ const FormInput: FC<FormInputProps> = ({
                     onChange={handleChange}
                     onBlur={handleBlur}
                     defaultValue={value}
+                    min={min}
+                    max={max}
+                    step={step}
                 />
                 {type === 'password' && (
                     <img
