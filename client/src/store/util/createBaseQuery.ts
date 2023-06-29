@@ -1,5 +1,9 @@
 import { fetchBaseQuery } from '@reduxjs/toolkit/dist/query';
-import { RootState } from '..';
+
+import isAccessTokenRunningOut from '../../util/IsAccessTokenRunningOut';
+import store, { RootState } from '..';
+import getAccessToken from './getAccessToken';
+import { authActions } from '../slices/auth';
 
 interface CreateBaseQueryArgs {
     baseUrl: string;
@@ -11,16 +15,32 @@ const createBaseQuery = (options: CreateBaseQueryArgs) => {
 
     return fetchBaseQuery({
         baseUrl: baseUrl,
-        prepareHeaders: (headers, { getState }) => {
+        prepareHeaders: async (headers, { getState }) => {
+            headers.set('Content-Type', 'application/json');
+
             if (includeAccessToken) {
-                const accessToken = (getState() as RootState).auth.accessToken;
+                // getting the access token from the Redux store
+                let accessToken = (getState() as RootState).auth.accessToken;
 
                 if (accessToken) {
+                    if (isAccessTokenRunningOut(accessToken)) {
+                        // making a request to the API to get a new access token
+                        try {
+                            accessToken = await getAccessToken();
+                            // updating the token in the Redux store
+                            store.dispatch(
+                                authActions.updateAccessToken(accessToken)
+                            );
+                        } catch (e) {
+                            // if we make it here, the API server is either down or the refresh token has expired
+                            store.dispatch(authActions.invalidateUser());
+                            return headers;
+                        }
+                    }
+
                     headers.set('Authorization', `Bearer ${accessToken}`);
                 }
             }
-
-            headers.set('Content-Type', 'application/json');
 
             return headers;
         },
