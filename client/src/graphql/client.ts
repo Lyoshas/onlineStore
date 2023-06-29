@@ -1,38 +1,31 @@
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
-import jwt_decode from 'jwt-decode';
 
 import store from '../store';
 import { authActions } from '../store/slices/auth';
-import AccessTokenPayload from '../interfaces/AccessTokenPayload';
+import getAccessToken from '../store/util/getAccessToken';
+import isAccessTokenRunningOut from '../util/IsAccessTokenRunningOut';
 
 const httpLink = createHttpLink({
     uri: '/api/graphql',
 });
 
-const getAccessToken = async () => {
-    const res = await fetch('/api/auth/refresh', {
-        method: 'GET',
-        credentials: 'include',
-    });
-    const data: { accessToken: string } = await res.json();
-
-    return data.accessToken;
-};
-
 const authLink = setContext(async (_: unknown, { headers }) => {
     // get the access token from the Redux store
     // it's not possible to use the "useSelector" hook in non-component functions
     let accessToken = store.getState().auth.accessToken;
-    const decoded: AccessTokenPayload | null = accessToken
-        ? jwt_decode(accessToken)
-        : null;
 
     // if the token expires in 5 seconds or has already expired
-    if (decoded && decoded.exp - Date.now() / 1000 < 5) {
+    if (accessToken && isAccessTokenRunningOut(accessToken)) {
         // the token is about to expire, so we need to make a request to renew this token
-        accessToken = await getAccessToken();
-        store.dispatch(authActions.updateAccessToken(accessToken));
+        try {
+            accessToken = await getAccessToken();
+            store.dispatch(authActions.updateAccessToken(accessToken));
+        } catch (e) {
+            // if we make it here, the API server is either down or the refresh token has expired
+            accessToken = null;
+            store.dispatch(authActions.invalidateUser());
+        }
     }
 
     // return the headers to the context so httpLink can read them
