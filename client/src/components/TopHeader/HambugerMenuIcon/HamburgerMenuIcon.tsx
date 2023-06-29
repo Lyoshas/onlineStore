@@ -1,10 +1,23 @@
 import { FC } from 'react';
 
 import classes from './HamburgerMenuIcon.module.css';
+import classNames from 'classnames';
 
-const HamburgerMenuIcon: FC<{ onClick?: () => void }> = (props) => {
+interface HamburgerMenuIconProps {
+    onClick?: () => void;
+    // null means that the admin status hasn't been determined yet
+    isAdmin: boolean | null;
+}
+
+const HamburgerMenuIcon: FC<HamburgerMenuIconProps> = (props) => {
     return (
-        <div className={classes['hamburger-block']} onClick={props.onClick}>
+        <div
+            className={classNames(
+                classes['hamburger-block'],
+                props.isAdmin && classes.admin
+            )}
+            onClick={props.onClick}
+        >
             <div className={classes['hamburger-block__line']} />
             <div className={classes['hamburger-block__line']} />
             <div className={classes['hamburger-block__line']} />

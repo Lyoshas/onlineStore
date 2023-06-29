@@ -26,8 +26,9 @@ const TopHeader: FC<{
     const isAuthenticated = useSelector(
         (state: RootState) => state.auth.isAuthenticated
     );
+    const isAdmin = useSelector((state: RootState) => state.auth.isAdmin);
     const isLargeScreen = useMediaQuery({
-        query: '(min-width: 941px)',
+        query: `(min-width: ${isAdmin ? 1201 : 941}px)`,
     });
 
     useEffect(() => {
@@ -47,10 +48,10 @@ const TopHeader: FC<{
 
     const handleHamburgerClick = () => setShowResponsiveMenu((prev) => !prev);
     const handleNavItemClick = () => {
-        // if the screen size is >= 941px, do nothing
+        // if the screen size is >= 941px (1201px if a user is an admin), do nothing
         if (isLargeScreen) return;
         setShowResponsiveMenu(false);
-    }
+    };
 
     return isAuthenticated === null ? (
         <div className="flex-wrapper">
@@ -61,12 +62,16 @@ const TopHeader: FC<{
             <header
                 className={classNames(
                     classes['top-header'],
+                    isAdmin ? classes['admin'] : classes['basic-user'],
                     isScrolled && classes.darkened
                 )}
             >
                 <Layout className={classes['top-header__layout']}>
                     <Logo className={classes['top-header-layout__logo']} />
-                    <HamburgerMenuIcon onClick={handleHamburgerClick} />
+                    <HamburgerMenuIcon
+                        onClick={handleHamburgerClick}
+                        isAdmin={isAdmin}
+                    />
                     {showResponsiveMenu && (
                         <Fragment>
                             <Navigation

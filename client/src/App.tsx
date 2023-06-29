@@ -23,6 +23,7 @@ import useApiError from './components/hooks/useApiError';
 import LandingPage from './pages/LandingPage/LandingPage';
 import ProductInfo from './components/ProductInfo/ProductInfo';
 import EditProduct from './components/EditProduct/EditProduct';
+import AddProduct from './pages/AddProduct/AddProduct';
 
 const App: FC = () => {
     const { errorMessage, isErrorNotificationShown } = useSelector(
@@ -140,6 +141,18 @@ const App: FC = () => {
                         <EnsureStatus auth={true} admin={true}>
                             <TopHeader
                                 RenderAfter={<EditProduct />}
+                                addOffset={true}
+                            />
+                        </EnsureStatus>
+                    }
+                />
+                <Route
+                    path="/add-product"
+                    element={
+                        // ensure the user is logged in and is an admin
+                        <EnsureStatus auth={true} admin={true}>
+                            <TopHeader
+                                RenderAfter={<AddProduct />}
                                 addOffset={true}
                             />
                         </EnsureStatus>

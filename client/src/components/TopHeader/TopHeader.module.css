@@ -30,6 +30,23 @@ main.position-adjustable-block {
     height: calc(100% - 107px);
 }
 
+@media screen and (max-width: 1200px) {
+    header.admin .top-header__layout {
+        flex-wrap: wrap;
+    }
+    
+    header.admin .top-header__layout .top-header-layout__navigation,
+    header.admin .top-header__layout > *:nth-child(4) {
+        flex-basis: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    header.admin .top-header-layout__navigation {
+        margin-bottom: 30px !important;
+    }
+}
+
 @media screen and (max-width: 940px) {
     .top-header__layout {
         flex-wrap: wrap;

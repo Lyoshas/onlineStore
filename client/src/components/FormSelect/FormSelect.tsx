@@ -11,7 +11,7 @@ interface FormSelectProps {
     options: string[];
     label: string;
     isRequired: boolean;
-    defaultOption: string;
+    defaultOption?: string;
 }
 
 const FormSelect: FC<FormSelectProps> = (props) => {
