@@ -1,4 +1,6 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
+
+import createBaseQuery from '../util/createBaseQuery';
 
 export interface IUserData {
     firstName: string;
@@ -17,8 +19,9 @@ export interface IUserCredentials {
 
 export const authApi = createApi({
     reducerPath: 'authApi',
-    baseQuery: fetchBaseQuery({
+    baseQuery: createBaseQuery({
         baseUrl: 'http://localhost/api/auth',
+        includeAccessToken: false,
     }),
     endpoints: (builder) => ({
         signUp: builder.mutation<{ msg: string }, IUserData>({
