@@ -5,11 +5,20 @@ import DisplayProduct from '../../interfaces/DisplayProduct';
 import isProductAvailable from '../helpers/isProductAvailable';
 import isProductRunningOut from '../helpers/isProductRunningOut';
 import ApolloServerContext from '../../interfaces/ApolloServerContext';
+import { getImageUrlByObjectKey } from '../../models/file-upload';
 
 type AddProductArguments = Omit<
     DisplayProduct,
-    'id' | 'isAvailable' | 'isRunningOut'
-> & { quantityInStock: number };
+    | 'id'
+    | 'isAvailable'
+    | 'isRunningOut'
+    | 'initialImageUrl'
+    | 'additionalImageUrl'
+> & {
+    quantityInStock: number;
+    initialImageName: string;
+    additionalImageName: string;
+};
 
 export default async (
     _: any,
@@ -17,6 +26,9 @@ export default async (
     context: ApolloServerContext
 ): Promise<DisplayProduct> => {
     await validateUser(context.user);
+
+    const initialImageUrl = getImageUrlByObjectKey(args.initialImageName);
+    const additionalImageUrl = getImageUrlByObjectKey(args.additionalImageName);
 
     const { rows } = await dbPool.query(
         `INSERT INTO products (
@@ -31,8 +43,8 @@ export default async (
         [
             args.title,
             args.price,
-            args.initialImageUrl,
-            args.additionalImageUrl,
+            initialImageUrl,
+            additionalImageUrl,
             args.quantityInStock,
             args.shortDescription,
             args.category,
@@ -44,8 +56,8 @@ export default async (
         title: args.title,
         price: args.price,
         category: args.category,
-        initialImageUrl: args.initialImageUrl,
-        additionalImageUrl: args.additionalImageUrl,
+        initialImageUrl: initialImageUrl,
+        additionalImageUrl: additionalImageUrl,
         shortDescription: args.shortDescription,
         isAvailable: isProductAvailable(args.quantityInStock),
         isRunningOut: isProductRunningOut(args.quantityInStock),

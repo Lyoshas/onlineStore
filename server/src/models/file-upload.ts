@@ -41,3 +41,7 @@ export const generatePresignedUrl = async (
 
     return signedUrl;
 };
+
+export const getImageUrlByObjectKey = (filename: string) => {
+    return `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/${filename}`;
+};
