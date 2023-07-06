@@ -24,50 +24,26 @@ export default async (
         shortDescription,
         quantityInStock,
     } = args;
-    let i = 0;
-
-    const isTitleCorrect = typeof title === 'string';
-    const isPriceCorrect = typeof price === 'number';
-    const isCategoryCorrect = typeof category === 'string';
-    const isInitialImageUrlCorrect = typeof initialImageUrl === 'string';
-    const isAdditionalImageUrlCorrect = typeof additionalImageUrl === 'string';
-    const isShortDescriptionCorrect = typeof shortDescription === 'string';
-    const isQuantityInStockCorrect = typeof quantityInStock === 'number';
-
-    if (
-        [
-            isTitleCorrect,
-            isPriceCorrect,
-            isInitialImageUrlCorrect,
-            isAdditionalImageUrlCorrect,
-            isShortDescriptionCorrect,
-            isQuantityInStockCorrect,
-        ].every((val) => !val)
-    ) {
-        throw new Error(
-            'At least one of these fields ("title", "price", "initialImageUrl", "additionalImageUrl", "shortDescription", and "quantityInStock") must be specified'
-        );
-    }
 
     const { rowCount } = await dbPool.query(
         `UPDATE products
         SET
-            ${isTitleCorrect ? `title = $${++i},` : ''}
-            ${isPriceCorrect ? `price = $${++i},` : ''}
-            ${isCategoryCorrect ? `category = $${++i},` : ''}
-            ${isInitialImageUrlCorrect ? `initial_image_url = $${++i},` : ''}
-            ${isAdditionalImageUrlCorrect ? `additional_image_url = $${++i},` : ''}
-            ${isShortDescriptionCorrect ? `short_description = $${++i},` : ''}
-            ${isQuantityInStockCorrect ? `quantity_in_stock = $${++i}` : ''}
-        WHERE id = $${++i}`,
+            title = $1
+            price = $2
+            category = $3
+            initial_image_url = $4
+            additional_image_url = $5
+            short_description = $6
+            quantity_in_stock = $7
+        WHERE id = $8`,
         [
-            isTitleCorrect ? title : null,
-            isPriceCorrect ? price : null,
-            isCategoryCorrect ? category : null,
-            isInitialImageUrlCorrect ? initialImageUrl : null,
-            isAdditionalImageUrlCorrect ? additionalImageUrl : null,
-            isShortDescriptionCorrect ? shortDescription : null,
-            isQuantityInStockCorrect ? quantityInStock : null,
+            title,
+            price,
+            category,
+            initialImageUrl,
+            additionalImageUrl,
+            shortDescription,
+            quantityInStock,
             id,
         ].filter((arg) => arg !== null)
     );
