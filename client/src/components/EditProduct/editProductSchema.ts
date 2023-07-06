@@ -17,7 +17,7 @@ const editProductSchema = Yup.object().shape({
         .transform((value) => +value)
         .typeError('Quantity in stock must be a number')
         .required('Quantity in stock is a required field')
-        .moreThan(0, 'Quantity in stock must be greater than 0'),
+        .moreThan(-1, 'Quantity in stock must be 0 or more'),
     shortDescription: Yup.string()
         .required('Short description is a required field')
         .test(
