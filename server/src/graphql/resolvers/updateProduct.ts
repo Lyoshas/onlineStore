@@ -6,24 +6,21 @@ import isProductAvailable from '../helpers/isProductAvailable';
 import ApolloServerContext from '../../interfaces/ApolloServerContext';
 import DisplayProduct from '../../interfaces/DisplayProduct';
 import CamelCaseProperties from '../../interfaces/CamelCaseProperties';
+import { getImageUrlByObjectKey } from '../../models/file-upload';
+import GraphqlAddProductsArgs from '../../interfaces/GraphqlAddProductArgs';
 
 export default async (
     _: any,
-    args: CamelCaseProperties<DBProduct>,
+    args: GraphqlAddProductsArgs & { id: number },
     context: ApolloServerContext
 ): Promise<DisplayProduct> => {
     await validateUser(context.user);
 
-    const {
-        id,
-        title,
-        price,
-        category,
-        initialImageUrl,
-        additionalImageUrl,
-        shortDescription,
-        quantityInStock,
-    } = args;
+    const initialImageUrl = getImageUrlByObjectKey(args.initialImageName);
+    const additionalImageUrl = getImageUrlByObjectKey(args.additionalImageName);
+
+    const { id, title, price, category, shortDescription, quantityInStock } =
+        args;
 
     const { rowCount } = await dbPool.query(
         `UPDATE products
@@ -45,7 +42,7 @@ export default async (
             shortDescription,
             quantityInStock,
             id,
-        ].filter((arg) => arg !== null)
+        ]
     );
 
     if (rowCount === 0) {

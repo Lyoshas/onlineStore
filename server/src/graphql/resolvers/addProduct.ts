@@ -6,23 +6,11 @@ import isProductAvailable from '../helpers/isProductAvailable';
 import isProductRunningOut from '../helpers/isProductRunningOut';
 import ApolloServerContext from '../../interfaces/ApolloServerContext';
 import { getImageUrlByObjectKey } from '../../models/file-upload';
-
-type AddProductArguments = Omit<
-    DisplayProduct,
-    | 'id'
-    | 'isAvailable'
-    | 'isRunningOut'
-    | 'initialImageUrl'
-    | 'additionalImageUrl'
-> & {
-    quantityInStock: number;
-    initialImageName: string;
-    additionalImageName: string;
-};
+import GraphqlAddProductsArgs from '../../interfaces/GraphqlAddProductArgs';
 
 export default async (
     _: any,
-    args: AddProductArguments,
+    args: GraphqlAddProductsArgs,
     context: ApolloServerContext
 ): Promise<DisplayProduct> => {
     await validateUser(context.user);
