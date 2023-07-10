@@ -66,6 +66,8 @@ export const typeDefs = `#graphql
         category: String!
         initialImageUrl: String!
         additionalImageUrl: String!
+        initialImageName: String!
+        additionalImageName: String!
         quantityInStock: Int!
         shortDescription: String!
     }
