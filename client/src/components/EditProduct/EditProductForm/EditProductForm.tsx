@@ -1,5 +1,5 @@
 import { Formik, Form } from 'formik';
-import { FC } from 'react';
+import { FC, useRef } from 'react';
 
 import classes from './EditProductForm.module.css';
 import editProductSchema from '../editProductSchema';
@@ -9,17 +9,29 @@ import FormActions from '../../FormActions/FormActions';
 import SubmitButton from '../../UI/SubmitButton/SubmitButton';
 import FormSelect from '../../FormSelect/FormSelect';
 import SchemaContext from '../../../context/validationSchema';
+import { OnFormSubmitArgs as OnAddProductArgs } from '../../AddProductForm/AddProductForm';
 
 interface EditProductFormProps {
-    product: DBProduct;
+    product: DBProduct & {
+        initialImageName: string;
+        additionalImageName: string;
+    };
     availableCategories: string[];
     // if the user has sent the form, this component will show the loading progress
     isUpdateRequestLoading: boolean;
-    onEditProduct: (options: { variables: DBProduct }) => unknown;
+    // onEditProduct: (options: { variables: DBProduct }) => unknown;
+    onEditProduct: (
+        formData: OnAddProductArgs & {
+            previousInitialImageName: string;
+            previousAdditionalImageName: string;
+        }
+    ) => void;
 }
 
 const EditProductForm: FC<EditProductFormProps> = (props) => {
     const product = props.product;
+    const initialImageRef = useRef<HTMLInputElement>(null);
+    const additionalImageRef = useRef<HTMLInputElement>(null);
 
     return (
         <Formik
@@ -31,23 +43,24 @@ const EditProductForm: FC<EditProductFormProps> = (props) => {
                 price: product.price,
                 category: product.category,
                 quantityInStock: product.quantityInStock,
-                initialImageUrl: product.initialImageUrl,
-                additionalImageUrl: product.additionalImageUrl,
+                initialImageInfo: { size: 0, type: '' },
+                additionalImageInfo: { size: 0, type: '' },
                 shortDescription: product.shortDescription,
             }}
             onSubmit={(values, { setSubmitting }) => {
                 setSubmitting(true);
                 props.onEditProduct({
-                    variables: {
-                        id: props.product.id,
-                        title: values.title,
-                        price: +values.price,
-                        category: values.category,
-                        quantityInStock: +values.quantityInStock,
-                        initialImageUrl: values.initialImageUrl,
-                        additionalImageUrl: values.additionalImageUrl,
-                        shortDescription: values.shortDescription,
-                    },
+                    title: values.title,
+                    price: +values.price,
+                    category: values.category,
+                    quantityInStock: +values.quantityInStock,
+                    initialImageInfo: values.initialImageInfo,
+                    additionalImageInfo: values.additionalImageInfo,
+                    initialImageInput: initialImageRef.current!,
+                    additionalImageInput: additionalImageRef.current!,
+                    shortDescription: values.shortDescription,
+                    previousInitialImageName: product.initialImageName,
+                    previousAdditionalImageName: product.additionalImageName,
                 });
                 setSubmitting(false);
             }}
@@ -73,6 +86,26 @@ const EditProductForm: FC<EditProductFormProps> = (props) => {
                             placeholder="Enter product price"
                             isRequired={true}
                             value={product.price}
+                        />
+                        <FormInput
+                            isRequired={false}
+                            type="file"
+                            label="Initial Image (if not selected, the image won't be changed)"
+                            name="initialImageInfo"
+                            placeholder="Select the main image for the product"
+                            validateOnChange={true}
+                            validateOnBlur={true}
+                            ref={initialImageRef}
+                        />
+                        <FormInput
+                            isRequired={false}
+                            type="file"
+                            label="Additional Image (if not selected, the image won't be changed)"
+                            name="additionalImageInfo"
+                            placeholder="Select the additional image for the product"
+                            validateOnChange={true}
+                            validateOnBlur={true}
+                            ref={additionalImageRef}
                         />
                         <FormSelect
                             label="Category"

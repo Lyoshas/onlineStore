@@ -8,6 +8,8 @@ const GET_ADMIN_PRODUCT_DETAILS = gql(`
             category
             initialImageUrl
             additionalImageUrl
+            initialImageName
+            additionalImageName
             shortDescription
             quantityInStock
         }

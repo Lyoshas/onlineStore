@@ -6,8 +6,8 @@ const UPDATE_PRODUCT = gql(`
         $title: String!,
         $price: Float!,
         $category: String!,
-        $initialImageUrl: String!,
-        $additionalImageUrl: String!,
+        $initialImageName: String!,
+        $additionalImageName: String!,
         $quantityInStock: Int!,
         $shortDescription: String!
     ) {
@@ -16,12 +16,14 @@ const UPDATE_PRODUCT = gql(`
             title: $title,
             price: $price,
             category: $category,
-            initialImageUrl: $initialImageUrl,
-            additionalImageUrl: $additionalImageUrl,
+            initialImageName: $initialImageName,
+            additionalImageName: $additionalImageName,
             quantityInStock: $quantityInStock,
             shortDescription: $shortDescription
         ) {
             id
+            initialImageUrl
+            additionalImageUrl
             isAvailable
             isRunningOut
         }
