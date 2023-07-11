@@ -12,12 +12,20 @@ import SchemaContext from '../../../context/validationSchema';
 import { OnFormSubmitArgs as OnAddProductArgs } from '../../AddProductForm/AddProductForm';
 
 interface EditProductFormProps {
-    product: DBProduct;
+    product: DBProduct & {
+        initialImageName: string;
+        additionalImageName: string;
+    };
     availableCategories: string[];
     // if the user has sent the form, this component will show the loading progress
     isUpdateRequestLoading: boolean;
     // onEditProduct: (options: { variables: DBProduct }) => unknown;
-    onEditProduct: (formData: OnAddProductArgs) => void;
+    onEditProduct: (
+        formData: OnAddProductArgs & {
+            previousInitialImageName: string;
+            previousAdditionalImageName: string;
+        }
+    ) => void;
 }
 
 const EditProductForm: FC<EditProductFormProps> = (props) => {
@@ -51,6 +59,8 @@ const EditProductForm: FC<EditProductFormProps> = (props) => {
                     initialImageInput: initialImageRef.current!,
                     additionalImageInput: additionalImageRef.current!,
                     shortDescription: values.shortDescription,
+                    previousInitialImageName: product.initialImageName,
+                    previousAdditionalImageName: product.additionalImageName,
                 });
                 setSubmitting(false);
             }}

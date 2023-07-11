@@ -58,16 +58,32 @@ const EditProduct = () => {
     ] = useMutation(UPDATE_PRODUCT);
     // "null" means that the form hasn't been submitted yet
     const [formData, setFormData] = useState<OnFormSubmitArgs | null>(null);
+    // specifies whether to include initial/additional images in the update request or simply preserve the images that were uploaded before
+    const [includeInitialImage, setIncludeInitialImage] = useState<
+        boolean | null
+    >(null);
+    const [includeAdditionalImage, setIncludeAdditionalImage] = useState<
+        boolean | null
+    >(null);
 
     useEffect(() => {
         async function main() {
             if (
                 !formData ||
+                includeInitialImage === null ||
+                includeAdditionalImage === null ||
+                // if 'includeInitialImage' is set to 'true', but the image upload hasn't been finished yet
+                (includeInitialImage && !initialImageName) ||
+                // if 'includeAdditionalImage' is set to 'true', but the image upload hasn't been finished yet
+                (includeAdditionalImage && !additionalImageName) ||
+                !productDetailsData
                 // if the user attached an image but it hasn't been uploaded yet, skip the execution
-                (formData.initialImageInfo.size !== 0 &&
-                    !wasInitialImageUploadSuccessful) ||
-                (formData.additionalImageInfo.size !== 0 &&
-                    !wasAdditionalImageUploadSuccessful)
+                // (formData.initialImageInfo.size !== 0 &&
+                //     !wasInitialImageUploadSuccessful) ||
+                // (formData.additionalImageInfo.size !== 0 &&
+                //     !wasAdditionalImageUploadSuccessful) ||
+                // (wasInitialImageUploadSuccessful && !initialImageName) ||
+                // (wasAdditionalImageUploadSuccessful && !additionalImageName)
             )
                 return;
 
@@ -87,8 +103,15 @@ const EditProduct = () => {
                     category,
                     quantityInStock: +quantityInStock,
                     shortDescription,
-                    initialImageName,
-                    additionalImageName,
+                    initialImageName:
+                        includeInitialImage && initialImageName
+                            ? initialImageName
+                            : productDetailsData.adminProduct.initialImageName,
+                    additionalImageName:
+                        includeAdditionalImage && additionalImageName
+                            ? additionalImageName
+                            : productDetailsData.adminProduct
+                                  .additionalImageName,
                 },
             });
             const updatedProduct = updatedProductResult.data!.updateProduct;
@@ -97,40 +120,40 @@ const EditProduct = () => {
             // otherwise the product data will be stale
 
             // updating cache associated with "query AdminProduct($productId: Int!)"
-            const initialImageUrl = updatedProduct.initialImageUrl;
-            const additionalImageUrl = updatedProduct.additionalImageUrl;
-            apolloClient.writeQuery({
-                query: GET_ADMIN_PRODUCT_DETAILS,
-                data: {
-                    adminProduct: {
-                        title,
-                        price,
-                        category,
-                        initialImageUrl,
-                        additionalImageUrl,
-                        quantityInStock,
-                        shortDescription,
-                    },
-                },
-                variables: { productId: +productId! },
-            });
-            // updating cache associated with "query Product($productId: Int!)" if it exists
-            // this query is used when the user tries to go to the product details page
-            apolloClient.writeQuery({
-                query: GET_PRODUCT_BY_ID,
-                data: {
-                    product: {
-                        title,
-                        price,
-                        initialImageUrl,
-                        additionalImageUrl,
-                        isAvailable: updatedProduct.isAvailable,
-                        isRunningOut: updatedProduct.isRunningOut,
-                        shortDescription,
-                    },
-                },
-                variables: { productId: +productId! },
-            });
+            // const initialImageUrl = updatedProduct.initialImageUrl;
+            // const additionalImageUrl = updatedProduct.additionalImageUrl;
+            // apolloClient.writeQuery({
+            //     query: GET_ADMIN_PRODUCT_DETAILS,
+            //     data: {
+            //         adminProduct: {
+            //             title,
+            //             price,
+            //             category,
+            //             initialImageUrl,
+            //             additionalImageUrl,
+            //             quantityInStock,
+            //             shortDescription,
+            //         },
+            //     },
+            //     variables: { productId: +productId! },
+            // });
+            // // updating cache associated with "query Product($productId: Int!)" if it exists
+            // // this query is used when the user tries to go to the product details page
+            // apolloClient.writeQuery({
+            //     query: GET_PRODUCT_BY_ID,
+            //     data: {
+            //         product: {
+            //             title,
+            //             price,
+            //             initialImageUrl,
+            //             additionalImageUrl,
+            //             isAvailable: updatedProduct.isAvailable,
+            //             isRunningOut: updatedProduct.isRunningOut,
+            //             shortDescription,
+            //         },
+            //     },
+            //     variables: { productId: +productId! },
+            // });
         }
 
         main();
@@ -194,17 +217,24 @@ const EditProduct = () => {
 
     const handleEditProduct = async (formData: OnAddProductArgs) => {
         setFormData(formData);
-        if (
-            formData.initialImageInput.files &&
-            formData.initialImageInput.files.length > 0
-        ) {
-            uploadInitialImageToS3(formData.initialImageInput.files[0]);
-        } else if (
-            formData.additionalImageInput.files &&
-            formData.additionalImageInput.files.length > 0
-        ) {
-            uploadAdditionalImageToS3(formData.additionalImageInput.files[0]);
+
+        const isInitialImageAttached =
+            !!formData.initialImageInput.files &&
+            formData.initialImageInput.files.length > 0;
+        const isAdditionalImageAttached =
+            !!formData.additionalImageInput.files &&
+            formData.additionalImageInput.files.length > 0;
+
+        if (isInitialImageAttached) {
+            uploadInitialImageToS3(formData.initialImageInput.files![0]);
         }
+
+        if (isAdditionalImageAttached) {
+            uploadAdditionalImageToS3(formData.additionalImageInput.files![0]);
+        }
+
+        setIncludeInitialImage(isInitialImageAttached);
+        setIncludeAdditionalImage(isAdditionalImageAttached);
     };
 
     return (
