@@ -25,12 +25,12 @@ export default async (
     const { rowCount } = await dbPool.query(
         `UPDATE products
         SET
-            title = $1
-            price = $2
-            category = $3
-            initial_image_url = $4
-            additional_image_url = $5
-            short_description = $6
+            title = $1,
+            price = $2,
+            category = $3,
+            initial_image_url = $4,
+            additional_image_url = $5,
+            short_description = $6,
             quantity_in_stock = $7
         WHERE id = $8`,
         [
