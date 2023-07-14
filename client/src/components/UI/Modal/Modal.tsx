@@ -1,4 +1,4 @@
-import { FC, Fragment } from 'react';
+import { forwardRef } from 'react';
 import { createPortal } from 'react-dom';
 
 import Backdrop from '../Backdrop/Backdrop';
@@ -25,12 +25,13 @@ interface ModalProps {
     onClose: () => void;
 }
 
-const Modal: FC<ModalProps> = (props) => {
+const Modal = forwardRef<HTMLDivElement, ModalProps>((props, ref) => {
     return createPortal(
         <Backdrop onClick={props.onClose}>
             <Card
                 className={classes.modal}
                 onClick={(event) => event.stopPropagation()}
+                ref={ref}
             >
                 {/* if props.title is defined and its length is bigger than 0 */}
                 {props.title?.length && (
@@ -54,6 +55,6 @@ const Modal: FC<ModalProps> = (props) => {
         </Backdrop>,
         document.getElementById('modal-window')!
     );
-};
+});
 
 export default Modal;
