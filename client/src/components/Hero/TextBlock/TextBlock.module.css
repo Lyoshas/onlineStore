@@ -1,8 +1,8 @@
 .hero__text-block {
     margin-right: 15%;
     width: 600px;
-    /* the top header has z-index: 999 */
-    z-index: 998;
+    /* the top header has z-index: 997 */
+    z-index: 996;
     background: rgba(0, 0, 0, .5);
     padding: 30px;
     border-radius: 20px;
