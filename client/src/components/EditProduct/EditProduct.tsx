@@ -19,6 +19,7 @@ import apolloClient from '../../graphql/client';
 import GET_PRODUCT_BY_ID from '../ProductInfo/GraphQL/GetProductByIdRequest';
 import useImageUpload from '../hooks/useImageUpload';
 import deriveErrorMessage from '../../util/deriveErrorMessage';
+import GET_FEATURED_PRODUCTS from '../ExploreProductsBlock/GraphQL/getFeaturedProducts';
 
 const EditProduct = () => {
     const { productId } = useParams();
@@ -121,6 +122,7 @@ const EditProduct = () => {
             const initialImageUrl: string = updatedProduct.initialImageUrl;
             const additionalImageUrl: string =
                 updatedProduct.additionalImageUrl;
+
             apolloClient.writeQuery({
                 query: GET_ADMIN_PRODUCT_DETAILS,
                 data: {
@@ -155,6 +157,37 @@ const EditProduct = () => {
                 },
                 variables: { productId: +productId! },
             });
+
+            // updating cache associated with "query featuredProducts"
+            // this query is used when the user goes to the main page
+
+            // first we need to get the cache
+            const featuredProducts = apolloClient.readQuery({
+                query: GET_FEATURED_PRODUCTS,
+            })?.featuredProducts;
+
+            // if this cache exists, modify it
+            if (featuredProducts) {
+                apolloClient.writeQuery({
+                    query: GET_FEATURED_PRODUCTS,
+                    data: {
+                        featuredProducts: featuredProducts.map((product) => {
+                            if (product === null || product.id !== +productId!)
+                                return product;
+                            return {
+                                id: +productId!,
+                                title,
+                                price,
+                                initialImageUrl,
+                                additionalImageUrl,
+                                isAvailable: updatedProduct.isAvailable,
+                                isRunningOut: updatedProduct.isRunningOut,
+                                shortDescription,
+                            };
+                        }),
+                    },
+                });
+            }
         }
 
         main();
