@@ -2,7 +2,7 @@
     width: 30%;
     display: inline-block;
     background: #fff;
-    position: absolute;
+    position: fixed;
     z-index: 999;
 }
 
