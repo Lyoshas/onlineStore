@@ -23,38 +23,49 @@ interface ModalProps {
     */
     actions?: JSX.Element;
     onClose: () => void;
+    includeCancelButton?: boolean;
 }
 
-const Modal = forwardRef<HTMLDivElement, ModalProps>((props, ref) => {
-    return createPortal(
-        <Backdrop onClick={props.onClose}>
-            <Card
-                className={classes.modal}
-                onClick={(event) => event.stopPropagation()}
-                ref={ref}
-            >
-                {/* if props.title is defined and its length is bigger than 0 */}
-                {props.title?.length && (
-                    <div className={classes['modal__header']}>
-                        <h2 className={classes['modal-header__title']}>
-                            {props.title}
-                        </h2>
+const Modal = forwardRef<HTMLDivElement, ModalProps>(
+    ({ includeCancelButton = true, ...props }, ref) => {
+        return createPortal(
+            <Backdrop onClick={props.onClose}>
+                <Card
+                    className={classes.modal}
+                    onClick={(event) => event.stopPropagation()}
+                    ref={ref}
+                >
+                    {/* if props.title is defined and its length is bigger than 0 */}
+                    {props.title?.length && (
+                        <div className={classes['modal__header']}>
+                            <h2 className={classes['modal-header__title']}>
+                                {props.title}
+                            </h2>
+                        </div>
+                    )}
+                    <div className={classes['modal__body']}>
+                        {props.message}
                     </div>
-                )}
-                <div className={classes['modal__body']}>{props.message}</div>
-                <div className={classes['modal__actions']}>
-                    <Button
-                        className={classes['modal-actions__cancel-button']}
-                        onClick={props.onClose}
-                    >
-                        Cancel
-                    </Button>
-                    {props.actions}
-                </div>
-            </Card>
-        </Backdrop>,
-        document.getElementById('modal-window')!
-    );
-});
+                    {includeCancelButton || props.actions ? (
+                        <div className={classes['modal__actions']}>
+                            {includeCancelButton && (
+                                <Button
+                                    className={
+                                        classes['modal-actions__cancel-button']
+                                    }
+                                    onClick={props.onClose}
+                                >
+                                    Cancel
+                                </Button>
+                            )}
+                            {props.actions}
+                        </div>
+                    ) : null}
+                </Card>
+            </Backdrop>,
+            document.getElementById('modal-window')!
+        );
+    }
+);
 
 export default Modal;
