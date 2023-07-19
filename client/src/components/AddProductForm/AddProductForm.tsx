@@ -35,6 +35,8 @@ const AddProductForm: FC<AddProductFormProps> = (props) => {
     const initialImageRef = useRef<HTMLInputElement>(null);
     const additionalImageRef = useRef<HTMLInputElement>(null);
 
+    const defaultCategory = props.productCategories[0];
+
     return (
         <CenterBlock className={classes['add-product-block']}>
             <h2 className={classes['add-product__title']}>Add Product</h2>
@@ -42,7 +44,10 @@ const AddProductForm: FC<AddProductFormProps> = (props) => {
                 validationSchema={addProductSchema}
                 validateOnBlur={true}
                 validateOnChange={true}
-                initialValues={initialValues}
+                initialValues={{
+                    ...initialValues,
+                    category: defaultCategory,
+                }}
                 onSubmit={async (values, { setSubmitting }) => {
                     setSubmitting(true);
                     props.onFormSubmit({
@@ -111,6 +116,7 @@ const AddProductForm: FC<AddProductFormProps> = (props) => {
                                 label="Select a category"
                                 name="category"
                                 options={props.productCategories}
+                                defaultOption={defaultCategory}
                             />
                             <FormActions>
                                 <SubmitButton

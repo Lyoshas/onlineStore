@@ -50,6 +50,7 @@ const addProductSchema = Yup.object().shape({
             if (!val) return true;
             return val.length <= 300;
         }),
+    category: Yup.string().required('Category is a required field'),
 });
 
 export default addProductSchema;
