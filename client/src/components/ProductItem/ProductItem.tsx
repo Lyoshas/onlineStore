@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, Fragment, useState } from 'react';
 import { useSelector } from 'react-redux';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
@@ -7,6 +7,7 @@ import classes from './ProductItem.module.css';
 import Button from '../UI/Button/Button';
 import { RootState } from '../../store';
 import ButtonLink from '../UI/ButtonLink/ButtonLink';
+import DeleteButton from './DeleteButton/DeleteButton';
 
 interface ProductItemProps {
     id: number;
@@ -32,6 +33,7 @@ const ProductItem: FC<ProductItemProps> = (props) => {
         <article
             className={classNames(
                 classes['product-list__item'],
+                isAdmin && classes.admin,
                 !props.isAvailable && classes['not-available'],
                 props.isAvailable &&
                     props.isRunningOut &&
@@ -86,12 +88,19 @@ const ProductItem: FC<ProductItemProps> = (props) => {
                         />
                     </Button>
                     {isAdmin && (
-                        <ButtonLink
-                            to={`/edit-product/${props.id}`}
-                            className={classes['product-item__edit-btn']}
-                        >
-                            Edit
-                        </ButtonLink>
+                        <Fragment>
+                            <ButtonLink
+                                to={`/edit-product/${props.id}`}
+                                className={classes['product-item__edit-btn']}
+                            >
+                                Edit
+                            </ButtonLink>
+                            <DeleteButton
+                                className={classes['product-item__delete-btn']}
+                                productId={props.id}
+                                productTitle={props.title}
+                            />
+                        </Fragment>
                     )}
                 </div>
             </div>

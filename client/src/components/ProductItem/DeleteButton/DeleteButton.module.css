@@ -1,0 +1,7 @@
+.product-delete-button {
+    background: rgb(255, 63, 63);
+}
+
+.product-delete-button:hover {
+    background: red;
+}

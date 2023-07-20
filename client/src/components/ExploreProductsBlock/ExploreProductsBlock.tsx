@@ -54,7 +54,7 @@ const ExploreProductsBlock = () => {
                     </Fragment>
                 )}
             </div>
-            {data && <ProductList products={data!.featuredProducts} />}
+            {data && <ProductList products={data.featuredProducts} />}
             <ButtonLink
                 to="/products"
                 className={classes['explore-products__more-btn']}
