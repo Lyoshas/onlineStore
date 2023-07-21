@@ -9,7 +9,7 @@ import getAdminProduct from './resolvers/getAdminProduct';
 export const typeDefs = `#graphql
     type Query {
         "Get products by page number"
-        products(page: Int!): [Product]!
+        products(page: Int!): GetProductByPageReturnValue!
         "Get a single product by its id"
         product(id: Int!): Product
         "Get featured products"
@@ -57,6 +57,11 @@ export const typeDefs = `#graphql
         shortDescription: String!
         isAvailable: Boolean!
         isRunningOut: Boolean!
+    }
+
+    type GetProductByPageReturnValue {
+        productList: [Product!]!
+        totalPages: Int!
     }
 
     type AdminProduct {
