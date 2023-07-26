@@ -24,6 +24,7 @@ import LandingPage from './pages/LandingPage/LandingPage';
 import ProductInfo from './components/ProductInfo/ProductInfo';
 import EditProduct from './components/EditProduct/EditProduct';
 import AddProduct from './pages/AddProduct/AddProduct';
+import ProductListPage from './pages/ProductListPage/ProductListPage';
 
 const App: FC = () => {
     const { errorMessage, isErrorNotificationShown } = useSelector(
@@ -130,6 +131,15 @@ const App: FC = () => {
                     element={
                         <TopHeader
                             RenderAfter={<ProductInfo />}
+                            addOffset={true}
+                        />
+                    }
+                />
+                <Route
+                    path="/products"
+                    element={
+                        <TopHeader
+                            RenderAfter={<ProductListPage />}
                             addOffset={true}
                         />
                     }

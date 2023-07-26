@@ -1,0 +1,20 @@
+.product-pagination-ul__three-dots {
+    display: flex;
+    width: 30px;
+    height: 30px;
+    justify-content: center;
+    align-items: center;
+    margin-right: 10px;
+}
+
+@media screen and (max-width: 400px) {
+    .product-pagination-ul__three-dots {
+        margin-right: 0;
+    }
+}
+
+@media screen and (max-width: 300px) {
+    .product-pagination-ul__three-dots {
+        width: 27px;
+    }
+}
