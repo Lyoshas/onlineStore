@@ -1,0 +1,13 @@
+.product-item__cart-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.cart-btn__icon {
+    width: 30px;
+    height: 30px;
+    filter: invert(100%);
+}
