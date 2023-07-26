@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import classNames from 'classnames';
 
 import ProductItem from '../ProductItem/ProductItem';
 import classes from './ProductList.module.css';
@@ -8,7 +9,12 @@ const ProductList: FC<{ products: (Omit<Product, 'category'> | null)[] }> = (
     props
 ) => {
     return (
-        <section className={classes['product-list']}>
+        <section
+            className={classNames(
+                classes['product-list'],
+                props.products.length === 1 && classes.centered
+            )}
+        >
             {props.products.map((product) => {
                 if (product === null) return false;
 

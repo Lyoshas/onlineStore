@@ -3,3 +3,7 @@
     flex-wrap: wrap;
     justify-content: space-between;
 }
+
+.product-list.centered {
+    justify-content: center;
+}
