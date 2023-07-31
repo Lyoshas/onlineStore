@@ -10,7 +10,7 @@ const router = Router();
 
 router.post(
     '/sign-in',
-    // recaptchaValidation,
+    recaptchaValidation,
     body('login')
         .notEmpty()
         .withMessage('the field "login" must be specified')
