@@ -21,6 +21,10 @@ async function getProductsByPage(
     parent: any,
     args: { page: number }
 ): Promise<GetProductsByPageResult> {
+    if (args.page <= 0) {
+        throw new Error("The 'page' parameter must be greater than zero");
+    }
+
     const productsPerPage: number = parseInt(
         process.env.PRODUCTS_PER_PAGE as string
     );
