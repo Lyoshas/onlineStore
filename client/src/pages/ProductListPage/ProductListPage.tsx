@@ -12,13 +12,18 @@ import Pagination from './Pagination/Pagination';
 
 const ProductListPage = () => {
     const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+
     // if "page" is not specified in the query string, set to default value of 1
     const currentPage: number = Number(searchParams.get('page')) || 1;
+
+    useEffect(() => {
+        if (currentPage <= 0) navigate('?page=1');
+    }, [currentPage, navigate]);
 
     const { loading, error, data } = useQuery(GET_PRODUCTS_BY_PAGE, {
         variables: { page: currentPage },
     });
-    const navigate = useNavigate();
 
     useEffect(() => {
         if (data?.products.productList.length !== 0) return;
