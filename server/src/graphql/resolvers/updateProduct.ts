@@ -1,12 +1,13 @@
 import validateUser from '../helpers/validateUser';
 import dbPool from '../../services/postgres.service';
-import DBProduct from '../../interfaces/DBProduct';
 import isProductRunningOut from '../helpers/isProductRunningOut';
 import isProductAvailable from '../helpers/isProductAvailable';
 import ApolloServerContext from '../../interfaces/ApolloServerContext';
 import DisplayProduct from '../../interfaces/DisplayProduct';
-import CamelCaseProperties from '../../interfaces/CamelCaseProperties';
-import { getImageUrlByObjectKey } from '../../models/file-upload';
+import {
+    doesS3ObjectExist,
+    getImageUrlByObjectKey,
+} from '../../models/file-upload';
 import GraphqlAddProductsArgs from '../../interfaces/GraphqlAddProductArgs';
 
 export default async (
@@ -15,6 +16,14 @@ export default async (
     context: ApolloServerContext
 ): Promise<DisplayProduct> => {
     await validateUser(context.user);
+
+    if (!(await doesS3ObjectExist(args.initialImageName))) {
+        throw new Error('initialImageName does not exist in the S3 bucket');
+    }
+
+    if (!(await doesS3ObjectExist(args.additionalImageName))) {
+        throw new Error('additionalImageName does not exist in the S3 bucket');
+    }
 
     const initialImageUrl = getImageUrlByObjectKey(args.initialImageName);
     const additionalImageUrl = getImageUrlByObjectKey(args.additionalImageName);
