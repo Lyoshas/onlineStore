@@ -9,6 +9,7 @@ import {
     getImageUrlByObjectKey,
 } from '../../models/file-upload';
 import GraphqlAddProductsArgs from '../../interfaces/GraphqlAddProductArgs';
+import { productCategoryExists } from '../../models/product-category';
 
 export default async (
     _: any,
@@ -23,6 +24,10 @@ export default async (
 
     if (!(await doesS3ObjectExist(args.additionalImageName))) {
         throw new Error('additionalImageName does not exist in the S3 bucket');
+    }
+
+    if (!(await productCategoryExists(args.category))) {
+        throw new Error('The specified category does not exist');
     }
 
     const initialImageUrl = getImageUrlByObjectKey(args.initialImageName);
