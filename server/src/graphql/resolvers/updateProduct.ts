@@ -5,30 +5,21 @@ import isProductAvailable from '../helpers/isProductAvailable';
 import ApolloServerContext from '../../interfaces/ApolloServerContext';
 import DisplayProduct from '../../interfaces/DisplayProduct';
 import {
-    doesS3ObjectExist,
     getImageUrlByObjectKey,
 } from '../../models/file-upload';
 import GraphqlAddProductsArgs from '../../interfaces/GraphqlAddProductArgs';
-import { productCategoryExists } from '../../models/product-category';
+import checkImageNames from '../helpers/checkImageNames';
+import checkProductCategory from '../helpers/checkProductCategory';
 
 export default async (
     _: any,
     args: GraphqlAddProductsArgs & { id: number },
     context: ApolloServerContext
 ): Promise<DisplayProduct> => {
+    // if any of these checks fail, an error will be thrown and the product will not be updated
     await validateUser(context.user);
-
-    if (!(await doesS3ObjectExist(args.initialImageName))) {
-        throw new Error('initialImageName does not exist in the S3 bucket');
-    }
-
-    if (!(await doesS3ObjectExist(args.additionalImageName))) {
-        throw new Error('additionalImageName does not exist in the S3 bucket');
-    }
-
-    if (!(await productCategoryExists(args.category))) {
-        throw new Error('The specified category does not exist');
-    }
+    await checkImageNames(args.initialImageName, args.additionalImageName);
+    await checkProductCategory(args.category);
 
     const initialImageUrl = getImageUrlByObjectKey(args.initialImageName);
     const additionalImageUrl = getImageUrlByObjectKey(args.additionalImageName);
