@@ -51,7 +51,7 @@ export default async (
     );
 
     if (rowCount === 0) {
-        throw new Error(`Product with id=${id} does not exist`);
+        throw new Error(`A product with the specified id does not exist`);
     }
 
     return {
