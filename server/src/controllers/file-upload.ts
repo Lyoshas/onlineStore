@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express';
 import asyncHandler from 'express-async-handler';
 
-import { generatePresignedUrl } from '../models/file-upload.js';
+import { generatePresignedUrl } from '../models/amazon-s3.js';
 
 interface GetS3PresignedUrlQuery {
     fileName: string;

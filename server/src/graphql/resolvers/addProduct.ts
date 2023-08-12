@@ -5,7 +5,7 @@ import DisplayProduct from '../../interfaces/DisplayProduct.js';
 import isProductAvailable from '../helpers/isProductAvailable.js';
 import isProductRunningOut from '../helpers/isProductRunningOut.js';
 import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
-import { getImageUrlByObjectKey } from '../../models/file-upload.js';
+import { getImageUrlByObjectKey } from '../../models/amazon-s3.js';
 import GraphqlAddProductsArgs from '../../interfaces/GraphqlAddProductArgs.js';
 import checkImageNames from '../helpers/checkImageNames.js';
 import checkProductCategory from '../helpers/checkProductCategory.js';

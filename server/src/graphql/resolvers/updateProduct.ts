@@ -6,7 +6,7 @@ import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
 import DisplayProduct from '../../interfaces/DisplayProduct.js';
 import {
     getImageUrlByObjectKey,
-} from '../../models/file-upload.js';
+} from '../../models/amazon-s3.js';
 import GraphqlAddProductsArgs from '../../interfaces/GraphqlAddProductArgs.js';
 import checkImageNames from '../helpers/checkImageNames.js';
 import checkProductCategory from '../helpers/checkProductCategory.js';
