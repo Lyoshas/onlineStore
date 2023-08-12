@@ -1,4 +1,4 @@
-import { doesS3ObjectExist } from '../../models/file-upload';
+import { doesS3ObjectExist } from '../../models/file-upload.js';
 
 const checkImageNames = async (
     initialImageName: string,

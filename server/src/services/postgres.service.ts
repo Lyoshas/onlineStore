@@ -1,3 +1,3 @@
-import { Pool } from 'pg';
+import pg from 'pg';
 
-export default new Pool();
+export default new pg.Pool();

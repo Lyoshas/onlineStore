@@ -1,14 +1,14 @@
-import DBProduct from '../../interfaces/DBProduct';
-import validateUser from '../helpers/validateUser';
-import dbPool from '../../services/postgres.service';
-import DisplayProduct from '../../interfaces/DisplayProduct';
-import isProductAvailable from '../helpers/isProductAvailable';
-import isProductRunningOut from '../helpers/isProductRunningOut';
-import ApolloServerContext from '../../interfaces/ApolloServerContext';
-import { getImageUrlByObjectKey } from '../../models/file-upload';
-import GraphqlAddProductsArgs from '../../interfaces/GraphqlAddProductArgs';
-import checkImageNames from '../helpers/checkImageNames';
-import checkProductCategory from '../helpers/checkProductCategory';
+import DBProduct from '../../interfaces/DBProduct.js';
+import validateUser from '../helpers/validateUser.js';
+import dbPool from '../../services/postgres.service.js';
+import DisplayProduct from '../../interfaces/DisplayProduct.js';
+import isProductAvailable from '../helpers/isProductAvailable.js';
+import isProductRunningOut from '../helpers/isProductRunningOut.js';
+import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
+import { getImageUrlByObjectKey } from '../../models/file-upload.js';
+import GraphqlAddProductsArgs from '../../interfaces/GraphqlAddProductArgs.js';
+import checkImageNames from '../helpers/checkImageNames.js';
+import checkProductCategory from '../helpers/checkProductCategory.js';
 
 export default async (
     _: any,

@@ -1,9 +1,9 @@
-import dbPool from '../../services/postgres.service';
-import DisplayProduct from '../../interfaces/DisplayProduct';
-import DBProduct from '../../interfaces/DBProduct';
-import isProductAvailable from '../helpers/isProductAvailable';
-import isProductRunningOut from '../helpers/isProductRunningOut';
-import getProductQuery from '../helpers/getProductQuery';
+import dbPool from '../../services/postgres.service.js';
+import DisplayProduct from '../../interfaces/DisplayProduct.js';
+import DBProduct from '../../interfaces/DBProduct.js';
+import isProductAvailable from '../helpers/isProductAvailable.js';
+import isProductRunningOut from '../helpers/isProductRunningOut.js';
+import getProductQuery from '../helpers/getProductQuery.js';
 
 // this function should get featured (or most popular) products,
 // but for now we're going to only get 12 random products

@@ -4,7 +4,7 @@ import asyncHandler from 'express-async-handler';
 import {
     deleteRefreshTokenFromDB,
     detachRefreshTokenAsCookie,
-} from '../models/refresh-token';
+} from '../models/refresh-token.js';
 
 export const handleLogout: RequestHandler = asyncHandler(
     async (req, res, next) => {

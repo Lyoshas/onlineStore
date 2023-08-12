@@ -1,4 +1,4 @@
-import CustomError from './CustomError';
+import CustomError from './CustomError.js';
 
 // this error will be used for getting a presigned url to upload to S3
 // right now only admins will be able to do this

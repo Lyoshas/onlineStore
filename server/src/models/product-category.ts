@@ -1,4 +1,4 @@
-import dbPool from '../services/postgres.service';
+import dbPool from '../services/postgres.service.js';
 
 export const getProductCategories = async (): Promise<string[]> => {
     const { rows } = await dbPool.query<{ category: string }>(

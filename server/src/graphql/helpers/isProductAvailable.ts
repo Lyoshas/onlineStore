@@ -1,4 +1,4 @@
-import DBProduct from '../../interfaces/DBProduct';
+import DBProduct from '../../interfaces/DBProduct.js';
 
 /*
     This function returns whether a product is deemed to be available.

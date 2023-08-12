@@ -1,6 +1,6 @@
 import { PoolClient } from 'pg';
 
-import dbPool from '../services/postgres.service';
+import dbPool from '../services/postgres.service.js';
 
 export const signUpUser = (options: {
     firstName: string;

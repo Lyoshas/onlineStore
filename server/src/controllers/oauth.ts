@@ -2,15 +2,15 @@ import { RequestHandler } from 'express';
 import asyncHandler from 'express-async-handler';
 import bcryptjs from 'bcryptjs';
 
-import * as userModel from '../models/user';
-import * as oauthModel from '../models/oauth';
-import { signUpUser } from '../models/signup';
-import { generateAccessToken } from '../models/access-token';
-import * as refreshTokenModel from '../models/refresh-token';
-import CustomValidationError from '../errors/CustomValidationError';
-import UnexpectedError from '../errors/UnexpectedError';
-import OAuthUserData from '../interfaces/OAuthUserData';
-import { generateRandomString } from '../util/generateRandomString';
+import * as userModel from '../models/user.js';
+import * as oauthModel from '../models/oauth.js';
+import { signUpUser } from '../models/signup.js';
+import { generateAccessToken } from '../models/access-token.js';
+import * as refreshTokenModel from '../models/refresh-token.js';
+import CustomValidationError from '../errors/CustomValidationError.js';
+import UnexpectedError from '../errors/UnexpectedError.js';
+import OAuthUserData from '../interfaces/OAuthUserData.js';
+import { generateRandomString } from '../util/generateRandomString.js';
 
 export const getURLToOAuthAuthorizationServer: RequestHandler = asyncHandler(
     async (req, res, next) => {

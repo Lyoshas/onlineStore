@@ -1,5 +1,5 @@
-import VerifiedUserInfo from '../../interfaces/VerifiedUserInfo';
-import { isAccountActivated } from '../../models/account-activation';
+import VerifiedUserInfo from '../../interfaces/VerifiedUserInfo.js';
+import { isAccountActivated } from '../../models/account-activation.js';
 
 export default async (user: VerifiedUserInfo | null) => {
     if (!user) {

@@ -1,5 +1,5 @@
-import CustomError from './CustomError';
-import ApplicationError from '../interfaces/ApplicationError';
+import CustomError from './CustomError.js';
+import ApplicationError from '../interfaces/ApplicationError.js';
 
 export default class CustomValidationError extends CustomError {
     statusCode = 422;

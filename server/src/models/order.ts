@@ -2,8 +2,8 @@ import fetch from 'node-fetch';
 import crypto from 'crypto';
 import { PoolClient } from 'pg';
 
-import dbPool from '../services/postgres.service';
-import * as userModel from './user';
+import dbPool from '../services/postgres.service.js';
+import * as userModel from './user.js';
 
 const getIdByNameFromDB = (
     tableName: string,

@@ -2,14 +2,14 @@ import { RequestHandler } from 'express';
 import asyncHandler from 'express-async-handler';
 import bcryptjs from 'bcryptjs';
 
-import * as transactionModel from '../models/pg-transaction';
-import * as signupModel from '../models/signup';
-import * as accountActivationModel from '../models/account-activation';
-import { addTokenToRedis } from '../models/redis-utils';
-import { generateRandomString } from '../util/generateRandomString';
-import { sendEmail } from '../services/email.service';
-import dbPool from '../services/postgres.service';
-import UnexpectedError from '../errors/UnexpectedError';
+import * as transactionModel from '../models/pg-transaction.js';
+import * as signupModel from '../models/signup.js';
+import * as accountActivationModel from '../models/account-activation.js';
+import { addTokenToRedis } from '../models/redis-utils.js';
+import { generateRandomString } from '../util/generateRandomString.js';
+import { sendEmail } from '../services/email.service.js';
+import dbPool from '../services/postgres.service.js';
+import UnexpectedError from '../errors/UnexpectedError.js';
 
 export const postSignUp: RequestHandler = asyncHandler(
     async (req, res, next) => {

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
-import RequestValidationError from '../errors/RequestValidationError';
+
+import RequestValidationError from '../errors/RequestValidationError.js';
 
 // this middleware is meant to reduce code duplication associated with using 'express-validator'
 export default (req: Request, res: Response, next: NextFunction) => {

@@ -1,6 +1,6 @@
 import { ValidationError } from 'express-validator';
 
-import CustomError from './CustomError';
+import CustomError from './CustomError.js';
 
 // this class should only be used in conjunction with "express-validator"
 // otherwise use CustomValidationError

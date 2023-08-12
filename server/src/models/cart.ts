@@ -1,7 +1,7 @@
 import { PoolClient } from 'pg';
 
-import dbPool from '../services/postgres.service';
-import CartEntry from '../interfaces/CartEntry';
+import dbPool from '../services/postgres.service.js';
+import CartEntry from '../interfaces/CartEntry.js';
 
 export const getUserCart = (userId: number): Promise<CartEntry[]> => {
     return dbPool.query(

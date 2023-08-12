@@ -1,10 +1,10 @@
 import express from 'express';
 import { query } from 'express-validator';
 
-import ensureAuthentication from '../middlewares/ensure-authentication';
-import ensureAdmin from '../middlewares/ensure-admin';
-import { getS3PresignedUrl } from '../controllers/file-upload';
-import validateRequest from '../middlewares/validate-request';
+import ensureAuthentication from '../middlewares/ensure-authentication.js';
+import ensureAdmin from '../middlewares/ensure-admin.js';
+import { getS3PresignedUrl } from '../controllers/file-upload.js';
+import validateRequest from '../middlewares/validate-request.js';
 
 const router = express.Router();
 

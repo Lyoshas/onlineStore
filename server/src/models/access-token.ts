@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 
-import { getUserPrivileges } from './authorization';
-import VerifiedUserInfo from '../interfaces/VerifiedUserInfo';
+import { getUserPrivileges } from './authorization.js';
+import VerifiedUserInfo from '../interfaces/VerifiedUserInfo.js';
 
 // The access token is generated as a JWT.
 // It's important to make sure that the user exists beforehand,

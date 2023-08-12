@@ -2,15 +2,15 @@ import { RequestHandler } from 'express';
 import asyncHandler from 'express-async-handler';
 import bcryptjs from 'bcryptjs';
 
-import * as userModel from '../models/user';
-import * as transactionModel from '../models/pg-transaction';
-import * as resetPasswordModel from '../models/reset-password';
-import { addTokenToRedis } from '../models/redis-utils';
-import CustomValidationError from '../errors/CustomValidationError';
-import dbPool from '../services/postgres.service';
-import UnexpectedError from '../errors/UnexpectedError';
-import { generateRandomString } from '../util/generateRandomString';
-import { sendEmail } from '../services/email.service';
+import * as userModel from '../models/user.js';
+import * as transactionModel from '../models/pg-transaction.js';
+import * as resetPasswordModel from '../models/reset-password.js';
+import { addTokenToRedis } from '../models/redis-utils.js';
+import CustomValidationError from '../errors/CustomValidationError.js';
+import dbPool from '../services/postgres.service.js';
+import UnexpectedError from '../errors/UnexpectedError.js';
+import { generateRandomString } from '../util/generateRandomString.js';
+import { sendEmail } from '../services/email.service.js';
 
 // this route sends a so-called "reset token"
 // it will be used to reset the user's password

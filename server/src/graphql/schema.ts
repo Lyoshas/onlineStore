@@ -1,10 +1,10 @@
-import getProduct from './resolvers/getProduct';
-import getProductsByPage from './resolvers/getProductsByPage';
-import addProduct from './resolvers/addProduct';
-import updateProduct from './resolvers/updateProduct';
-import deleteProduct from './resolvers/deleteProduct';
-import getFeaturedProducts from './resolvers/getFeaturedProducts';
-import getAdminProduct from './resolvers/getAdminProduct';
+import getProduct from './resolvers/getProduct.js';
+import getProductsByPage from './resolvers/getProductsByPage.js';
+import addProduct from './resolvers/addProduct.js';
+import updateProduct from './resolvers/updateProduct.js';
+import deleteProduct from './resolvers/deleteProduct.js';
+import getFeaturedProducts from './resolvers/getFeaturedProducts.js';
+import getAdminProduct from './resolvers/getAdminProduct.js';
 
 export const typeDefs = `#graphql
     type Query {

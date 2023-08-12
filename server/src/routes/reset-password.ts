@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
 
-import recaptchaValidation from './util/recaptchaValidation';
-import passwordValidation from './util/passwordValidation';
-import validateRequest from '../middlewares/validate-request';
-import * as resetPasswordController from '../controllers/reset-password';
+import recaptchaValidation from './util/recaptchaValidation.js';
+import passwordValidation from './util/passwordValidation.js';
+import validateRequest from '../middlewares/validate-request.js';
+import * as resetPasswordController from '../controllers/reset-password.js';
 
 const router = Router();
 

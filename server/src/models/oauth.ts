@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
 import fetch from 'node-fetch';
 
-import dbPool from '../services/postgres.service';
-import OAuthUserData from '../interfaces/OAuthUserData';
+import dbPool from '../services/postgres.service.js';
+import OAuthUserData from '../interfaces/OAuthUserData.js';
 
 export const getAuthorizationServerIdByName = (
     name: string

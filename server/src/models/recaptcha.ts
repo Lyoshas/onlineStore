@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import RecaptchaValidationResult from '../interfaces/RecaptchaValidationResult';
+import RecaptchaValidationResult from '../interfaces/RecaptchaValidationResult.js';
 
 export const isRecaptchaValid = async (
     recaptchaToken: string,

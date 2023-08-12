@@ -1,4 +1,4 @@
-import CustomError from './CustomError';
+import CustomError from './CustomError.js';
 
 export default class UnexpectedError extends CustomError {
     public statusCode = 500;

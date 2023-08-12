@@ -2,11 +2,11 @@ import express from 'express';
 import { body, param } from 'express-validator';
 import fetch from 'node-fetch';
 
-import * as orderController from '../controllers/order';
-import * as orderModel from '../models/order';
-import ensureAuthentication from '../middlewares/ensure-authentication';
-import dbPool from '../services/postgres.service';
-import validateRequest from '../middlewares/validate-request';
+import * as orderController from '../controllers/order.js';
+import * as orderModel from '../models/order.js';
+import ensureAuthentication from '../middlewares/ensure-authentication.js';
+import dbPool from '../services/postgres.service.js';
+import validateRequest from '../middlewares/validate-request.js';
 
 const router = express.Router();
 

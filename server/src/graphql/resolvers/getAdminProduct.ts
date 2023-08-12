@@ -1,10 +1,10 @@
-import ApolloServerContext from '../../interfaces/ApolloServerContext';
-import DBProduct from '../../interfaces/DBProduct';
-import validateUser from '../helpers/validateUser';
-import dbPool from '../../services/postgres.service';
-import CamelCaseProperties from '../../interfaces/CamelCaseProperties';
-import getProductQuery from '../helpers/getProductQuery';
-import getImageName from '../helpers/getImageName';
+import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
+import DBProduct from '../../interfaces/DBProduct.js';
+import validateUser from '../helpers/validateUser.js';
+import dbPool from '../../services/postgres.service.js';
+import CamelCaseProperties from '../../interfaces/CamelCaseProperties.js';
+import getProductQuery from '../helpers/getProductQuery.js';
+import getImageName from '../helpers/getImageName.js';
 
 type GetAdminProductOutput = CamelCaseProperties<DBProduct> & {
     initialImageName: string;

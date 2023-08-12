@@ -1,15 +1,15 @@
 import { RequestHandler } from 'express';
 import asyncHandler from 'express-async-handler';
 
-import * as activationModel from '../models/account-activation';
-import * as userModel from '../models/user';
-import CustomValidationError from '../errors/CustomValidationError';
-import InvalidCredentialsError from '../errors/InvalidPasswordError';
-import AccountActivatedError from '../errors/AccountActivatedError';
-import UnexpectedError from '../errors/UnexpectedError';
-import { generateRandomString } from '../util/generateRandomString';
-import { addTokenToRedis } from '../models/redis-utils';
-import { sendEmail } from '../services/email.service';
+import * as activationModel from '../models/account-activation.js';
+import * as userModel from '../models/user.js';
+import CustomValidationError from '../errors/CustomValidationError.js';
+import InvalidCredentialsError from '../errors/InvalidPasswordError.js';
+import AccountActivatedError from '../errors/AccountActivatedError.js';
+import UnexpectedError from '../errors/UnexpectedError.js';
+import { generateRandomString } from '../util/generateRandomString.js';
+import { addTokenToRedis } from '../models/redis-utils.js';
+import { sendEmail } from '../services/email.service.js';
 
 export const activateAccount: RequestHandler = asyncHandler(
     async (req, res, next) => {

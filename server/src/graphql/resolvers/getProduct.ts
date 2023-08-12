@@ -1,9 +1,9 @@
-import DBProduct from '../../interfaces/DBProduct';
-import DisplayProduct from '../../interfaces/DisplayProduct';
-import dbPool from '../../services/postgres.service';
-import getProductQuery from '../helpers/getProductQuery';
-import isProductAvailable from '../helpers/isProductAvailable';
-import isProductRunningOut from '../helpers/isProductRunningOut';
+import DBProduct from '../../interfaces/DBProduct.js';
+import DisplayProduct from '../../interfaces/DisplayProduct.js';
+import dbPool from '../../services/postgres.service.js';
+import getProductQuery from '../helpers/getProductQuery.js';
+import isProductAvailable from '../helpers/isProductAvailable.js';
+import isProductRunningOut from '../helpers/isProductRunningOut.js';
 
 function getProduct(
     parent: any,

@@ -1,4 +1,4 @@
-import CustomError from './CustomError';
+import CustomError from './CustomError.js';
 
 export default class InvalidCredentialsError extends CustomError {
     statusCode = 401;

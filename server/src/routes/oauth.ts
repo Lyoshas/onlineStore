@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { query } from 'express-validator';
 
-import * as oauthController from '../controllers/oauth';
-import validateRequest from '../middlewares/validate-request';
+import * as oauthController from '../controllers/oauth.js';
+import validateRequest from '../middlewares/validate-request.js';
 
 const router = Router();
 

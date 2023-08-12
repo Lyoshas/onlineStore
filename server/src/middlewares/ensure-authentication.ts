@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 
-import AuthenticationError from '../errors/AuthenticationError';
+import AuthenticationError from '../errors/AuthenticationError.js';
 
 const ensureAuthentication: RequestHandler = (req, res, next) => {
     let errorMessage: string;

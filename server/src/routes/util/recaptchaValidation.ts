@@ -1,7 +1,7 @@
 import { body } from 'express-validator';
 import { Request } from 'express';
 
-import { isRecaptchaValid } from '../../models/recaptcha';
+import { isRecaptchaValid } from '../../models/recaptcha.js';
 
 const recaptchaValidation = body('recaptchaToken')
     .not()

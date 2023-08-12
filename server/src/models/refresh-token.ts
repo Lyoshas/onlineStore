@@ -1,7 +1,7 @@
 import { CookieOptions, Response } from 'express';
 
-import dbPool from '../services/postgres.service';
-import { generateRandomString } from '../util/generateRandomString';
+import dbPool from '../services/postgres.service.js';
+import { generateRandomString } from '../util/generateRandomString.js';
 
 // there is a table in the database called 'token_types' that stores available token names
 // as of the time of writing this comment, there are "activation" and "refresh" types of tokens.

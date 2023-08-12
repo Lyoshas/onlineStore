@@ -5,7 +5,7 @@ import {
     S3ServiceException,
 } from '@aws-sdk/client-s3';
 
-import s3Client from '../services/s3.service';
+import s3Client from '../services/s3.service.js';
 
 const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME!;
 

@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import { body, query } from 'express-validator';
 
-import recaptchaValidation from './util/recaptchaValidation';
-import passwordValidation from './util/passwordValidation';
-import { isEmailAvailable } from '../models/signup';
-import dbPool from '../services/postgres.service';
-import validateRequest from '../middlewares/validate-request';
-import * as signupController from '../controllers/signup';
+import recaptchaValidation from './util/recaptchaValidation.js';
+import passwordValidation from './util/passwordValidation.js';
+import { isEmailAvailable } from '../models/signup.js';
+import dbPool from '../services/postgres.service.js';
+import validateRequest from '../middlewares/validate-request.js';
+import * as signupController from '../controllers/signup.js';
 
 const router = Router();
 

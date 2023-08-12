@@ -1,4 +1,4 @@
-import { productCategoryExists } from '../../models/product-category';
+import { productCategoryExists } from '../../models/product-category.js';
 
 const checkProductCategory = async (category: string) => {
     if (!(await productCategoryExists(category))) {

@@ -1,6 +1,5 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import dotenv from 'dotenv';
 import path from 'path';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
@@ -16,30 +15,21 @@ if (!['development', 'test', 'production'].includes(NODE_ENV)) {
     `.replace(/[\n\t]|\s{2}/g, ''));
 }
 
-dotenv.config({
-    path: path.join(
-        process.cwd(),
-        'src',
-        'config',
-        ['development', 'test'].includes(NODE_ENV) ? 'dev.env' : 'prod.env'
-    )
-});
-
-import signinRoutes from './routes/signin';
-import signupRoutes from './routes/signup';
-import accountActivationRoutes from './routes/account-activation';
-import resetPasswordRoutes from './routes/reset-password';
-import oauthRoutes from './routes/oauth';
-import cartRoutes from './routes/cart';
-import orderRoutes from './routes/order';
-import logoutRoutes from './routes/logout';
-import identifyUser from './middlewares/identify-user';
-import { typeDefs, resolvers } from './graphql/schema';
-import ApolloServerContext from './interfaces/ApolloServerContext';
-import errorHandler from './middlewares/error-handler';
-import notFoundHandler from './middlewares/not-found-handler';
-import productCategoriesRoutes from './routes/product-category';
-import s3Routes from './routes/file-upload';
+import signinRoutes from './routes/signin.js';
+import signupRoutes from './routes/signup.js';
+import accountActivationRoutes from './routes/account-activation.js';
+import resetPasswordRoutes from './routes/reset-password.js';
+import oauthRoutes from './routes/oauth.js';
+import cartRoutes from './routes/cart.js';
+import orderRoutes from './routes/order.js';
+import logoutRoutes from './routes/logout.js';
+import identifyUser from './middlewares/identify-user.js';
+import { typeDefs, resolvers } from './graphql/schema.js';
+import ApolloServerContext from './interfaces/ApolloServerContext.js';
+import errorHandler from './middlewares/error-handler.js';
+import notFoundHandler from './middlewares/not-found-handler.js';
+import productCategoriesRoutes from './routes/product-category.js';
+import s3Routes from './routes/file-upload.js';
 
 const app = express();
 

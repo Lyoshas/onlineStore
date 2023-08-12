@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
 
-import * as accountActivationController from '../controllers/account-activation';
-import recaptchaValidation from './util/recaptchaValidation';
-import validateRequest from '../middlewares/validate-request';
+import * as accountActivationController from '../controllers/account-activation.js';
+import recaptchaValidation from './util/recaptchaValidation.js';
+import validateRequest from '../middlewares/validate-request.js';
 
 const router = Router();
 

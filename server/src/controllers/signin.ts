@@ -1,13 +1,13 @@
 import { RequestHandler } from 'express';
 import asyncHandler from 'express-async-handler';
 
-import * as userModel from '../models/user';
-import * as activationModel from '../models/account-activation';
-import * as refreshTokenModel from '../models/refresh-token';
-import * as accessTokenModel from '../models/access-token';
-import InvalidCredentialsError from '../errors/InvalidPasswordError';
-import AccountNotActivatedError from '../errors/AccountNotActivatedError';
-import CustomValidationError from '../errors/CustomValidationError';
+import * as userModel from '../models/user.js';
+import * as activationModel from '../models/account-activation.js';
+import * as refreshTokenModel from '../models/refresh-token.js';
+import * as accessTokenModel from '../models/access-token.js';
+import InvalidCredentialsError from '../errors/InvalidPasswordError.js';
+import AccountNotActivatedError from '../errors/AccountNotActivatedError.js';
+import CustomValidationError from '../errors/CustomValidationError.js';
 
 export const postSignIn: RequestHandler<
     {},

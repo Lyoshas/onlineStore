@@ -1,10 +1,13 @@
 import { RequestHandler } from 'express';
-
-import * as accessTokenModel from '../models/access-token';
-import VerifiedUserInfo from '../interfaces/VerifiedUserInfo';
-import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
-import UnexpectedError from '../errors/UnexpectedError';
+import jsonwebtoken from 'jsonwebtoken';
 import asyncHandler from 'express-async-handler';
+
+import * as accessTokenModel from '../models/access-token.js';
+import VerifiedUserInfo from '../interfaces/VerifiedUserInfo.js';
+import UnexpectedError from '../errors/UnexpectedError.js';
+
+// jsonwebtoken is a CommonJS module, so this workaround is needed
+const { JsonWebTokenError, TokenExpiredError } = jsonwebtoken;
 
 declare global {
     namespace Express {

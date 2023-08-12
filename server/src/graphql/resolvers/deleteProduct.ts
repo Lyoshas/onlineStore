@@ -1,6 +1,6 @@
-import validateUser from '../helpers/validateUser';
-import dbPool from '../../services/postgres.service';
-import ApolloServerContext from '../../interfaces/ApolloServerContext';
+import validateUser from '../helpers/validateUser.js';
+import dbPool from '../../services/postgres.service.js';
+import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
 
 interface DeleteProductArguments {
     id: number;

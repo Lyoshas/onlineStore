@@ -1,5 +1,5 @@
-import UserPrivileges from '../interfaces/UserPrivileges';
-import dbPool from '../services/postgres.service';
+import UserPrivileges from '../interfaces/UserPrivileges.js';
+import dbPool from '../services/postgres.service.js';
 
 // it returns an object with { isAdmin: boolean }
 // or, if the user doesn't exist, it returns null

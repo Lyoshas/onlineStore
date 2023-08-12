@@ -1,13 +1,13 @@
 import { RequestHandler } from 'express';
 import asyncHandler from 'express-async-handler';
 
-import VerifiedUserInfo from '../interfaces/VerifiedUserInfo';
-import * as orderModel from '../models/order';
-import * as cartModel from '../models/cart';
-import * as transactionModel from '../models/pg-transaction';
-import EmptyCartError from '../errors/EmptyCartError';
-import UnexpectedError from '../errors/UnexpectedError';
-import dbPool from '../services/postgres.service';
+import VerifiedUserInfo from '../interfaces/VerifiedUserInfo.js';
+import * as orderModel from '../models/order.js';
+import * as cartModel from '../models/cart.js';
+import * as transactionModel from '../models/pg-transaction.js';
+import EmptyCartError from '../errors/EmptyCartError.js';
+import UnexpectedError from '../errors/UnexpectedError.js';
+import dbPool from '../services/postgres.service.js';
 
 export const createOrder: RequestHandler = asyncHandler(
     async (req, res, next) => {

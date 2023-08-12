@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 
-import NotAdminError from '../errors/NotAdminError';
+import NotAdminError from '../errors/NotAdminError.js';
 
 const ensureAdmin: RequestHandler = (req, res, next) => {
     if (req.user && req.user.isAdmin) return next();

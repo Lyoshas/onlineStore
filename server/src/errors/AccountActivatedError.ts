@@ -1,4 +1,4 @@
-import CustomError from './CustomError';
+import CustomError from './CustomError.js';
 
 // this error will be used in endpoint that require a user's account to be unactivated
 export default class AccountActivatedError extends CustomError {

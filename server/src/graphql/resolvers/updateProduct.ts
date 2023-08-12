@@ -1,15 +1,15 @@
-import validateUser from '../helpers/validateUser';
-import dbPool from '../../services/postgres.service';
-import isProductRunningOut from '../helpers/isProductRunningOut';
-import isProductAvailable from '../helpers/isProductAvailable';
-import ApolloServerContext from '../../interfaces/ApolloServerContext';
-import DisplayProduct from '../../interfaces/DisplayProduct';
+import validateUser from '../helpers/validateUser.js';
+import dbPool from '../../services/postgres.service.js';
+import isProductRunningOut from '../helpers/isProductRunningOut.js';
+import isProductAvailable from '../helpers/isProductAvailable.js';
+import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
+import DisplayProduct from '../../interfaces/DisplayProduct.js';
 import {
     getImageUrlByObjectKey,
-} from '../../models/file-upload';
-import GraphqlAddProductsArgs from '../../interfaces/GraphqlAddProductArgs';
-import checkImageNames from '../helpers/checkImageNames';
-import checkProductCategory from '../helpers/checkProductCategory';
+} from '../../models/file-upload.js';
+import GraphqlAddProductsArgs from '../../interfaces/GraphqlAddProductArgs.js';
+import checkImageNames from '../helpers/checkImageNames.js';
+import checkProductCategory from '../helpers/checkProductCategory.js';
 
 export default async (
     _: any,

@@ -1,8 +1,8 @@
 import { RequestHandler } from 'express';
 import asyncHandler from 'express-async-handler';
 
-import VerifiedUserInfo from '../interfaces/VerifiedUserInfo';
-import * as cartModel from '../models/cart';
+import VerifiedUserInfo from '../interfaces/VerifiedUserInfo.js';
+import * as cartModel from '../models/cart.js';
 
 // if the user made it to any of these middlewares,
 // it means he/she is authenticated, so req.user is prepopulated

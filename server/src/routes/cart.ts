@@ -1,10 +1,10 @@
 import express from 'express';
 import { body } from 'express-validator';
 
-import * as cartController from '../controllers/cart';
-import ensureAuthentication from '../middlewares/ensure-authentication';
-import validateRequest from '../middlewares/validate-request';
-import dbPool from '../services/postgres.service';
+import * as cartController from '../controllers/cart.js';
+import ensureAuthentication from '../middlewares/ensure-authentication.js';
+import validateRequest from '../middlewares/validate-request.js';
+import dbPool from '../services/postgres.service.js';
 
 const router = express.Router();
 
