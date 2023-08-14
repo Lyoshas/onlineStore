@@ -1,9 +1,13 @@
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import {
+    DeleteObjectsCommand,
+    GetObjectCommand,
     HeadObjectCommand,
     PutObjectCommand,
     S3ServiceException,
 } from '@aws-sdk/client-s3';
+import { Readable } from 'stream';
+import { fileTypeFromStream } from 'file-type';
 
 import s3Client from '../services/s3.service.js';
 
@@ -62,4 +66,55 @@ export const doesS3ObjectExist = async (filename: string) => {
         // otherwise forward the error
         throw error;
     }
+};
+
+// this function checks the magic number of the specified S3 object and returns its MIME type or undefined if there is no match
+// please make sure this file exists in the S3 bucket before using this function
+export const getMagicNumberMimeType = async (
+    filename: string,
+    // if the specified object wasn't found, an error will be thrown with "objectNotFoundErrorMessage" as its message
+    objectNotFoundErrorMessage: string
+) => {
+    try {
+        const response = await s3Client.send(
+            new GetObjectCommand({
+                Bucket: S3_BUCKET_NAME,
+                Key: filename,
+                // fetching the first 1024 bytes of the S3 object
+                // it will be enough to determine the file type based on magic number of the file
+                Range: 'bytes=0-1023',
+            })
+        );
+
+        const fileTypeResult = await fileTypeFromStream(
+            response.Body as Readable
+        );
+
+        return fileTypeResult?.mime;
+    } catch (error) {
+        console.log(error);
+        let message =
+            'An unexpected error occurred while checking a MIME type of an S3 object';
+
+        // in order for AWS SDK to return the "NoSuchKey" error, the bucket must have the "ListBucket" permission attached
+        if (error instanceof S3ServiceException && error.name === 'NoSuchKey') {
+            message = objectNotFoundErrorMessage;
+        }
+
+        throw new Error(message);
+    }
+};
+
+// this function removes specified objects from the S3 bucket
+// this function should be used if you want to delete multiple objects from S3 using a single HTTP request
+// "objectNames" must be an array of object names that you want to delete, e.g. ["image1.png", "image2.png"]
+export const deleteS3Objects = (objectNames: string[]) => {
+    return s3Client.send(
+        new DeleteObjectsCommand({
+            Bucket: S3_BUCKET_NAME,
+            Delete: {
+                Objects: objectNames.map((objectName) => ({ Key: objectName })),
+            },
+        })
+    );
 };
