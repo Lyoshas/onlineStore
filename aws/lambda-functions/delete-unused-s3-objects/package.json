@@ -1,0 +1,29 @@
+{
+  "name": "delete-unused-s3-objects",
+  "version": "1.0.0",
+  "description": "Removes all S3 objects that are not associated with any product in the RDS database",
+  "main": "deleteUnusedS3Objects.js",
+  "scripts": {
+    "compile": "tsc",
+    "lambda:create-zip": "cd dist && zip -r ../function.zip * -q && cd .. && zip -r function.zip node_modules/ -q && zip function.zip package.json package-lock.json -q",
+    "lambda:perform-cleanup": "rm function.zip",
+    "lambda:deploy": "npm run compile && npm run lambda:create-zip && aws lambda update-function-code --function-name deleteUnusedS3Objects --zip-file fileb://function.zip > /dev/null && npm run lambda:perform-cleanup && echo 'The function has been deployed successfully'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lyoshas/onlineStore.git"
+  },
+  "author": "Oleksii Potapchuk",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Lyoshas/onlineStore/issues"
+  },
+  "homepage": "https://github.com/Lyoshas/onlineStore#readme",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.391.0",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.10.2"
+  }
+}
