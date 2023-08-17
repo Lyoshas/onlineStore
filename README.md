@@ -1,6 +1,5 @@
 # Online Store Project
 ## Table of Contents
-  - [Table of Contents](#table-of-contents)
   - [Prerequisites](#prerequisites)
   - [Starting the project up](#starting-the-project-up)
   - [Terminology](#terminology)
@@ -23,6 +22,18 @@
       - [Endpoint #10. Get a link to the Google/Facebook authorization server](#endpoint-10-get-a-link-to-the-googlefacebook-authorization-server)
       - [Endpoint #11. OAuth 2.0 Callback](#endpoint-11-oauth-20-callback)
       - [Endpoint #12. Logout](#endpoint-12-logout)
+    - [Product Category Endpoints](#product-category-endpoints)
+      - [Get all product categories](#get-all-product-categories)
+    - [Uploading an image to the 'onlinestore-product-images' Amazon S3 bucket](#uploading-an-image-to-the-onlinestore-product-images-amazon-s3-bucket)
+      - [Get a presigned URL](#get-a-presigned-url)
+    - [GraphQL Queries and Mutations](#graphql-queries-and-mutations)
+      - [1. Get basic information about an individual product](#1-get-basic-information-about-an-individual-product)
+      - [2. Get a list of products by specifying a page](#2-get-a-list-of-products-by-specifying-a-page)
+      - [3. Get featured products](#3-get-featured-products)
+      - [4. Get product info including 'quantity\_in\_stock'](#4-get-product-info-including-quantity_in_stock)
+      - [5. Add a new product](#5-add-a-new-product)
+      - [6. Update a product](#6-update-a-product)
+      - [7. Delete a product](#7-delete-a-product)
 
 ## Prerequisites
 - Install Docker and Docker Compose
@@ -705,3 +716,598 @@ Some API endpoints require authentication using access tokens and refresh tokens
         ]
       }
       ```
+
+### Product Category Endpoints
+#### Get all product categories
+- **URL:** /api/product/categories
+- **Method:** GET
+- **Description:** returns all possible product categories that are in the database.
+- **Who can access:** everyone
+- **Rate limiting:** none
+- **Request body:** empty
+- **Request params:** none
+- **Query string parameters:** none
+- **Required cookies:** none
+- **Success response:**
+  - **Status code:** 200 OK
+  - **Description:** the product categories were fetched successfully
+  - **Content:**
+    ```JSON
+    {
+      "categories": [
+        "Game Consoles",
+        "Laptops",
+        "Data Storage",
+        "Computer Processors",
+        "Graphics Cards",
+        "RAM",
+        "Personal Computers",
+        "Tablets",
+        "Smartphones",
+        "Monitors"
+      ]
+    }
+    ```
+
+### Uploading an image to the 'onlinestore-product-images' Amazon S3 bucket
+#### Get a presigned URL
+- **URL:** /api/s3/presigned-url
+- **Method:** GET
+- **Description:** generates a presigned URL to upload an image. It's important to note that endpoint is intended to upload images only. but it is technically possible to disguise a file that is not an image as an image. You just need to change the extension to '.png'. The main thing is that the file size should not exceed 500 KB. Doing this is absolutely not recommended, and it is written here only for warning purposes. This endpoint is available only for administrators, so they should be aware of this. Implementing a full validation flow would require us to utilize AWS Lambda, which would create a significant overhead and slow down the upload process.
+- **Who can access:** only administrators with the correct [access token](#access-token)
+- **Rate limiting:** none
+- **Request body:** empty
+- **Request params:** none
+- **Query string parameters:**
+  - _fileName_ - the name of the file you are trying to upload. Must be a string between 50 to 300 characters in length and end with the ".png" extension. For example "test-file-name.png".
+  - _mimeType_ - label used to identify the type of data contained in a file. Can be only 'image/png'.
+  - _contentLength_ - size of the file in bytes, with a minimum value of 1 and a maximum value of 512,000 (equivalent to 500 KB).
+- **Required cookies:** none
+- **Success response:**
+  - **Status code:** 200 OK
+  - **Description:** the product categories were fetched successfully
+  - **Content:**
+    ```JSON
+    {
+      "categories": [
+        "Game Consoles",
+        "Laptops",
+        "Data Storage",
+        "Computer Processors",
+        "Graphics Cards",
+        "RAM",
+        "Personal Computers",
+        "Tablets",
+        "Smartphones",
+        "Monitors"
+      ]
+    }
+    ```
+
+### GraphQL Queries and Mutations
+#### 1. Get basic information about an individual product
+- **Who can access:** everyone
+- **Required parameters:**
+  - _id_ - the id of the product that you are trying to get information about. Must be a number.
+- **Example**:
+  ```graphql
+  query Product($productId: Int!) {
+    product(id: $productId) {
+      id
+      title
+      price
+      category
+      initialImageUrl
+      additionalImageUrl
+      shortDescription
+      isAvailable
+      isRunningOut
+    }
+  }
+  ```
+  **Result**:
+  ```JSON
+  {
+    "data": {
+      "product": {
+        "id": 5,
+        "title": "Intel Core i5-10400F 2.9GHz/12MB",
+        "price": 5375,
+        "category": "Laptops",
+        "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/ff042894-a2d5-457d-b9b2-82f7cde46255.png",
+        "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/1aab2da7-775e-4759-9d99-57f1d669b2e2.png",
+        "shortDescription": "A small description of the product",
+        "isAvailable": true,
+        "isRunningOut": false
+      }
+    }
+  }
+  ```
+#### 2. Get a list of products by specifying a page
+- **Who can access:** everyone
+- **Required parameters:**
+  - _page_ - the product page that you are trying to access. Must be a number.
+- **Example**:
+  ```graphql
+  query Products($page: Int!) {
+    products(page: $page) {
+      productList {
+        id
+        title
+        price
+        category
+        initialImageUrl
+        additionalImageUrl
+        shortDescription
+        isAvailable
+        isRunningOut
+      }
+      totalPages // indicates how many pages there are, used for pagination purposes
+    }
+  }
+  ```
+  **Result**:
+  ```JSON
+  {
+    "data": {
+      "product": {
+        "id": 5,
+        "title": "Intel Core i5-10400F 2.9GHz/12MB",
+        "price": 5375,
+        "category": "Laptops",
+        "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/ff042894-a2d5-457d-b9b2-82f7cde46255.png",
+        "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/1aab2da7-775e-4759-9d99-57f1d669b2e2.png",
+        "shortDescription": "A small description of the product",
+        "isAvailable": true,
+        "isRunningOut": false
+      }
+    }
+  }
+  ```
+- **Error responses**:
+  - The 'page' parameter is less than or equal to zero.
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "The 'page' parameter must be greater than zero"
+        }
+      ]
+    }
+    ```
+#### 3. Get featured products
+- **Who can access:** everyone
+- **Required parameters:** none
+- **Example**:
+  ```graphql
+  query FeaturedProducts {
+    featuredProducts {
+      id
+      title
+      price
+      category
+      initialImageUrl
+      additionalImageUrl
+      shortDescription
+      isAvailable
+      isRunningOut
+    }
+  }
+  ```
+  **Result**:
+  ```JSON
+  {
+    "data": {
+      "featuredProducts": [
+        {
+          "id": 1096,
+          "title": "Motorola G32 6/128GB Grey",
+          "price": 6999,
+          "category": "Smartphones",
+          "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/3d87fc8e-eed4-4bdd-9020-4aa99d85d244.png",
+          "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/f1a9e141-1b95-4519-9a5f-f67c401da8a0.png",
+          "shortDescription": "An extremely cool smartphone!!!",
+          "isAvailable": true,
+          "isRunningOut": false
+        },
+        ... (11 more products)
+      ]
+    }
+  }
+  ```
+#### 4. Get product info including 'quantity_in_stock'
+- **Who can access:** only administrators with the correct [access token](#access-token)
+- **Required parameters:**
+  - _productId_ - the id of the product that you are trying to get information about. Must be a number.
+- **Example**:
+  ```graphql
+  query AdminProduct($productId: Int!) {
+    adminProduct(productId: $productId) {
+      id
+      title
+      price
+      category
+      initialImageUrl
+      additionalImageUrl
+      initialImageName
+      additionalImageName
+      quantityInStock
+      shortDescription
+    }
+  }
+  ```
+  **Result**:
+  ```JSON
+  {
+    "data": {
+      "adminProduct": {
+        "id": 3,
+        "title": "Apple MacBook Pro 16\" M1 Pro 512GB 2021",
+        "price": 114970,
+        "category": "Laptops",
+        "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/8bd44131-8cc9-4503-9d38-a784e90220f4.png",
+        "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/14f5c601-96a6-41f2-a22e-9922bb207376.png",
+        "initialImageName": "8bd44131-8cc9-4503-9d38-a784e90220f4.png",
+        "additionalImageName": "14f5c601-96a6-41f2-a22e-9922bb207376.png",
+        "quantityInStock": 20,
+        "shortDescription": "A small description of the productt macc"
+      }
+    }
+  }
+  ```
+- **Error responses**:
+  - The user is not authenticated (the 'Authorization' header is empty):
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "User must be authenticated to perform this action"
+        }
+      ]
+    }
+    ```
+  - The user is not activated:
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "User must be activated to perform this action",
+        }
+      ]
+    }
+    ```
+  - The user doesn't have admin rights:
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "User must be activated to perform this action",
+        }
+      ]
+    }
+    ```
+#### 5. Add a new product
+- **Who can access:** only administrators with the correct [access token](#access-token)
+- **Required parameters:**
+  - _title_ - must be a string not exceeding 200 characters
+  - _price_ - must be a float
+  - _category_ - must be a string and must point to an existing category that is inside the 'product_categories' DB table
+  - _initialImageName_ - the image name for the initial product image. The image must be first uploaded to AWS S3
+  - _additionalImageName_ - the image name for the additional product image. The image must be first uploaded to AWS S3
+  - _quantityInStock_ - how many products are in stock. Must be a number
+  - _shortDescription_ - short description of the product. Must be no more than 300 characters.
+- **Example**:
+  ```graphql
+  mutation AddProduct(
+    $title: String!
+    $price: Float!
+    $category: String!
+    $initialImageName: String!
+    $additionalImageName: String!
+    $quantityInStock: Int!
+    $shortDescription: String!
+  ) {
+    addProduct(
+      title: $title
+      price: $price
+      category: $category
+      initialImageName: $initialImageName
+      additionalImageName: $additionalImageName
+      quantityInStock: $quantityInStock
+      shortDescription: $shortDescription
+    ) {
+      id
+      title
+      price
+      category
+      initialImageUrl
+      additionalImageUrl
+      shortDescription
+      isAvailable
+      isRunningOut
+    }
+  }
+  ```
+  **Example Variables**:
+  ```JSON
+  {
+    "title": "New Laptop",
+    "price": 5534,
+    "category": "Laptops",
+    "initialImageName": "03200236-ae87-46bd-81c7-49c677463b4c.png",
+    "additionalImageName": "03200236-ae87-46bd-81c7-49c677463b4c.png",
+    "quantityInStock": 100,
+    "shortDescription": "A great laptop for everyday use"
+  }
+  ```
+  **Result**:
+  ```JSON
+  {
+    "data": {
+      "addProduct": {
+        "id": 1133,
+        "title": "New Laptop",
+        "price": 5534,
+        "category": "Laptops",
+        "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/03200236-ae87-46bd-81c7-49c677463b4c.png",
+        "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/03200236-ae87-46bd-81c7-49c677463b4c.png",
+        "shortDescription": "A great laptop for everyday use",
+        "isAvailable": true,
+        "isRunningOut": false
+      }
+    }
+  }
+  ```
+- **Error responses**:
+  - The user is not authenticated (the 'Authorization' header is empty):
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "User must be authenticated to perform this action"
+        }
+      ]
+    }
+    ```
+  - The user is not activated:
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "User must be activated to perform this action"
+        }
+      ]
+    }
+    ```
+  - The user doesn't have admin rights:
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "User must be an admin to perform this action"
+        }
+      ]
+    }
+    ```
+  - The specified category doesn't exist in the database:
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "The specified category does not exist"
+        }
+      ]
+    }
+    ```
+  - initialImageName doesn't exist in the designated S3 bucket:
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "initialImageName does not exist in the S3 bucket"
+        }
+      ]
+    }
+    ```
+  - additionalImageName doesn't exist in the designated S3 bucket:
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "additionalImageName does not exist in the S3 bucket"
+        }
+      ]
+    }
+    ```
+#### 6. Update a product
+- **Who can access:** only administrators with the correct [access token](#access-token)
+- **Required parameters:**
+  - _id_ - must be a valid id of a product that you are trying to update. Must point to a product in the database
+  - _title_ - must be a string not exceeding 200 characters
+  - _price_ - must be a float
+  - _category_ - must be a string and must point to an existing category that is inside the 'product_categories' DB table
+  - _initialImageName_ - the new image name for the initial product image. The image must be first uploaded to AWS S3
+  - _additionalImageName_ - the image name for the additional product image. The image must be first uploaded to AWS S3
+  - _quantityInStock_ - how many products are now in stock. Must be a number
+  - _shortDescription_ - new short description of the product. Must be no more than 300 characters.
+- **Example**:
+  ```graphql
+  mutation UpdateProduct(
+    $updateProductId: Int!
+    $title: String!
+    $price: Float!
+    $category: String!
+    $initialImageName: String!
+    $additionalImageName: String!
+    $quantityInStock: Int!
+    $shortDescription: String!
+  ) {
+    updateProduct(
+      id: $updateProductId
+      title: $title
+      price: $price
+      category: $category
+      initialImageName: $initialImageName
+      additionalImageName: $additionalImageName
+      quantityInStock: $quantityInStock
+      shortDescription: $shortDescription
+    ) {
+      id
+      title
+      price
+      category
+      initialImageUrl
+      additionalImageUrl
+      shortDescription
+      isAvailable
+      isRunningOut
+    }
+  }
+  ```
+  **Example Variables**:
+  ```JSON
+  {
+    "updateProductId": 5,
+    "title": "New title of the product",
+    "price": 4234,
+    "category": "Game Consoles",
+    "initialImageName": "03200236-ae87-46bd-81c7-49c677463b4c.png",
+    "additionalImageName": "03200236-ae87-46bd-81c7-49c677463b4c.png",
+    "quantityInStock": 2,
+    "shortDescription": "Updated description of the product"
+  }
+  ```
+  **Result**:
+  ```JSON
+  {
+    "data": {
+      "updateProduct": {
+        "id": 5,
+        "title": "New title of the product",
+        "price": 4234,
+        "category": "Game Consoles",
+        "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/03200236-ae87-46bd-81c7-49c677463b4c.png",
+        "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/03200236-ae87-46bd-81c7-49c677463b4c.png",
+        "shortDescription": "Updated description of the product",
+        "isAvailable": true,
+        "isRunningOut": true
+      }
+    }
+  }
+  ```
+- **Error responses**:
+  - The specified product id wasn't found in the database
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "A product with the specified id does not exist"
+        }
+      ]
+    } 
+    ```
+  - The user is not authenticated (the 'Authorization' header is empty):
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "User must be authenticated to perform this action"
+        }
+      ]
+    }
+    ```
+  - The user is not activated:
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "User must be activated to perform this action"
+        }
+      ]
+    }
+    ```
+  - The user doesn't have admin rights:
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "User must be an admin to perform this action"
+        }
+      ]
+    }
+    ```
+  - The specified category doesn't exist in the database:
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "The specified category does not exist"
+        }
+      ]
+    }
+    ```
+  - initialImageName doesn't exist in the designated S3 bucket:
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "initialImageName does not exist in the S3 bucket"
+        }
+      ]
+    }
+    ```
+  - additionalImageName doesn't exist in the designated S3 bucket:
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "additionalImageName does not exist in the S3 bucket"
+        }
+      ]
+    }
+    ```
+#### 7. Delete a product
+- **Who can access:** only administrators with the correct [access token](#access-token)
+- **Required parameters:**
+  - _id_ - must be a valid id of a product that you are trying to delete. Must point to a product in the database
+- **Example**:
+  ```graphql
+  mutation DeleteProduct($deleteProductId: Int!) {
+    deleteProduct(id: $deleteProductId) {
+      id
+    }
+  }
+  ```
+  **Example Variables**:
+  ```JSON
+  {
+    "updateProductId": 1134
+  }
+  ```
+  **Result**:
+  ```JSON
+  {
+    "data": {
+      "deleteProduct": {
+        "id": 1134
+      }
+    }
+  } 
+  ```
