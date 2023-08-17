@@ -1,0 +1,38 @@
+name: Automatic API server deployment
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy_api_server_to_aws_ec2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create a .pem file that will be used to execute commands on an EC2 instance
+        run: echo "${{ secrets.EC2_API_KEY_PAIR }}" > ec2-key-pair.pem
+      - name: Ensure the .pem key is not publicly viewable
+        run: chmod 400 ec2-key-pair.pem
+      - name: Create potentially missing folders for ~/.ssh/known_hosts
+        run: mkdir -p ~/.ssh/
+      - name: Create the known_hosts file
+        run: touch ~/.ssh/known_hosts
+      - name: Add the public API address to trusted SSH hosts
+        run: ssh-keyscan -H ${{ secrets.EC2_API_ADDRESS }} >> ~/.ssh/known_hosts
+      - name: Deploy the app to the EC2 instance
+        run: >-
+          ssh
+          -i ec2-key-pair.pem "${{ secrets.EC2_API_USERNAME_AND_ADDRESS }}"
+          -t '
+          docker compose -f docker-compose-ec2.yml down;
+          rm -rf ./onlineStore;
+          eval `ssh-agent -s` &&
+          ssh-add ~/.ssh/id_ed25519 &&
+          git clone git@github.com:Lyoshas/onlineStore.git --single-branch &&
+          cd ./onlineStore/server/src &&
+          mkdir -p config &&
+          echo "${{ secrets.DEV_ENV_FILE_CONTENTS }}" > ./config/dev.env &&
+          cd ../../redis &&
+          echo "${{ secrets.REDIS_CONF_FILE_CONTENTS }}" > ./redis.conf &&
+          cd .. &&
+          docker compose -f docker-compose-ec2.yml up -d --build
+          '
