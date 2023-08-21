@@ -7,6 +7,7 @@ import classes from './FormInput.module.css';
 import ErrorMessage from '../UI/ErrorMessage/ErrorMessage';
 import FileInfo from '../../interfaces/FileInfo';
 import SchemaContext from '../../context/validationSchema';
+import getStaticAssetUrl from '../../util/getStaticAssetUrl';
 
 type FormInputProps = {
     label: string | React.ReactNode;
@@ -213,8 +214,8 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
                         <img
                             src={
                                 isPasswordVisible
-                                    ? '/show-password.png'
-                                    : '/hide-password.png'
+                                    ? getStaticAssetUrl('show-password.png')
+                                    : getStaticAssetUrl('hide-password.png')
                             }
                             className={
                                 classes['toggle-password-visibility-icon']

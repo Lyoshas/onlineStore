@@ -1,9 +1,11 @@
 import { FC } from 'react';
 
+import getStaticAssetUrl from '../../../util/getStaticAssetUrl';
+
 const SuccessIcon: FC<{ className?: string }> = (props) => {
     return (
         <img
-            src="/success-icon.svg"
+            src={getStaticAssetUrl('success-icon.svg')}
             className={props.className || ''}
             alt="Success icon"
         />

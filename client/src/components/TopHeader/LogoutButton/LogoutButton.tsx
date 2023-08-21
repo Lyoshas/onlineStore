@@ -1,3 +1,4 @@
+import getStaticAssetUrl from '../../../util/getStaticAssetUrl';
 import ActionButton from '../ActionButton/ActionButton';
 
 const LogoutButton = () => {
@@ -5,7 +6,7 @@ const LogoutButton = () => {
         <ActionButton
             to="/auth/logout"
             content="Log out"
-            imageURL="/logout-icon.svg"
+            imageURL={getStaticAssetUrl('logout-icon.svg')}
             imageAlt="Log out"
         />
     );

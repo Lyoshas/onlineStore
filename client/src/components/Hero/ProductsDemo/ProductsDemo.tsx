@@ -2,12 +2,25 @@ import { FC, Fragment } from 'react';
 import classNames from 'classnames';
 
 import classes from './ProductsDemo.module.css';
+import getStaticAssetUrl from '../../../util/getStaticAssetUrl';
 
 const products = [
-    [classes.laptop, '/api/images/Asus-Laptop-X515EA-EJ3560.png', 'Laptop 1'],
-    [classes.smartphone, '/api/images/Motorola-G32.png', 'Smartphone'],
-    [classes.tablet, '/api/images/Samsung-Galaxy-Tab-S7-FE.png', 'Tablet'],
-    [classes.laptop, '/api/images/HP-Pavilion-15-eh2234nw.png', 'Laptop 2'],
+    [
+        classes.laptop,
+        getStaticAssetUrl('Asus-Laptop-X515EA-EJ3560.png'),
+        'Laptop 1',
+    ],
+    [classes.smartphone, getStaticAssetUrl('Motorola-G32.png'), 'Smartphone'],
+    [
+        classes.tablet,
+        getStaticAssetUrl('Samsung-Galaxy-Tab-S7-FE.png'),
+        'Tablet',
+    ],
+    [
+        classes.laptop,
+        getStaticAssetUrl('HP-Pavilion-15-eh2234nw.png'),
+        'Laptop 2',
+    ],
 ];
 
 const ProductsDemo: FC<{ offset: number }> = (props) => {

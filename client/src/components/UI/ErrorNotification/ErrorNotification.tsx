@@ -2,6 +2,7 @@ import { FC, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 
 import classes from './ErrorNotification.module.css';
+import getStaticAssetUrl from '../../../util/getStaticAssetUrl';
 
 const ErrorNotification: FC<{ message: string; onClose: () => void }> = (
     props
@@ -19,7 +20,7 @@ const ErrorNotification: FC<{ message: string; onClose: () => void }> = (
             <div className={classes['error-wrapper']}>
                 <div className={classes['error__flex-container']}>
                     <img
-                        src="/error-icon.png"
+                        src={getStaticAssetUrl('error-icon.png')}
                         className={classes['error__icon']}
                     />
                     <span>{props.message}</span>

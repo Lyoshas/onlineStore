@@ -1,5 +1,6 @@
 import { Fragment } from 'react';
 import ActionButton from '../ActionButton/ActionButton';
+import getStaticAssetUrl from '../../../util/getStaticAssetUrl';
 
 const MyCartButton = () => {
     const handleClick = () => {
@@ -13,7 +14,7 @@ const MyCartButton = () => {
                     My Cart (<span>0</span>)
                 </Fragment>
             }
-            imageURL="/cart-icon.svg"
+            imageURL={getStaticAssetUrl('cart-icon.svg')}
             imageAlt="Cart icon"
             onClick={handleClick}
         />

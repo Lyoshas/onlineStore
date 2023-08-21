@@ -39,8 +39,6 @@ app.use(cookieParser());
 
 app.use(bodyParser.urlencoded({ extended: false, limit: '5kb' }));
 
-app.use(express.static(path.join(process.cwd(), 'src', 'public')));
-
 app.use(identifyUser);
 
 app.use('/auth', [

@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import classes from './Navigation.module.css';
 import Image from '../Image/Image';
 import { RootState } from '../../../store';
+import getStaticAssetUrl from '../../../util/getStaticAssetUrl';
 
 interface NavigationLinkProps {
     label: string;
@@ -44,10 +45,16 @@ const Navigation: FC<{ className?: string; onNavItemClick: () => void }> = (
     const isAdmin = useSelector((state: RootState) => state.auth.isAdmin);
 
     const linksInfo = [
-        ['/', 'Home', '/home-icon.svg'],
-        ['/products', 'Products', '/product-icon.svg'],
-        ['/orders', 'Orders', '/order-icon.svg'],
-        isAdmin ? ['/add-product', 'Add Product', '/add-product.svg'] : null,
+        ['/', 'Home', getStaticAssetUrl('home-icon.svg')],
+        ['/products', 'Products', getStaticAssetUrl('product-icon.svg')],
+        ['/orders', 'Orders', getStaticAssetUrl('order-icon.svg')],
+        isAdmin
+            ? [
+                  '/add-product',
+                  'Add Product',
+                  getStaticAssetUrl('add-product.svg'),
+              ]
+            : null,
     ].filter((value) => value !== null) as string[][];
 
     return (

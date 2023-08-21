@@ -1,3 +1,4 @@
+import getStaticAssetUrl from '../../../util/getStaticAssetUrl';
 import ActionButton from '../ActionButton/ActionButton';
 
 const SignupButton = () => {
@@ -5,7 +6,7 @@ const SignupButton = () => {
         <ActionButton
             to="/auth/sign-up"
             content="Sign Up"
-            imageURL="/signup-icon.svg"
+            imageURL={getStaticAssetUrl('signup-icon.svg')}
             imageAlt="Sign up icon"
         />
     );

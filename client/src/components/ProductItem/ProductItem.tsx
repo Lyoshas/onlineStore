@@ -8,6 +8,7 @@ import Button from '../UI/Button/Button';
 import { RootState } from '../../store';
 import ButtonLink from '../UI/ButtonLink/ButtonLink';
 import DeleteButton from './DeleteButton/DeleteButton';
+import getStaticAssetUrl from '../../util/getStaticAssetUrl';
 
 interface ProductItemProps {
     id: number;
@@ -83,7 +84,7 @@ const ProductItem: FC<ProductItemProps> = (props) => {
                     <Button className={classes['product-item__cart-btn']}>
                         <img
                             className={classes['cart-btn__icon']}
-                            src="/cart-icon.svg"
+                            src={getStaticAssetUrl('cart-icon.svg')}
                             alt="Cart"
                         />
                     </Button>
