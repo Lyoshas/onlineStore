@@ -1283,6 +1283,30 @@ Some API endpoints require authentication using access tokens and refresh tokens
       ]
     }
     ```
+  - Invalid MIME type of the initial image
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "The MIME type of initialImageName is not \"image/png\""
+        }
+      ]
+    }
+    ```
+  - Invalid MIME type of the additional image
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "The MIME type of additionalImageName is not \"image/png\""
+        }
+      ]
+    }
+    ```
+- **Additional Notes**:
+  - The 'updateProduct' mutation doesn't delete S3 objects if the MIME type is incorrect. This is delegated to the 'deleteUnusedS3Objects' Lambda function that acts as a cron job.
 #### 7. Delete a product
 - **Who can access:** only administrators with the correct [access token](#access-token)
 - **Required parameters:**

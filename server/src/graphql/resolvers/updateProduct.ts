@@ -4,12 +4,11 @@ import isProductRunningOut from '../helpers/isProductRunningOut.js';
 import isProductAvailable from '../helpers/isProductAvailable.js';
 import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
 import DisplayProduct from '../../interfaces/DisplayProduct.js';
-import {
-    getImageUrlByObjectKey,
-} from '../../models/amazon-s3.js';
+import { getImageUrlByObjectKey } from '../../models/amazon-s3.js';
 import GraphqlAddProductsArgs from '../../interfaces/GraphqlAddProductArgs.js';
-import checkImageNames from '../helpers/checkImageNames.js';
 import checkProductCategory from '../helpers/checkProductCategory.js';
+import checkImageMimeTypes from '../helpers/checkImageMimeTypes.js';
+import ProductNotFoundError from '../errors/ProductNotFoundError.js';
 
 export default async (
     _: any,
@@ -18,14 +17,23 @@ export default async (
 ): Promise<DisplayProduct> => {
     // if any of these checks fail, an error will be thrown and the product will not be updated
     await validateUser(context.user);
-    await checkImageNames(args.initialImageName, args.additionalImageName);
-    await checkProductCategory(args.category);
 
-    const initialImageUrl = getImageUrlByObjectKey(args.initialImageName);
-    const additionalImageUrl = getImageUrlByObjectKey(args.additionalImageName);
+    const {
+        id,
+        title,
+        price,
+        category,
+        shortDescription,
+        quantityInStock,
+        initialImageName,
+        additionalImageName,
+    } = args;
 
-    const { id, title, price, category, shortDescription, quantityInStock } =
-        args;
+    await checkImageMimeTypes(initialImageName, additionalImageName);
+    await checkProductCategory(category);
+
+    const initialImageUrl = getImageUrlByObjectKey(initialImageName);
+    const additionalImageUrl = getImageUrlByObjectKey(additionalImageName);
 
     const { rowCount } = await dbPool.query(
         `UPDATE products
@@ -51,7 +59,7 @@ export default async (
     );
 
     if (rowCount === 0) {
-        throw new Error(`A product with the specified id does not exist`);
+        throw new ProductNotFoundError();
     }
 
     return {
