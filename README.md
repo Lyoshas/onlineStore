@@ -1129,6 +1129,33 @@ Some API endpoints require authentication using access tokens and refresh tokens
       ]
     }
     ```
+  - Invalid MIME type of the initial image
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "The MIME type of initialImageName is not \"image/png\""
+        }
+      ]
+    }
+    ```
+  - Invalid MIME type of the additional image
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "The MIME type of additionalImageName is not \"image/png\""
+        }
+      ]
+    }
+    ```
+- **Additional Notes**:
+  - The provided images will be deleted from the 'onlinestore-product-images' S3 bucket if at least one of these scenarios is true:
+    - If either of the provided images does not exist in the S3 bucket.
+    - If either of the provided images has an incorrect MIME type (anything other than 'image/png').
+    - If the provided product category does not exist in the database.
 #### 6. Update a product
 - **Who can access:** only administrators with the correct [access token](#access-token)
 - **Required parameters:**
