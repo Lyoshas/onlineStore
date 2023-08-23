@@ -1152,10 +1152,12 @@ Some API endpoints require authentication using access tokens and refresh tokens
     }
     ```
 - **Additional Notes**:
-  - The provided images will be deleted from the 'onlinestore-product-images' S3 bucket if at least one of these scenarios is true:
+  - During the execution of the request, the provided images will be deleted from the 'onlinestore-product-images' S3 bucket if they are not tied to any other product AND if at least one of these scenarios is true:
     - If either of the provided images does not exist in the S3 bucket.
     - If either of the provided images has an incorrect MIME type (anything other than 'image/png').
     - If the provided product category does not exist in the database.
+
+    For example, if you've just uploaded two images to S3 and then try to execute the addProduct mutation with these images and you specify an incorrect category, these 2 images will be deleted from the S3 bucket. However, if these 2 images already point to another product, they will not be deleted.
 #### 6. Update a product
 - **Who can access:** only administrators with the correct [access token](#access-token)
 - **Required parameters:**
