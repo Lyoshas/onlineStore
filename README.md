@@ -1335,7 +1335,12 @@ Some API endpoints require authentication using access tokens and refresh tokens
     }
     ```
 - **Additional Notes**:
-  - The 'updateProduct' mutation doesn't delete S3 objects if the MIME type is incorrect. This is delegated to the 'deleteUnusedS3Objects' Lambda function that acts as a cron job.
+  - During the execution of the request, the provided images will be deleted from the 'onlinestore-product-images' S3 bucket if they are not tied to any product (including the product you are trying to change) AND if at least one of these scenarios is true:
+    - If either of the provided images does not exist in the S3 bucket.
+    - If either of the provided images has an incorrect MIME type (anything other than 'image/png').
+    - If the provided product category does not exist in the database.
+
+    For example, if you've just uploaded two images to S3 and then try to execute the updateProduct mutation with these images and you specify an incorrect category, these 2 images will be deleted from the S3 bucket. However, if these 2 images already point to any product (including the product that you are trying to change), they will not be deleted.
 #### 7. Delete a product
 - **Who can access:** only administrators with the correct [access token](#access-token)
 - **Required parameters:**
