@@ -80,9 +80,9 @@ export const getMagicNumberMimeType = async (
             new GetObjectCommand({
                 Bucket: S3_BUCKET_NAME,
                 Key: filename,
-                // fetching the first 1024 bytes of the S3 object
+                // fetching the first 4096 bytes of the S3 object
                 // it will be enough to determine the file type based on magic number of the file
-                Range: 'bytes=0-1023',
+                Range: 'bytes=0-4095',
             })
         );
 
