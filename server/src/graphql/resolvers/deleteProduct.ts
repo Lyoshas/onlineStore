@@ -2,7 +2,7 @@ import validateUser from '../helpers/validateUser.js';
 import dbPool from '../../services/postgres.service.js';
 import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
 import { performProductUpsertCleanup as performProductDeleteCleanup } from '../helpers/performProductUpsertCleanup.js';
-import getImageName from '../helpers/getImageName.js';
+import { getObjectKeyByImageUrl } from '../../models/amazon-s3.js';
 
 interface DeleteProductArguments {
     id: number;
@@ -37,8 +37,8 @@ export default async (
     // but we will delete them only if there are no other products these images are tied to
     // this function will run asynchronously
     performProductDeleteCleanup(
-        getImageName(rows[0].initial_image_url),
-        getImageName(rows[0].additional_image_url)
+        getObjectKeyByImageUrl(rows[0].initial_image_url),
+        getObjectKeyByImageUrl(rows[0].additional_image_url)
     );
 
     return { id };

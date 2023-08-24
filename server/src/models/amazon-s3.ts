@@ -50,6 +50,17 @@ export const getImageUrlByObjectKey = (filename: string) => {
     return `https://${S3_BUCKET_NAME}.s3.amazonaws.com/${filename}`;
 };
 
+/**
+ * Examples:
+ * 1) getS3ObjectKeyByUrl("https://onlinestore-product-images.s3.eu-north-1.amazonaws.com/17bdd15e-190b-44a6-a555-93906d11df28.png") => "17bdd15e-190b-44a6-a555-93906d11df28.png"
+ * 2) getS3ObjectKeyByUrl("/api/images/ff042894-a2d5-457d-b9b2-82f7cde46255.png") => "ff042894-a2d5-457d-b9b2-82f7cde46255.png"
+ */
+export const getObjectKeyByImageUrl = (imageURL: string): string => {
+    const IMAGE_NAME_REGEX =
+        /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.png/i;
+    return imageURL.match(IMAGE_NAME_REGEX)![0];
+};
+
 export const doesS3ObjectExist = async (filename: string) => {
     try {
         // using HeadObjectCommand to check if the object key exists
