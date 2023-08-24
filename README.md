@@ -1356,7 +1356,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
   **Example Variables**:
   ```JSON
   {
-    "updateProductId": 1134
+    "deleteProductId": 1134
   }
   ```
   **Result**:
@@ -1369,3 +1369,58 @@ Some API endpoints require authentication using access tokens and refresh tokens
     }
   } 
   ```
+- **Error responses**:
+  - You are trying to delete a product that doesn't exist
+    ```JSON
+    {
+      "data": {
+        "deleteProduct": null
+      },
+      "errors": [
+        {
+          "message": "A product with the specified id does not exist"
+        }
+      ]
+    } 
+    ```
+  - The user is not authenticated (the 'Authorization' header is empty):
+    ```JSON
+    {
+      "data": {
+        "deleteProduct": null
+      },
+      "errors": [
+        {
+          "message": "User must be authenticated to perform this action"
+        }
+      ]
+    }
+    ```
+  - The user is not activated:
+    ```JSON
+    {
+      "data": {
+        "deleteProduct": null
+      },
+      "errors": [
+        {
+          "message": "User must be activated to perform this action"
+        }
+      ]
+    }
+    ```
+  - The user doesn't have admin rights:
+    ```JSON
+    {
+      "data": {
+        "deleteProduct": null
+      },
+      "errors": [
+        {
+          "message": "User must be an admin to perform this action"
+        }
+      ]
+    }
+    ```
+- **Additional Notes**:
+  - When the product is deleted, the associated images that are stored in S3 won't be deleted. This behavior is temporary and will be fixed in the future.
