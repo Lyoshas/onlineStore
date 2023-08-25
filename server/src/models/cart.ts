@@ -33,7 +33,7 @@ export const addProductToCart = async (
         [userId, productId]
     ).then(({ rows }) => rows[0].exists);
 
-    // if there are no entries with this product
+    // if the user hasn't added this product before, create a new entry
     if (!existingCartEntry) {
         console.log('this entry does not exist');
         return dbPool.query(
@@ -45,7 +45,7 @@ export const addProductToCart = async (
         );
     }
 
-    // if there are entries, update the quantity
+    // if the user has added this product before, then update the quantity
     return dbPool.query(
         `
             UPDATE carts
