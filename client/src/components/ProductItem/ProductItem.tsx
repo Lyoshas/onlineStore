@@ -4,11 +4,10 @@ import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 
 import classes from './ProductItem.module.css';
-import Button from '../UI/Button/Button';
 import { RootState } from '../../store';
 import ButtonLink from '../UI/ButtonLink/ButtonLink';
 import DeleteButton from './DeleteButton/DeleteButton';
-import getStaticAssetUrl from '../../util/getStaticAssetUrl';
+import AddToCartButton from '../AddToCartButton/AddToCartButton';
 
 interface ProductItemProps {
     id: number;
@@ -81,13 +80,7 @@ const ProductItem: FC<ProductItemProps> = (props) => {
                         isAdmin && classes['keep-separate']
                     )}
                 >
-                    <Button className={classes['product-item__cart-btn']}>
-                        <img
-                            className={classes['cart-btn__icon']}
-                            src={getStaticAssetUrl('cart-icon.svg')}
-                            alt="Cart"
-                        />
-                    </Button>
+                    <AddToCartButton productId={props.id} />
                     {isAdmin && (
                         <Fragment>
                             <ButtonLink
