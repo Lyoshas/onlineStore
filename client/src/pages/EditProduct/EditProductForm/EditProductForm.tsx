@@ -2,7 +2,7 @@ import { Formik, Form } from 'formik';
 import { FC, useRef } from 'react';
 
 import classes from './EditProductForm.module.css';
-import editProductSchema from '../editProductSchema';
+import editProductSchema from '../../EditProduct/editProductSchema';
 import DBProduct from '../../../interfaces/DBProduct';
 import FormInput from '../../../components/Input/FormInput';
 import FormActions from '../../../components/FormActions/FormActions';
