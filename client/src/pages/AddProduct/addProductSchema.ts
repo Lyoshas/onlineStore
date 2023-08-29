@@ -36,14 +36,19 @@ const addProductSchema = Yup.object().shape({
         .transform((value) => +value)
         .typeError('Price must be a number')
         .required('Price is a required field')
-        .moreThan(0, 'Price must be greater than 0'),
+        .moreThan(0, 'Price must be greater than 0')
+        .lessThan(10000000, 'Price must be less than or equal to 9999999.99'),
     initialImageInfo: attachment.required('Initial image is required'),
     additionalImageInfo: attachment.required('Additional image is required'),
     quantityInStock: Yup.number()
         .transform((value) => +value)
         .typeError('Quantity in stock must be a number')
         .required('Quantity in stock is a required field')
-        .moreThan(-1, 'Quantity in stock must be 0 or more'),
+        .moreThan(-1, 'Quantity in stock must be 0 or more')
+        .lessThan(
+            32768,
+            'Quantity in stock must be less than or equal to 32767'
+        ),
     shortDescription: Yup.string()
         .required('Short description is a required field')
         .test('length', 'Must have no more than 300 characters', (val) => {
