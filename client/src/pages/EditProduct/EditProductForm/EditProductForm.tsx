@@ -4,12 +4,12 @@ import { FC, useRef } from 'react';
 import classes from './EditProductForm.module.css';
 import editProductSchema from '../editProductSchema';
 import DBProduct from '../../../interfaces/DBProduct';
-import FormInput from '../../Input/FormInput';
-import FormActions from '../../FormActions/FormActions';
-import SubmitButton from '../../UI/SubmitButton/SubmitButton';
-import FormSelect from '../../FormSelect/FormSelect';
+import FormInput from '../../../components/Input/FormInput';
+import FormActions from '../../../components/FormActions/FormActions';
+import SubmitButton from '../../../components/UI/SubmitButton/SubmitButton';
+import FormSelect from '../../../components/FormSelect/FormSelect';
 import SchemaContext from '../../../context/validationSchema';
-import { OnFormSubmitArgs as OnAddProductArgs } from '../../AddProductForm/AddProductForm';
+import { OnFormSubmitArgs as OnAddProductArgs } from '../../../components/AddProductForm/AddProductForm';
 
 interface EditProductFormProps {
     product: DBProduct & {

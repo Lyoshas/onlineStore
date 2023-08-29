@@ -22,7 +22,7 @@ import Logout from './pages/Logout/Logout';
 import useApiError from './components/hooks/useApiError';
 import LandingPage from './pages/LandingPage/LandingPage';
 import ProductInfo from './components/ProductInfo/ProductInfo';
-import EditProduct from './components/EditProduct/EditProduct';
+import EditProduct from './pages/EditProduct/EditProduct';
 import AddProduct from './pages/AddProduct/AddProduct';
 import ProductListPage from './pages/ProductListPage/ProductListPage';
 

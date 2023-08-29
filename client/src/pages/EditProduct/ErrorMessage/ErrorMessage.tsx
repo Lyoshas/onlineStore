@@ -1,8 +1,8 @@
 import { FC } from 'react';
 
-import CenterBlock from '../../UI/CenterBlock/CenterBlock';
-import ErrorIcon from '../../UI/Icons/ErrorIcon';
-import ButtonLink from '../../UI/ButtonLink/ButtonLink';
+import CenterBlock from '../../../components/UI/CenterBlock/CenterBlock';
+import ErrorIcon from '../../../components/UI/Icons/ErrorIcon';
+import ButtonLink from '../../../components/UI/ButtonLink/ButtonLink';
 import classes from './ErrorMessage.module.css';
 
 const ErrorMessage: FC<{ message: string }> = ({ message }) => {

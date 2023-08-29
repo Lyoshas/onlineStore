@@ -1,6 +1,6 @@
-import ButtonLink from '../../UI/ButtonLink/ButtonLink';
-import CenterBlock from '../../UI/CenterBlock/CenterBlock';
-import SuccessIcon from '../../UI/Icons/SuccessIcon';
+import ButtonLink from '../../../components/UI/ButtonLink/ButtonLink';
+import CenterBlock from '../../../components/UI/CenterBlock/CenterBlock';
+import SuccessIcon from '../../../components/UI/Icons/SuccessIcon';
 import classes from './SuccessMessage.module.css';
 
 const SuccessMessage = () => {
