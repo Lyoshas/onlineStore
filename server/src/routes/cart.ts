@@ -15,11 +15,10 @@ router.get('/cart', ensureAuthentication, cartController.getUserCart);
 router.put(
     '/cart',
     ensureAuthentication,
-    body(
-        'productId',
-        'productId must be a valid identifier that points to a product'
-    )
+    body('productId')
         .isNumeric()
+        .withMessage('productId must be a number')
+        .bail()
         .custom(async (productId: number) => {
             const doesProductExist: boolean = await dbPool
                 .query('SELECT EXISTS(SELECT 1 FROM products WHERE id = $1)', [
@@ -28,7 +27,8 @@ router.put(
                 .then(({ rows }) => rows[0].exists);
             if (!doesProductExist) return Promise.reject();
             return Promise.resolve();
-        }),
+        })
+        .withMessage('productId must point to a valid product'),
     // if the product id is invalid, return the error and don't check any other field
     validateRequest,
     body('quantity')
