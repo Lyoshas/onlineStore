@@ -1,5 +1,5 @@
 import DBProduct from '../../interfaces/DBProduct.js';
-import validateUser from '../helpers/validateUser.js';
+import validateUser from '../validators/validateUser.js';
 import dbPool from '../../services/postgres.service.js';
 import DisplayProduct from '../../interfaces/DisplayProduct.js';
 import isProductAvailable from '../helpers/isProductAvailable.js';
@@ -7,9 +7,9 @@ import isProductRunningOut from '../helpers/isProductRunningOut.js';
 import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
 import { getImageUrlByObjectKey } from '../../models/amazon-s3.js';
 import GraphqlAddProductsArgs from '../../interfaces/GraphqlAddProductArgs.js';
-import checkImageNames from '../helpers/checkImageNames.js';
-import checkProductCategory from '../helpers/checkProductCategory.js';
-import checkImageMimeTypes from '../helpers/checkImageMimeTypes.js';
+import checkImageNames from '../validators/checkImageNames.js';
+import checkProductCategory from '../validators/checkProductCategory.js';
+import checkImageMimeTypes from '../validators/checkImageMimeTypes.js';
 import { performProductUpsertCleanup as performProductInsertCleanup } from '../helpers/performProductUpsertCleanup.js';
 
 export default async (

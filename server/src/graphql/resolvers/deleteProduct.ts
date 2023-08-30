@@ -1,4 +1,4 @@
-import validateUser from '../helpers/validateUser.js';
+import validateUser from '../validators/validateUser.js';
 import dbPool from '../../services/postgres.service.js';
 import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
 import { performProductUpsertCleanup as performProductDeleteCleanup } from '../helpers/performProductUpsertCleanup.js';

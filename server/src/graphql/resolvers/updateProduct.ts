@@ -1,4 +1,4 @@
-import validateUser from '../helpers/validateUser.js';
+import validateUser from '../validators/validateUser.js';
 import dbPool from '../../services/postgres.service.js';
 import isProductRunningOut from '../helpers/isProductRunningOut.js';
 import isProductAvailable from '../helpers/isProductAvailable.js';
@@ -6,8 +6,8 @@ import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
 import DisplayProduct from '../../interfaces/DisplayProduct.js';
 import { getImageUrlByObjectKey } from '../../models/amazon-s3.js';
 import GraphqlAddProductsArgs from '../../interfaces/GraphqlAddProductArgs.js';
-import checkProductCategory from '../helpers/checkProductCategory.js';
-import checkImageMimeTypes from '../helpers/checkImageMimeTypes.js';
+import checkProductCategory from '../validators/checkProductCategory.js';
+import checkImageMimeTypes from '../validators/checkImageMimeTypes.js';
 import ProductNotFoundError from '../errors/ProductNotFoundError.js';
 import { performProductUpsertCleanup as performProductUpdateCleanup } from '../helpers/performProductUpsertCleanup.js';
 

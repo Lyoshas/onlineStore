@@ -1,6 +1,6 @@
 import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
 import DBProduct from '../../interfaces/DBProduct.js';
-import validateUser from '../helpers/validateUser.js';
+import validateUser from '../validators/validateUser.js';
 import dbPool from '../../services/postgres.service.js';
 import CamelCaseProperties from '../../interfaces/CamelCaseProperties.js';
 import getProductQuery from '../helpers/getProductQuery.js';
