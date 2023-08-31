@@ -993,13 +993,13 @@ Some API endpoints require authentication using access tokens and refresh tokens
 #### 5. Add a new product
 - **Who can access:** only administrators with the correct [access token](#access-token)
 - **Required parameters:**
-  - _title_ - must be a string not exceeding 200 characters
-  - _price_ - must be a float
+  - _title_ - must be a string with a length between 1 and 200 characters
+  - _price_ - must be a float that is greater than 0 and less than or equal to 9999999.99
   - _category_ - must be a string and must point to an existing category that is inside the 'product_categories' DB table
   - _initialImageName_ - the image name for the initial product image. The image must be first uploaded to AWS S3
   - _additionalImageName_ - the image name for the additional product image. The image must be first uploaded to AWS S3
-  - _quantityInStock_ - how many products are in stock. Must be a number
-  - _shortDescription_ - short description of the product. Must be no more than 300 characters.
+  - _quantityInStock_ - how many products are in stock. Must be a number that is greater than or equal to 0 and not greater than 32767
+  - _shortDescription_ - short description of the product. Must have the length between 1 and 300 characters.
 - **Example**:
   ```graphql
   mutation AddProduct(
@@ -1063,6 +1063,17 @@ Some API endpoints require authentication using access tokens and refresh tokens
   }
   ```
 - **Error responses**:
+  - The parameter requirements were not met (please check the requirements above):
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "Title length must be between 1 and 200 characters"
+        }
+      ]
+    }
+    ```
   - The user is not authenticated (the 'Authorization' header is empty):
     ```JSON
     {
@@ -1162,13 +1173,13 @@ Some API endpoints require authentication using access tokens and refresh tokens
 - **Who can access:** only administrators with the correct [access token](#access-token)
 - **Required parameters:**
   - _id_ - must be a valid id of a product that you are trying to update. Must point to a product in the database
-  - _title_ - must be a string not exceeding 200 characters
-  - _price_ - must be a float
+  - _title_ - must be a string with a length between 1 and 200 characters
+  - _price_ - must be a float that is greater than 0 and less than or equal to 9999999.99
   - _category_ - must be a string and must point to an existing category that is inside the 'product_categories' DB table
   - _initialImageName_ - the new image name for the initial product image. The image must be first uploaded to AWS S3
   - _additionalImageName_ - the image name for the additional product image. The image must be first uploaded to AWS S3
-  - _quantityInStock_ - how many products are now in stock. Must be a number
-  - _shortDescription_ - new short description of the product. Must be no more than 300 characters.
+  - _quantityInStock_ - how many products are now in stock. Must be a number that is greater than or equal to 0 and not greater than 32767
+  - _shortDescription_ - new short description of the product. Must have the length between 1 and 300 characters.
 - **Example**:
   ```graphql
   mutation UpdateProduct(
@@ -1235,6 +1246,17 @@ Some API endpoints require authentication using access tokens and refresh tokens
   }
   ```
 - **Error responses**:
+  - The parameter requirements were not met (please check the requirements above):
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "Title length must be between 1 and 200 characters"
+        }
+      ]
+    }
+    ```
   - The specified product id wasn't found in the database
     ```JSON
     {

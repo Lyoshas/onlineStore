@@ -10,6 +10,11 @@ import checkProductCategory from '../validators/checkProductCategory.js';
 import checkImageMimeTypes from '../validators/checkImageMimeTypes.js';
 import ProductNotFoundError from '../errors/ProductNotFoundError.js';
 import { performProductUpsertCleanup as performProductUpdateCleanup } from '../helpers/performProductUpsertCleanup.js';
+import checkProductTitle from '../validators/checkProductTitle.js';
+import checkProductPrice from '../validators/checkProductPrice.js';
+import checkQuantityInStock from '../validators/checkQuantityInStock.js';
+import checkShortDescription from '../validators/checkShortDescription.js';
+import checkImageNames from '../validators/checkImageNames.js';
 
 export default async (
     _: any,
@@ -31,6 +36,11 @@ export default async (
     } = args;
 
     try {
+        checkProductTitle(title);
+        checkProductPrice(price);
+        checkQuantityInStock(quantityInStock);
+        checkShortDescription(shortDescription);
+        await checkImageNames(initialImageName, additionalImageName);
         await checkImageMimeTypes(initialImageName, additionalImageName);
         await checkProductCategory(category);
 
