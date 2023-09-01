@@ -990,6 +990,17 @@ Some API endpoints require authentication using access tokens and refresh tokens
       ]
     }
     ```
+  - The specified id doesn't point to any product in the database:
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "A product with the specified id does not exist",
+        }
+      ]
+    }
+    ```
 #### 5. Add a new product
 - **Who can access:** only administrators with the correct [access token](#access-token)
 - **Required parameters:**

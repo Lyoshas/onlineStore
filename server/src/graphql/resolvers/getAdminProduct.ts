@@ -5,6 +5,7 @@ import dbPool from '../../services/postgres.service.js';
 import CamelCaseProperties from '../../interfaces/CamelCaseProperties.js';
 import getProductQuery from '../helpers/getProductQuery.js';
 import { getObjectKeyByImageUrl } from '../../models/amazon-s3.js';
+import ProductNotFoundError from '../errors/ProductNotFoundError.js';
 
 type GetAdminProductOutput = CamelCaseProperties<DBProduct> & {
     initialImageName: string;
@@ -22,6 +23,10 @@ const getAdminProduct = async (
         getProductQuery('WHERE id = $1'),
         [args.productId]
     );
+
+    if (rows.length === 0) {
+        throw new ProductNotFoundError();
+    }
 
     const product = rows[0];
 
