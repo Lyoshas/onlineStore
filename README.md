@@ -830,7 +830,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
       "data": {},
       "errors": [
         {
-          "message": "Product not found"
+          "message": "A product with the specified id does not exist"
         }
       ]
     }

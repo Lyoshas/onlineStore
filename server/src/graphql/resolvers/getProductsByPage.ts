@@ -4,6 +4,7 @@ import dbPool from '../../services/postgres.service.js';
 import getProductQuery from '../helpers/getProductQuery.js';
 import isProductAvailable from '../helpers/isProductAvailable.js';
 import isProductRunningOut from '../helpers/isProductRunningOut.js';
+import { PageOutOfRangeError } from '../errors/PageOutOfRangeError.js';
 
 interface GetProductsByPageResult {
     productList: DisplayProduct[];
@@ -22,7 +23,7 @@ async function getProductsByPage(
     args: { page: number }
 ): Promise<GetProductsByPageResult> {
     if (args.page <= 0) {
-        throw new Error("The 'page' parameter must be greater than zero");
+        throw new PageOutOfRangeError();
     }
 
     const productsPerPage: number = parseInt(

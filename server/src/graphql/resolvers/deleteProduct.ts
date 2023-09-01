@@ -3,6 +3,7 @@ import dbPool from '../../services/postgres.service.js';
 import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
 import { performProductUpsertCleanup as performProductDeleteCleanup } from '../helpers/performProductUpsertCleanup.js';
 import { getObjectKeyByImageUrl } from '../../models/amazon-s3.js';
+import ProductNotFoundError from '../errors/ProductNotFoundError.js';
 
 interface DeleteProductArguments {
     id: number;
@@ -30,7 +31,7 @@ export default async (
     );
 
     if (rowCount === 0) {
-        throw new Error('A product with the specified id does not exist');
+        throw new ProductNotFoundError();
     }
 
     // now we need to delete S3 objects what are associated with the specified productId

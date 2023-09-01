@@ -1,6 +1,7 @@
 import DBProduct from '../../interfaces/DBProduct.js';
 import DisplayProduct from '../../interfaces/DisplayProduct.js';
 import dbPool from '../../services/postgres.service.js';
+import ProductNotFoundError from '../errors/ProductNotFoundError.js';
 import getProductQuery from '../helpers/getProductQuery.js';
 import isProductAvailable from '../helpers/isProductAvailable.js';
 import isProductRunningOut from '../helpers/isProductRunningOut.js';
@@ -14,7 +15,7 @@ function getProduct(
         .query<DBProduct>(getProductQuery('WHERE id = $1'), [args.id])
         .then(({ rows }) => {
             if (rows.length === 0) {
-                throw new Error('Product not found');
+                throw new ProductNotFoundError();
             }
 
             const product = rows[0];

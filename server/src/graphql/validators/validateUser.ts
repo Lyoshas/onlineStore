@@ -1,16 +1,19 @@
 import VerifiedUserInfo from '../../interfaces/VerifiedUserInfo.js';
 import { isAccountActivated } from '../../models/account-activation.js';
+import UserNotAuthenticatedError from '../errors/UserNotAuthenticatedError.js';
+import UserNotActivatedError from '../errors/UserNotActivatedError.js';
+import UserNotAdminError from '../errors/UserNotAdminError.js';
 
 export default async (user: VerifiedUserInfo | null) => {
     if (!user) {
-        throw new Error('User must be authenticated to perform this action');
+        throw new UserNotAuthenticatedError();
     }
 
-    if ( !(await isAccountActivated(user.id)) ) {
-        throw new Error('User must be activated to perform this action');
+    if (!(await isAccountActivated(user.id))) {
+        throw new UserNotActivatedError();
     }
 
     if (!user.isAdmin) {
-        throw new Error('User must be an admin to perform this action');
+        throw new UserNotAdminError();
     }
 };

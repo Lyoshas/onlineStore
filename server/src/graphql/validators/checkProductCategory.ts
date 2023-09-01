@@ -1,8 +1,9 @@
 import { productCategoryExists } from '../../models/product-category.js';
+import CategoryNotExistsError from '../errors/CategoryNotExistsError.js';
 
 const checkProductCategory = async (category: string) => {
     if (!(await productCategoryExists(category))) {
-        throw new Error('The specified category does not exist');
+        throw new CategoryNotExistsError();
     }
 };
 
