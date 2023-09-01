@@ -823,6 +823,18 @@ Some API endpoints require authentication using access tokens and refresh tokens
     }
   }
   ```
+- **Error responses**:
+  - The specified product id doesn't exist
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "Product not found"
+        }
+      ]
+    }
+    ```
 #### 2. Get a list of products by specifying a page
 - **Who can access:** everyone
 - **Required parameters:**
