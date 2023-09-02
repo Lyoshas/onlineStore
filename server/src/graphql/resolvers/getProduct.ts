@@ -12,7 +12,10 @@ function getProduct(
 ): Promise<DisplayProduct> {
     // code to get data from the DB
     return dbPool
-        .query<DBProduct>(getProductQuery('WHERE id = $1'), [args.id])
+        .query<Omit<DBProduct, 'max_order_quantity'>>(
+            getProductQuery('WHERE id = $1'),
+            [args.id]
+        )
         .then(({ rows }) => {
             if (rows.length === 0) {
                 throw new ProductNotFoundError();

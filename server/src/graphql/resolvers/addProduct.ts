@@ -1,12 +1,11 @@
 import DBProduct from '../../interfaces/DBProduct.js';
 import validateUser from '../validators/validateUser.js';
 import dbPool from '../../services/postgres.service.js';
-import DisplayProduct from '../../interfaces/DisplayProduct.js';
 import isProductAvailable from '../helpers/isProductAvailable.js';
 import isProductRunningOut from '../helpers/isProductRunningOut.js';
 import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
 import { getImageUrlByObjectKey } from '../../models/amazon-s3.js';
-import GraphqlAddProductsArgs from '../../interfaces/GraphqlAddProductArgs.js';
+import GraphqlAddProductArgs from '../../interfaces/GraphqlAddProductArgs.js';
 import checkImageNames from '../validators/checkImageNames.js';
 import checkProductCategory from '../validators/checkProductCategory.js';
 import checkImageMimeTypes from '../validators/checkImageMimeTypes.js';
@@ -15,12 +14,17 @@ import checkProductPrice from '../validators/checkProductPrice.js';
 import checkProductTitle from '../validators/checkProductTitle.js';
 import checkQuantityInStock from '../validators/checkQuantityInStock.js';
 import checkShortDescription from '../validators/checkShortDescription.js';
+import checkMaxOrderQuantity from '../validators/checkMaxOrderQuantity.js';
+import ProductUpsertReturnValue from '../../interfaces/ProductUpsertReturnValue.js';
+import knexInstance from '../../services/knex.service.js';
+import transformToSQLParameters from '../helpers/transformToSQLParameters.js';
+import AnyObject from '../../interfaces/AnyObject.js';
 
 export default async (
     _: any,
-    args: GraphqlAddProductsArgs,
+    args: GraphqlAddProductArgs,
     context: ApolloServerContext
-): Promise<DisplayProduct> => {
+): Promise<ProductUpsertReturnValue> => {
     const {
         title,
         price,
@@ -29,6 +33,7 @@ export default async (
         shortDescription,
         initialImageName,
         additionalImageName,
+        maxOrderQuantity,
     } = args;
 
     // if a user doesn't have enough privileges, throw an error immediately
@@ -40,6 +45,8 @@ export default async (
         checkProductPrice(price);
         checkQuantityInStock(quantityInStock);
         checkShortDescription(shortDescription);
+        typeof maxOrderQuantity === 'number' &&
+            checkMaxOrderQuantity(maxOrderQuantity);
         await checkImageNames(initialImageName, additionalImageName);
         // both images must have the MIME type of 'image/png'
         await checkImageMimeTypes(initialImageName, additionalImageName);
@@ -48,35 +55,38 @@ export default async (
         const initialImageUrl = getImageUrlByObjectKey(initialImageName);
         const additionalImageUrl = getImageUrlByObjectKey(additionalImageName);
 
-        const { rows } = await dbPool.query(
-            `INSERT INTO products (
-                title,
-                price,
-                initial_image_url,
-                additional_image_url,
-                quantity_in_stock,
-                short_description,
-                category
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-            [
-                title,
-                price,
-                initialImageUrl,
-                additionalImageUrl,
-                quantityInStock,
-                shortDescription,
-                category,
-            ]
-        );
+        let insertParameters: AnyObject = transformToSQLParameters({
+            title,
+            price,
+            category,
+            quantityInStock,
+            shortDescription,
+            initialImageUrl,
+            additionalImageUrl,
+            ...(maxOrderQuantity == null ? {} : { maxOrderQuantity }),
+        });
+
+        // since we have parameters that may or may not exist (in our case it's "max_order_quantity"), it wouldn't be really practical to use the native pg driver
+        // so we're building a dynamic query with Knex
+        const sqlQuery: string = knexInstance('products')
+            .insert(insertParameters)
+            .returning(['id', 'max_order_quantity'])
+            .toString();
+
+        const { rows } = await dbPool.query<{
+            id: number;
+            max_order_quantity: number;
+        }>(sqlQuery);
 
         return {
             id: rows[0].id as DBProduct['id'],
-            title: title,
-            price: price,
-            category: category,
-            initialImageUrl: initialImageUrl,
-            additionalImageUrl: additionalImageUrl,
-            shortDescription: shortDescription,
+            title,
+            price,
+            category,
+            initialImageUrl,
+            additionalImageUrl,
+            shortDescription,
+            maxOrderQuantity: rows[0].max_order_quantity,
             isAvailable: isProductAvailable(quantityInStock),
             isRunningOut: isProductRunningOut(quantityInStock),
         };

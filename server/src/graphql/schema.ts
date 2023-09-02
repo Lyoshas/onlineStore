@@ -26,8 +26,9 @@ export const typeDefs = `#graphql
             initialImageName: String!,
             additionalImageName: String!,
             quantityInStock: Int!,
-            shortDescription: String!
-        ): Product!
+            shortDescription: String!,
+            maxOrderQuantity: Int
+        ): ProductUpsertReturnValue!
 
         updateProduct(
             id: Int!,
@@ -37,8 +38,9 @@ export const typeDefs = `#graphql
             initialImageName: String!,
             additionalImageName: String!,
             quantityInStock: Int!,
-            shortDescription: String!
-        ): Product!
+            shortDescription: String!,
+            maxOrderQuantity: Int!
+        ): ProductUpsertReturnValue!
 
         deleteProduct(id: Int!): DeleteProductReturnValue
     }
@@ -59,6 +61,19 @@ export const typeDefs = `#graphql
         isRunningOut: Boolean!
     }
 
+    type ProductUpsertReturnValue {
+        id: Int!
+        title: String!
+        price: Float!
+        category: String!
+        initialImageUrl: String!
+        additionalImageUrl: String!
+        shortDescription: String!
+        maxOrderQuantity: Int!
+        isAvailable: Boolean!
+        isRunningOut: Boolean!
+    }
+
     type GetProductByPageReturnValue {
         productList: [Product!]!
         totalPages: Int!
@@ -75,6 +90,7 @@ export const typeDefs = `#graphql
         additionalImageName: String!
         quantityInStock: Int!
         shortDescription: String!
+        maxOrderQuantity: Int!
     }
 `;
 

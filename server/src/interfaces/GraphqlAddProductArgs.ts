@@ -1,6 +1,6 @@
 import DisplayProduct from './DisplayProduct';
 
-type GraphqlAddProductsArgs = Omit<
+type GraphqlAddProductArgs = Omit<
     DisplayProduct,
     | 'id'
     | 'isAvailable'
@@ -11,6 +11,7 @@ type GraphqlAddProductsArgs = Omit<
     quantityInStock: number;
     initialImageName: string;
     additionalImageName: string;
+    maxOrderQuantity: number | null | undefined;
 };
 
-export default GraphqlAddProductsArgs;
+export default GraphqlAddProductArgs;

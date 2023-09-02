@@ -8,4 +8,5 @@ export default interface DBProduct {
     quantity_in_stock: number;
     short_description: string;
     category: string;
+    max_order_quantity: number;
 }

@@ -3,9 +3,7 @@ import dbPool from '../../services/postgres.service.js';
 import isProductRunningOut from '../helpers/isProductRunningOut.js';
 import isProductAvailable from '../helpers/isProductAvailable.js';
 import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
-import DisplayProduct from '../../interfaces/DisplayProduct.js';
 import { getImageUrlByObjectKey } from '../../models/amazon-s3.js';
-import GraphqlAddProductsArgs from '../../interfaces/GraphqlAddProductArgs.js';
 import checkProductCategory from '../validators/checkProductCategory.js';
 import checkImageMimeTypes from '../validators/checkImageMimeTypes.js';
 import ProductNotFoundError from '../errors/ProductNotFoundError.js';
@@ -15,12 +13,15 @@ import checkProductPrice from '../validators/checkProductPrice.js';
 import checkQuantityInStock from '../validators/checkQuantityInStock.js';
 import checkShortDescription from '../validators/checkShortDescription.js';
 import checkImageNames from '../validators/checkImageNames.js';
+import GraphqlUpdateProductArgs from '../../interfaces/GraphqlUpdateProductArgs.js';
+import checkMaxOrderQuantity from '../validators/checkMaxOrderQuantity.js';
+import ProductUpsertReturnValue from '../../interfaces/ProductUpsertReturnValue.js';
 
 export default async (
     _: any,
-    args: GraphqlAddProductsArgs & { id: number },
+    args: GraphqlUpdateProductArgs,
     context: ApolloServerContext
-): Promise<DisplayProduct> => {
+): Promise<ProductUpsertReturnValue> => {
     // if any of these checks fail, an error will be thrown and the product will not be updated
     await validateUser(context.user);
 
@@ -33,6 +34,7 @@ export default async (
         quantityInStock,
         initialImageName,
         additionalImageName,
+        maxOrderQuantity,
     } = args;
 
     try {
@@ -40,6 +42,7 @@ export default async (
         checkProductPrice(price);
         checkQuantityInStock(quantityInStock);
         checkShortDescription(shortDescription);
+        checkMaxOrderQuantity(maxOrderQuantity);
         await checkImageNames(initialImageName, additionalImageName);
         await checkImageMimeTypes(initialImageName, additionalImageName);
         await checkProductCategory(category);
@@ -56,8 +59,9 @@ export default async (
                 initial_image_url = $4,
                 additional_image_url = $5,
                 short_description = $6,
-                quantity_in_stock = $7
-            WHERE id = $8`,
+                quantity_in_stock = $7,
+                max_order_quantity = $8
+            WHERE id = $9`,
             [
                 title,
                 price,
@@ -66,6 +70,7 @@ export default async (
                 additionalImageUrl,
                 shortDescription,
                 quantityInStock,
+                maxOrderQuantity,
                 id,
             ]
         );
@@ -82,6 +87,7 @@ export default async (
             initialImageUrl,
             additionalImageUrl,
             shortDescription,
+            maxOrderQuantity,
             isAvailable: isProductAvailable(quantityInStock),
             isRunningOut: isProductRunningOut(quantityInStock),
         };

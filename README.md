@@ -928,7 +928,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
     }
   }
   ```
-#### 4. Get product info including 'quantity_in_stock'
+#### 4. Get product info including 'quantity_in_stock' and/or 'max_order_quantity'
 - **Who can access:** only administrators with the correct [access token](#access-token)
 - **Required parameters:**
   - _productId_ - the id of the product that you are trying to get information about. Must be a number.
@@ -946,6 +946,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
       additionalImageName
       quantityInStock
       shortDescription
+      maxOrderQuantity
     }
   }
   ```
@@ -963,7 +964,8 @@ Some API endpoints require authentication using access tokens and refresh tokens
         "initialImageName": "8bd44131-8cc9-4503-9d38-a784e90220f4.png",
         "additionalImageName": "14f5c601-96a6-41f2-a22e-9922bb207376.png",
         "quantityInStock": 20,
-        "shortDescription": "A small description of the productt macc"
+        "shortDescription": "A small description of the productt macc",
+        "maxOrderQuantity": 32767
       }
     }
   }
@@ -1023,6 +1025,8 @@ Some API endpoints require authentication using access tokens and refresh tokens
   - _additionalImageName_ - the image name for the additional product image. The image must be first uploaded to AWS S3
   - _quantityInStock_ - how many products are in stock. Must be a number that is greater than or equal to 0 and not greater than 32767
   - _shortDescription_ - short description of the product. Must have the length between 1 and 300 characters.
+- **Optional parameters:**
+  - _maxOrderQuantity_ - how many products a user is allowed to order at once. Must be a number that is greater than or equal to 0 and not greater than 32767. If not specified, the default value of 32767 is assumed.
 - **Example**:
   ```graphql
   mutation AddProduct(
@@ -1033,6 +1037,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
     $additionalImageName: String!
     $quantityInStock: Int!
     $shortDescription: String!
+    $maxOrderQuantity: Int
   ) {
     addProduct(
       title: $title
@@ -1042,6 +1047,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
       additionalImageName: $additionalImageName
       quantityInStock: $quantityInStock
       shortDescription: $shortDescription
+      maxOrderQuantity: $maxOrderQuantity
     ) {
       id
       title
@@ -1050,6 +1056,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
       initialImageUrl
       additionalImageUrl
       shortDescription
+      maxOrderQuantity
       isAvailable
       isRunningOut
     }
@@ -1064,7 +1071,8 @@ Some API endpoints require authentication using access tokens and refresh tokens
     "initialImageName": "03200236-ae87-46bd-81c7-49c677463b4c.png",
     "additionalImageName": "03200236-ae87-46bd-81c7-49c677463b4c.png",
     "quantityInStock": 100,
-    "shortDescription": "A great laptop for everyday use"
+    "shortDescription": "A great laptop for everyday use",
+    "maxOrderQuantity": 50
   }
   ```
   **Result**:
@@ -1080,13 +1088,14 @@ Some API endpoints require authentication using access tokens and refresh tokens
         "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/03200236-ae87-46bd-81c7-49c677463b4c.png",
         "shortDescription": "A great laptop for everyday use",
         "isAvailable": true,
-        "isRunningOut": false
+        "isRunningOut": false,
+        "maxOrderQuantity": 50
       }
     }
   }
   ```
 - **Error responses**:
-  - The parameter requirements were not met (please check the requirements above):
+  - The parameter requirements were not met (please check the requirements above). Example response:
     ```JSON
     {
       "data": {},
@@ -1202,7 +1211,8 @@ Some API endpoints require authentication using access tokens and refresh tokens
   - _initialImageName_ - the new image name for the initial product image. The image must be first uploaded to AWS S3
   - _additionalImageName_ - the image name for the additional product image. The image must be first uploaded to AWS S3
   - _quantityInStock_ - how many products are now in stock. Must be a number that is greater than or equal to 0 and not greater than 32767
-  - _shortDescription_ - new short description of the product. Must have the length between 1 and 300 characters.
+  - _shortDescription_ - new short description of the product. Must have the length between 1 and 300 characters
+  - _maxOrderQuantity_ - how many products a user is allowed to order at once. Must be a number that is greater than or equal to 0 and not greater than 32767.
 - **Example**:
   ```graphql
   mutation UpdateProduct(
@@ -1214,6 +1224,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
     $additionalImageName: String!
     $quantityInStock: Int!
     $shortDescription: String!
+    $maxOrderQuantity: Int!
   ) {
     updateProduct(
       id: $updateProductId
@@ -1224,6 +1235,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
       additionalImageName: $additionalImageName
       quantityInStock: $quantityInStock
       shortDescription: $shortDescription
+      maxOrderQuantity: $maxOrderQuantity
     ) {
       id
       title
@@ -1232,6 +1244,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
       initialImageUrl
       additionalImageUrl
       shortDescription
+      maxOrderQuantity
       isAvailable
       isRunningOut
     }
@@ -1247,7 +1260,8 @@ Some API endpoints require authentication using access tokens and refresh tokens
     "initialImageName": "03200236-ae87-46bd-81c7-49c677463b4c.png",
     "additionalImageName": "03200236-ae87-46bd-81c7-49c677463b4c.png",
     "quantityInStock": 2,
-    "shortDescription": "Updated description of the product"
+    "shortDescription": "Updated description of the product",
+    "maxOrderQuantity": 50
   }
   ```
   **Result**:
@@ -1262,6 +1276,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
         "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/03200236-ae87-46bd-81c7-49c677463b4c.png",
         "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/03200236-ae87-46bd-81c7-49c677463b4c.png",
         "shortDescription": "Updated description of the product",
+        "maxOrderQuantity": 50,
         "isAvailable": true,
         "isRunningOut": true
       }

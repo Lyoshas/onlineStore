@@ -30,7 +30,7 @@ async function getProductsByPage(
         process.env.PRODUCTS_PER_PAGE as string
     );
 
-    const { rows } = await dbPool.query<DBProduct>(
+    const { rows } = await dbPool.query<Omit<DBProduct, 'max_order_quantity'>>(
         getProductQuery('OFFSET $1 LIMIT $2'),
         [productsPerPage * (+args.page - 1), productsPerPage]
     );

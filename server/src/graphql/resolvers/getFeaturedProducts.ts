@@ -12,7 +12,7 @@ async function getFeaturedProducts(
     args: void
 ): Promise<DisplayProduct[]> {
     // get 12 random products
-    const { rows } = await dbPool.query<DBProduct>(
+    const { rows } = await dbPool.query<Omit<DBProduct, 'max_order_quantity'>>(
         getProductQuery('ORDER BY RANDOM() LIMIT 12')
     );
 

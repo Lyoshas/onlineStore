@@ -6,8 +6,11 @@ interface AdditionalAttributes {
     isRunningOut: boolean;
 }
 
-// make each property camelCase, omit 'quantityInStock' and add { isAvailable: boolean; isRunningOut: boolean; }
-type DisplayProduct = Omit<CamelCaseProperties<DBProduct>, 'quantityInStock'> &
+// make each property camelCase, omit 'quantityInStock' and 'maxOrderQuantity' and add { isAvailable: boolean; isRunningOut: boolean; }
+type DisplayProduct = Omit<
+    CamelCaseProperties<DBProduct>,
+    'quantityInStock' | 'maxOrderQuantity'
+> &
     AdditionalAttributes;
 
 export default DisplayProduct;
