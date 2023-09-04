@@ -7,6 +7,7 @@ interface DBProduct {
     additionalImageUrl: string;
     quantityInStock: number;
     shortDescription: string;
+    maxOrderQuantity: number;
 }
 
 export default DBProduct;

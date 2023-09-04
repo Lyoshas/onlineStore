@@ -46,6 +46,7 @@ const EditProductForm: FC<EditProductFormProps> = (props) => {
                 initialImageInfo: { size: 0, type: '' },
                 additionalImageInfo: { size: 0, type: '' },
                 shortDescription: product.shortDescription,
+                maxOrderQuantity: product.maxOrderQuantity,
             }}
             onSubmit={(values, { setSubmitting }) => {
                 setSubmitting(true);
@@ -61,6 +62,7 @@ const EditProductForm: FC<EditProductFormProps> = (props) => {
                     shortDescription: values.shortDescription,
                     previousInitialImageName: product.initialImageName,
                     previousAdditionalImageName: product.additionalImageName,
+                    maxOrderQuantity: values.maxOrderQuantity,
                 });
                 setSubmitting(false);
             }}
@@ -129,6 +131,14 @@ const EditProductForm: FC<EditProductFormProps> = (props) => {
                             placeholder="Enter product description"
                             isRequired={true}
                             value={product.shortDescription}
+                        />
+                        <FormInput
+                            type="number"
+                            label="Max order quantity"
+                            name="maxOrderQuantity"
+                            placeholder="Enter the maximum quantity per order"
+                            isRequired={true}
+                            value={product.maxOrderQuantity}
                         />
                     </SchemaContext.Provider>
                     <FormActions>

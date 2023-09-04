@@ -90,6 +90,7 @@ const EditProduct = () => {
                 category,
                 quantityInStock,
                 shortDescription,
+                maxOrderQuantity,
             } = formData;
 
             const newInitialImageName =
@@ -111,6 +112,7 @@ const EditProduct = () => {
                     shortDescription,
                     initialImageName: newInitialImageName,
                     additionalImageName: newAdditionalImageName,
+                    maxOrderQuantity: +maxOrderQuantity,
                 },
             });
             const updatedProduct = updatedProductResult.data!.updateProduct;
@@ -136,6 +138,7 @@ const EditProduct = () => {
                         shortDescription,
                         initialImageName: newInitialImageName,
                         additionalImageName: newAdditionalImageName,
+                        maxOrderQuantity: maxOrderQuantity,
                     },
                 },
                 variables: { productId: +productId! },

@@ -12,6 +12,7 @@ const GET_ADMIN_PRODUCT_DETAILS = gql(`
             additionalImageName
             shortDescription
             quantityInStock
+            maxOrderQuantity
         }
     }
 `);
