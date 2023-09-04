@@ -123,8 +123,14 @@ const AddProduct = () => {
         )
             return;
 
-        const { title, price, category, quantityInStock, shortDescription } =
-            formData;
+        const {
+            title,
+            price,
+            category,
+            quantityInStock,
+            shortDescription,
+            maxOrderQuantity,
+        } = formData;
 
         addProductToDB({
             variables: {
@@ -135,6 +141,7 @@ const AddProduct = () => {
                 shortDescription,
                 initialImageName,
                 additionalImageName,
+                maxOrderQuantity: +maxOrderQuantity,
             },
         });
     }, [

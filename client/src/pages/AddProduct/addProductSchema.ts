@@ -56,6 +56,15 @@ const addProductSchema = Yup.object().shape({
             return val.length <= 300;
         }),
     category: Yup.string().required('Category is a required field'),
+    maxOrderQuantity: Yup.number()
+        .transform((value) => +value)
+        .typeError('Max order quantity must be a number')
+        .required('Max order quantity in a required field')
+        .moreThan(0, 'Max order quantity must be greater than 0')
+        .lessThan(
+            32768,
+            'Max order quantity must be less than or equal to 32767'
+        ),
 });
 
 export default addProductSchema;

@@ -18,6 +18,7 @@ const initialValues = {
     quantityInStock: 0,
     shortDescription: '',
     category: '',
+    maxOrderQuantity: 32767,
 };
 export type FormValues = typeof initialValues;
 
@@ -117,6 +118,17 @@ const AddProductForm: FC<AddProductFormProps> = (props) => {
                                 name="category"
                                 options={props.productCategories}
                                 defaultOption={defaultCategory}
+                            />
+                            <FormInput
+                                isRequired={true}
+                                type="number"
+                                label="Max order quantity"
+                                name="maxOrderQuantity"
+                                placeholder="Enter the maximum quantity per order"
+                                value={32767}
+                                min={1}
+                                max={32767}
+                                step={1}
                             />
                             <FormActions>
                                 <SubmitButton

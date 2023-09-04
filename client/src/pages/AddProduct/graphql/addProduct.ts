@@ -8,7 +8,8 @@ const ADD_PRODUCT = gql(`
         $initialImageName: String!,
         $additionalImageName: String!,
         $quantityInStock: Int!,
-        $shortDescription: String!
+        $shortDescription: String!,
+        $maxOrderQuantity: Int!
     ) {
         addProduct(
             title: $title,
@@ -17,7 +18,8 @@ const ADD_PRODUCT = gql(`
             initialImageName: $initialImageName,
             additionalImageName: $additionalImageName,
             quantityInStock: $quantityInStock,
-            shortDescription: $shortDescription
+            shortDescription: $shortDescription,
+            maxOrderQuantity: $maxOrderQuantity
         ) {
             id
         }
