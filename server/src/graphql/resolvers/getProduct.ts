@@ -1,39 +1,50 @@
+import { GraphQLResolveInfo } from 'graphql';
+import graphqlFields from 'graphql-fields';
+
+import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
 import DBProduct from '../../interfaces/DBProduct.js';
 import DisplayProduct from '../../interfaces/DisplayProduct.js';
 import dbPool from '../../services/postgres.service.js';
 import ProductNotFoundError from '../errors/ProductNotFoundError.js';
-import getProductQuery from '../helpers/getProductQuery.js';
-import isProductAvailable from '../helpers/isProductAvailable.js';
-import isProductRunningOut from '../helpers/isProductRunningOut.js';
+import getRelevantProductFields from '../helpers/getRelevantProductFields.js';
+import knexInstance from '../../services/knex.service.js';
+import mapRequestedFieldsToProductInfo from '../helpers/mapRequestedFieldsToProductInfo.js';
 
-function getProduct(
+type GetProductOutput = Partial<DisplayProduct>;
+
+type PossibleGraphQLFields = {
+    [productField in keyof DisplayProduct]?: {};
+};
+
+async function getProduct(
     parent: any,
-    args: { id: number }
-): Promise<DisplayProduct> {
-    // code to get data from the DB
-    return dbPool
-        .query<Omit<DBProduct, 'max_order_quantity'>>(
-            getProductQuery('WHERE id = $1'),
-            [args.id]
-        )
-        .then(({ rows }) => {
-            if (rows.length === 0) {
-                throw new ProductNotFoundError();
-            }
+    args: { id: number },
+    context: ApolloServerContext,
+    resolveInfo: GraphQLResolveInfo
+): Promise<GetProductOutput> {
+    const requestedFields = graphqlFields(resolveInfo) as PossibleGraphQLFields;
+    const requestedFieldsList = Object.keys(requestedFields) as (keyof PossibleGraphQLFields)[];
 
-            const product = rows[0];
-            return {
-                id: product.id,
-                title: product.title,
-                price: product.price,
-                category: product.category,
-                initialImageUrl: product.initial_image_url,
-                additionalImageUrl: product.additional_image_url,
-                shortDescription: product.short_description,
-                isAvailable: isProductAvailable(product.quantity_in_stock),
-                isRunningOut: isProductRunningOut(product.quantity_in_stock),
-            };
-        });
+    const sqlQuery: string = knexInstance('products')
+        .select(getRelevantProductFields(requestedFieldsList))
+        .where({ id: args.id })
+        .toString();
+
+    const {
+        rows: [product],
+        rowCount,
+    } = await dbPool.query<Partial<Omit<DBProduct, 'max_order_quantity'>>>(
+        sqlQuery
+    );
+
+    if (rowCount === 0) {
+        throw new ProductNotFoundError();
+    }
+
+    return mapRequestedFieldsToProductInfo(
+        product,
+        requestedFieldsList
+    ) as GetProductOutput;
 }
 
 export default getProduct;

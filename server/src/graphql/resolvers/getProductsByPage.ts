@@ -1,14 +1,26 @@
+import { GraphQLResolveInfo } from 'graphql';
+import graphqlFields from 'graphql-fields';
+
 import DBProduct from '../../interfaces/DBProduct.js';
 import DisplayProduct from '../../interfaces/DisplayProduct.js';
 import dbPool from '../../services/postgres.service.js';
-import getProductQuery from '../helpers/getProductQuery.js';
-import isProductAvailable from '../helpers/isProductAvailable.js';
-import isProductRunningOut from '../helpers/isProductRunningOut.js';
 import { PageOutOfRangeError } from '../errors/PageOutOfRangeError.js';
+import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
+import knexInstance from '../../services/knex.service.js';
+import getRelevantProductFields from '../helpers/getRelevantProductFields.js';
+import mapRequestedFieldsToProductInfo from '../helpers/mapRequestedFieldsToProductInfo.js';
+import RequireAtLeastOneProperty from '../../interfaces/RequireAtLeastOneProperty.js';
 
-interface GetProductsByPageResult {
-    productList: DisplayProduct[];
+type GetProductsByPageOutput = RequireAtLeastOneProperty<{
+    productList: Partial<DisplayProduct>[];
     totalPages: number;
+}>;
+
+interface PossibleGraphQLFields {
+    productList?: {
+        [productField in keyof DisplayProduct]?: {};
+    };
+    totalPages?: {};
 }
 
 async function getTotalPages(productsPerPage: number): Promise<number> {
@@ -20,8 +32,13 @@ async function getTotalPages(productsPerPage: number): Promise<number> {
 
 async function getProductsByPage(
     parent: any,
-    args: { page: number }
-): Promise<GetProductsByPageResult> {
+    args: { page: number },
+    context: ApolloServerContext,
+    resolveInfo: GraphQLResolveInfo
+): Promise<GetProductsByPageOutput> {
+    const requestedFields = graphqlFields(resolveInfo) as PossibleGraphQLFields;
+    const resultProductList: GetProductsByPageOutput['productList'] = [];
+
     if (args.page <= 0) {
         throw new PageOutOfRangeError();
     }
@@ -30,25 +47,44 @@ async function getProductsByPage(
         process.env.PRODUCTS_PER_PAGE as string
     );
 
-    const { rows } = await dbPool.query<Omit<DBProduct, 'max_order_quantity'>>(
-        getProductQuery('OFFSET $1 LIMIT $2'),
-        [productsPerPage * (+args.page - 1), productsPerPage]
-    );
+    // if the user requested products
+    if (requestedFields.productList) {
+        // instead of fetching every field of a product, we can be more granular by dynamically building a SELECT query
+        // this way, the query will execute faster
+
+        // getting products fields that the user requested
+        const requestedProductFields = Object.keys(
+            requestedFields.productList
+        ) as (keyof DisplayProduct)[];
+
+        const sqlQuery: string = knexInstance('products')
+            .select(getRelevantProductFields(requestedProductFields))
+            .offset(productsPerPage * (+args.page - 1))
+            .limit(productsPerPage)
+            .toString();
+        
+        const { rows } = await dbPool.query<
+            Partial<Omit<DBProduct, 'max_order_quantity'>>
+        >(sqlQuery);
+
+        rows.forEach((productInfo) => {
+            resultProductList.push(
+                mapRequestedFieldsToProductInfo(
+                    productInfo,
+                    requestedProductFields
+                ) as Partial<DisplayProduct>
+            );
+        });
+    }
 
     return {
-        productList: rows.map((product) => ({
-            id: product.id,
-            title: product.title,
-            price: product.price,
-            category: product.category,
-            initialImageUrl: product.initial_image_url,
-            additionalImageUrl: product.additional_image_url,
-            shortDescription: product.short_description,
-            isAvailable: isProductAvailable(product.quantity_in_stock),
-            isRunningOut: isProductRunningOut(product.quantity_in_stock),
-        })),
-        totalPages: await getTotalPages(productsPerPage),
-    };
+        ...(requestedFields.productList
+            ? { productList: resultProductList }
+            : {}),
+        ...(requestedFields.totalPages
+            ? { totalPages: await getTotalPages(productsPerPage) }
+            : {}),
+    } as GetProductsByPageOutput;
 }
 
 export default getProductsByPage;
