@@ -2,21 +2,28 @@ import { PoolClient } from 'pg';
 
 import dbPool from '../services/postgres.service.js';
 import CartEntry from '../interfaces/CartEntry.js';
+import SnakeCaseProperties from '../interfaces/SnakeCaseProperties.js';
+import camelCaseObject from '../util/camelCaseObject.js';
 
-export const getUserCart = (userId: number): Promise<CartEntry[]> => {
-    return dbPool.query(
+export const getUserCart = async (userId: number): Promise<CartEntry[]> => {
+    const { rows } = await dbPool.query<SnakeCaseProperties<CartEntry>>(
         `
-        SELECT
-            p.id AS product_id,
-            p.title,
-            p.price,
-            p.preview_url,
-            c.quantity
-        FROM carts AS c
-        INNER JOIN products AS p ON c.product_id = p.id
-        `
-    )
-        .then(({ rows }) => rows);
+            SELECT
+                p.id AS product_id,
+                p.title,
+                p.price,
+                p.initial_image_url,
+                c.quantity
+            FROM carts AS c
+            INNER JOIN products AS p ON c.product_id = p.id
+            WHERE c.user_id = $1
+        `,
+        [userId]
+    );
+
+    return rows.map((cartEntry) => {
+        return { ...camelCaseObject(cartEntry), price: +cartEntry.price };
+    });
 };
 
 export const addProductToCart = async (
@@ -24,14 +31,16 @@ export const addProductToCart = async (
     productId: number,
     quantity: number
 ) => {
-    const existingCartEntry = await dbPool.query(
-        `
+    const existingCartEntry = await dbPool
+        .query(
+            `
         SELECT EXISTS(
             SELECT 1 FROM carts WHERE user_id = $1 AND product_id = $2 
         )
         `,
-        [userId, productId]
-    ).then(({ rows }) => rows[0].exists);
+            [userId, productId]
+        )
+        .then(({ rows }) => rows[0].exists);
 
     // if the user hasn't added this product before, create a new entry
     if (!existingCartEntry) {
@@ -56,10 +65,7 @@ export const addProductToCart = async (
     );
 };
 
-export const deleteProductFromCart = (
-    userId: number,
-    productId: number
-) => {
+export const deleteProductFromCart = (userId: number, productId: number) => {
     return dbPool.query(
         'DELETE FROM carts WHERE user_id = $1 AND product_id = $2',
         [userId, productId]

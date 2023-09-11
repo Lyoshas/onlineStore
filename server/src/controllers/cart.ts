@@ -3,12 +3,20 @@ import asyncHandler from 'express-async-handler';
 
 import VerifiedUserInfo from '../interfaces/VerifiedUserInfo.js';
 import * as cartModel from '../models/cart.js';
+import CartEntry from '../interfaces/CartEntry.js';
 
 // if the user made it to any of these middlewares,
 // it means he/she is authenticated, so req.user is prepopulated
 
-export const getUserCart: RequestHandler = async (req, res, next) => {
-    res.json(await cartModel.getUserCart((req.user as VerifiedUserInfo).id));
+export const getUserCart: RequestHandler<
+    unknown,
+    { products: CartEntry[] }
+> = async (req, res, next) => {
+    res.json({
+        products: await cartModel.getUserCart(
+            (req.user as VerifiedUserInfo).id
+        ),
+    });
 };
 
 export const addProductToCart: RequestHandler<
