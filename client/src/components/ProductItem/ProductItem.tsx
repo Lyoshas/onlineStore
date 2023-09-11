@@ -80,7 +80,9 @@ const ProductItem: FC<ProductItemProps> = (props) => {
                         isAdmin && classes['keep-separate']
                     )}
                 >
-                    <AddToCartButton productId={props.id} />
+                    {props.isAvailable && (
+                        <AddToCartButton productId={props.id} />
+                    )}
                     {isAdmin && (
                         <Fragment>
                             <ButtonLink
