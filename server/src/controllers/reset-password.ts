@@ -96,6 +96,9 @@ export const changePassword: RequestHandler<
     } catch (e) {
         await transactionModel.rollbackTransaction(client);
         throw new UnexpectedError('Something went wrong');
+    } finally {
+        // we must release the connection to avoid resource leaks
+        client.release();
     }
 });
 

@@ -56,6 +56,9 @@ export const createOrder: RequestHandler = asyncHandler(
             }
 
             throw new UnexpectedError();
+        } finally {
+            // we must release the connection to avoid resource leaks
+            dbClient.release();
         }
     }
 );

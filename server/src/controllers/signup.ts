@@ -56,6 +56,9 @@ export const postSignUp: RequestHandler = asyncHandler(
             console.log(e);
             transactionModel.rollbackTransaction(dbClient);
             throw new UnexpectedError();
+        } finally {
+            // we must release the connection to avoid resource leaks
+            dbClient.release();
         }
 
         await transactionModel.commitTransaction(dbClient);
