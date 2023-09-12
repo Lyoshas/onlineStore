@@ -26,6 +26,21 @@ export const getUserCart = async (userId: number): Promise<CartEntry[]> => {
     });
 };
 
+export const countCartItems = async (userId: number): Promise<number> => {
+    const {
+        rows: [{ total_quantity }],
+    } = await dbPool.query<{ total_quantity: number }>(
+        `
+            SELECT
+                SUM(quantity)::INTEGER as total_quantity
+            FROM carts WHERE user_id = $1
+        `,
+        [userId]
+    );
+
+    return +total_quantity;
+};
+
 export const addProductToCart = async (
     userId: number,
     productId: number,

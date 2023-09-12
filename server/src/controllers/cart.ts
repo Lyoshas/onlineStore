@@ -19,6 +19,17 @@ export const getUserCart: RequestHandler<
     });
 };
 
+export const getCartItemCount: RequestHandler<
+    unknown,
+    { cartItemCount: number }
+> = async (req, res, next) => {
+    res.json({
+        cartItemCount: await cartModel.countCartItems(
+            (req.user as VerifiedUserInfo).id
+        ),
+    });
+};
+
 export const addProductToCart: RequestHandler<
     {},
     {},

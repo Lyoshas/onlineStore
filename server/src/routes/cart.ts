@@ -11,6 +11,12 @@ const router = express.Router();
 
 router.get('/cart', ensureAuthentication, cartController.getUserCart);
 
+router.get(
+    '/cart/count',
+    ensureAuthentication,
+    cartController.getCartItemCount
+);
+
 // add or edit
 router.put(
     '/cart',
