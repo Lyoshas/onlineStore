@@ -30,7 +30,7 @@
       - [1. Get basic information about an individual product](#1-get-basic-information-about-an-individual-product)
       - [2. Get a list of products by specifying a page](#2-get-a-list-of-products-by-specifying-a-page)
       - [3. Get featured products](#3-get-featured-products)
-      - [4. Get product info including 'quantity\_in\_stock'](#4-get-product-info-including-quantity_in_stock)
+      - [4. Get product info including 'quantity\_in\_stock' and/or 'max\_order\_quantity'](#4-get-product-info-including-quantity_in_stock-andor-max_order_quantity)
       - [5. Add a new product](#5-add-a-new-product)
       - [6. Update a product](#6-update-a-product)
       - [7. Delete a product](#7-delete-a-product)
