@@ -1,5 +1,5 @@
 import express from 'express';
-import { body } from 'express-validator';
+import { body, param } from 'express-validator';
 
 import * as cartController from '../controllers/cart.js';
 import ensureAuthentication from '../middlewares/ensure-authentication.js';
@@ -59,6 +59,10 @@ router.put(
 router.delete(
     '/cart/:productId',
     ensureAuthentication,
+    param('productId')
+        .isNumeric()
+        .withMessage('productId must be a number'),
+    validateRequest,
     cartController.deleteProductFromCart
 );
 
