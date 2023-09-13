@@ -34,6 +34,11 @@
       - [5. Add a new product](#5-add-a-new-product)
       - [6. Update a product](#6-update-a-product)
       - [7. Delete a product](#7-delete-a-product)
+    - [Cart Endpoints](#cart-endpoints)
+      - [1. Get the contents of your shopping cart](#1-get-the-contents-of-your-shopping-cart)
+      - [2. Get the total number of items in the cart](#2-get-the-total-number-of-items-in-the-cart)
+      - [3. Add an item to the cart or change its quantity in the cart](#3-add-an-item-to-the-cart-or-change-its-quantity-in-the-cart)
+      - [4. Remove the specified product from the cart](#4-remove-the-specified-product-from-the-cart)
 
 ## Prerequisites
 - Install Docker and Docker Compose
@@ -1486,3 +1491,262 @@ Some API endpoints require authentication using access tokens and refresh tokens
   - When the product is deleted, the associated images that are stored in S3 will be deleted only if these images are not tied to any other product in the database.
   
     For example, if you try to delete a product and the images that are tied to this product don't point to any other product, these images will be deleted from the S3 bucket. However, if another product uses these images, they will stay in the S3 bucket and won't be deleted.
+
+### Cart Endpoints
+#### 1. Get the contents of your shopping cart
+- **URL:** /api/user/cart
+- **Method:** GET
+- **Description:** returns the cart of the user who made a request to this endpoint
+- **Who can access:** only authenticated users with the provided [access token](#access-token)
+- **Rate limiting:** none
+- **Request body:** none
+- **Request params:** none
+- **Query string parameters:** none
+- **Required cookies:** none
+- **Success response:**
+  - **Status code:** 200
+  - **Description:** The cart has been fetched successfully
+  - **Content (if there are items in the cart):**
+    ```JSON
+    {
+      "products": [
+        {
+          "productId": 1,
+          "title": "Монітор 24\" Samsung LF24T450 Black",
+          "price": 6399.99,
+          "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/7f5e2915-66f7-45e0-9802-775db86b86dd.png",
+          "quantity": 50
+        },
+        {
+          "productId": 2,
+          "title": "Sony PlayStation 5 Digital Edition 825GB White",
+          "price": 28999,
+          "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/64d22b21-b6be-4038-b37c-7e5696b7bd14.png",
+          "quantity": 2
+        }
+      ]
+    }
+    ```
+  - **Content (if there are no items in the cart):**
+    ```JSON
+    {
+      "products": []
+    }
+    ```
+- **Error responses**:
+  - The access token is not specified or is invalid
+    - **Status code**: 401 Unauthorized
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "The access token is either invalid or is not provided",
+          }
+        ]
+      }
+      ```
+  - The access token has expired
+    - **Status code**: 401 Unauthorized
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "The access token has expired",
+          }
+        ]
+      }
+      ```
+#### 2. Get the total number of items in the cart
+- **URL:** /api/user/cart/count
+- **Method:** GET
+- **Description:** returns the total number of items in the shopping cart of the user who made the request to this endpoint
+- **Who can access:** only authenticated users with the provided [access token](#access-token)
+- **Rate limiting:** none
+- **Request body:** none
+- **Request params:** none
+- **Query string parameters:** none
+- **Required cookies:** none
+- **Success response:**
+  - **Status code:** 200 OK
+  - **Description:** the number of cart items has been successfully received
+  - **Content (example):**
+    ```JSON
+    {
+      "cartItemCount": 12
+    }
+    ```
+- **Error responses**:
+  - The access token is not specified or is invalid
+    - **Status code**: 401 Unauthorized
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "The access token is either invalid or is not provided",
+          }
+        ]
+      }
+      ```
+  - The access token has expired
+    - **Status code**: 401 Unauthorized
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "The access token has expired",
+          }
+        ]
+      }
+      ```
+#### 3. Add an item to the cart or change its quantity in the cart
+- **URL:** /api/user/cart
+- **Method:** PUT
+- **Description:** add a new product to the cart or modify the quantity of this product if it's already in the cart
+- **Who can access:** only authenticated users with the provided [access token](#access-token)
+- **Rate limiting:** none
+- **Request body:**
+  - _productId_ - must be a number that points to an existing product
+  - _quantity_ - how many products with the given ID you want to add to the cart. Must be a number that is greater than 0 and must not exceed the current stock of this product in the warehouse
+- **Request params:** none
+- **Query string parameters:** none
+- **Required cookies:** none
+- **Success response:**
+  - **Status code:** 204 No Content
+  - **Description:** the product has been successfully added to the cart
+  - **Content**: empty
+- **Error responses**:
+  - The access token is not specified or is invalid
+    - **Status code**: 401 Unauthorized
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "The access token is either invalid or is not provided",
+          }
+        ]
+      }
+      ```
+  - The access token has expired
+    - **Status code**: 401 Unauthorized
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "The access token has expired",
+          }
+        ]
+      }
+      ```
+  - The product id is not a number
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "productId must be a number",
+            "field": "productId"
+          }
+        ]
+      }
+      ```
+  - The product id points to a non-existent product
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "productId must point to a valid product",
+            "field": "productId"
+          }
+        ]
+      }
+      ```
+  - The provided quantity is not a number or is less than 1
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "quantity must be an integer and greater than zero",
+            "field": "quantity"
+          }
+        ]
+      }
+      ```
+  - There aren't enough products in stock
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "insufficient stock available for this product",
+            "field": "quantity"
+          }
+        ]
+      }
+      ```
+- **Additional Notes:**
+  - Because this endpoint may return an error indicating insufficient stock for the item, it is important to keep in mind that this can be exploited by determined competitors. They may try to figure out how many items we have by making requests to add items to the cart. If they get an error, they will get a better idea of how many items we have in stock.
+#### 4. Remove the specified product from the cart
+- **URL:** /api/user/cart/:productId
+- **Method:** DELETE
+- **Description:** completely deletes a specified product from the cart
+- **Who can access:** only authenticated users with the provided [access token](#access-token)
+- **Rate limiting:** none
+- **Request body:** empty
+- **Request params:**
+  - _productId_ - must be a number that points to a valid product (although if it points to a non-existent product, no error will be returned)
+- **Query string parameters:** none
+- **Required cookies:** none
+- **Success response:**
+  - **Status code:** 204 No Content
+  - **Description:** the item has been removed from the cart or nothing has changed because there is no item with the specified ID in the cart
+  - **Content**: empty
+- **Error responses**:
+  - The access token is not specified or is invalid
+    - **Status code**: 401 Unauthorized
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "The access token is either invalid or is not provided",
+          }
+        ]
+      }
+      ```
+  - The access token has expired
+    - **Status code**: 401 Unauthorized
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "The access token has expired",
+          }
+        ]
+      }
+      ```
+  - The provided product id is not a number
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "productId must be a number",
+            "field": "productId"
+          }
+        ]
+      }
+      ```
