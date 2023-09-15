@@ -5,7 +5,7 @@ import * as cartController from '../controllers/cart.js';
 import ensureAuthentication from '../middlewares/ensure-authentication.js';
 import validateRequest from '../middlewares/validate-request.js';
 import dbPool from '../services/postgres.service.js';
-import { getProductQuantity } from '../models/product.js';
+import { getProduct } from '../models/product.js';
 
 const router = express.Router();
 
@@ -44,9 +44,10 @@ router.put(
         .custom(async (providedQuantity: number, { req }) => {
             // we need to check whether we have this many products in stock
 
-            const productQuantity = await getProductQuantity(
+            const { quantity_in_stock: productQuantity } = await getProduct(
                 // we've already validated req.body.productId, so we can use type casting
-                req.body.productId as number
+                req.body.productId as number,
+                ['quantity_in_stock']
             );
 
             if (productQuantity < providedQuantity) return Promise.reject();
