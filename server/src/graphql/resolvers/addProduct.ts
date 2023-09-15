@@ -17,8 +17,8 @@ import checkShortDescription from '../validators/checkShortDescription.js';
 import checkMaxOrderQuantity from '../validators/checkMaxOrderQuantity.js';
 import ProductUpsertReturnValue from '../../interfaces/ProductUpsertReturnValue.js';
 import knexInstance from '../../services/knex.service.js';
-import transformToSQLParameters from '../helpers/transformToSQLParameters.js';
 import AnyObject from '../../interfaces/AnyObject.js';
+import snakeCaseObject from '../../util/snakeCaseObject.js';
 
 export default async (
     _: any,
@@ -55,7 +55,7 @@ export default async (
         const initialImageUrl = getImageUrlByObjectKey(initialImageName);
         const additionalImageUrl = getImageUrlByObjectKey(additionalImageName);
 
-        let insertParameters: AnyObject = transformToSQLParameters({
+        let insertParameters: AnyObject = snakeCaseObject({
             title,
             price,
             category,
