@@ -1,94 +1,82 @@
 import { PoolClient } from 'pg';
 
-import dbPool from '../services/postgres.service.js';
 import CartEntry from '../interfaces/CartEntry.js';
-import SnakeCaseProperties from '../interfaces/SnakeCaseProperties.js';
-import camelCaseObject from '../util/camelCaseObject.js';
+import * as postgresCartModel from './cartPostgres.js';
+import * as redisCartModel from './cartRedis.js';
 
+// first, we try to get the cart from Redis
+// if it fails, we get it from PostgreSQL
 export const getUserCart = async (userId: number): Promise<CartEntry[]> => {
-    const { rows } = await dbPool.query<SnakeCaseProperties<CartEntry>>(
-        `
-            SELECT
-                p.id AS product_id,
-                p.title,
-                p.price,
-                p.initial_image_url,
-                c.quantity
-            FROM carts AS c
-            INNER JOIN products AS p ON c.product_id = p.id
-            WHERE c.user_id = $1
-        `,
-        [userId]
-    );
+    try {
+        const redisCart = await redisCartModel.getUserCart(userId);
+        if (redisCart !== null) return redisCart;
+    } catch (error) {
+        console.error('Error fetching cart from Redis:', error);
+    }
 
-    return rows.map((cartEntry) => {
-        return { ...camelCaseObject(cartEntry), price: +cartEntry.price };
-    });
+    const postgresCart = await postgresCartModel.getUserCart(userId);
+
+    // we won't wait for this function to execute
+    // it will run asynchronously
+    redisCartModel.cacheUserCart(userId, postgresCart);
+
+    return postgresCart;
 };
 
+// this function will first try to count cart items that are stored in Redis
+// if it fails, the function will fall back to using PostgreSQL
 export const countCartItems = async (userId: number): Promise<number> => {
-    const {
-        rows: [{ total_quantity }],
-    } = await dbPool.query<{ total_quantity: number }>(
-        `
-            SELECT
-                SUM(quantity)::INTEGER as total_quantity
-            FROM carts WHERE user_id = $1
-        `,
-        [userId]
-    );
+    try {
+        const cartItemsCountRedis = await redisCartModel.countCartItems(userId);
 
-    return +total_quantity;
+        if (cartItemsCountRedis !== null) return cartItemsCountRedis;
+    } catch (error) {
+        console.error('Error counting cart items in Redis:', error);
+    }
+
+    return postgresCartModel.countCartItems(userId);
 };
 
 export const addProductToCart = async (
     userId: number,
     productId: number,
     quantity: number
-) => {
-    const existingCartEntry = await dbPool
-        .query(
-            `
-        SELECT EXISTS(
-            SELECT 1 FROM carts WHERE user_id = $1 AND product_id = $2 
-        )
-        `,
-            [userId, productId]
-        )
-        .then(({ rows }) => rows[0].exists);
+): Promise<void> => {
+    await postgresCartModel.addProductToCart(userId, productId, quantity);
 
-    // if the user hasn't added this product before, create a new entry
-    if (!existingCartEntry) {
-        console.log('this entry does not exist');
-        return dbPool.query(
-            `
-            INSERT INTO carts (user_id, product_id, quantity)
-            VALUES ($1, $2, $3)
-            `,
-            [userId, productId, quantity]
-        );
+    try {
+        // if the cart cache is empty, this function won't do anything
+        // because fetching the cart from Postgres and then adding a product to it would take too long
+        await redisCartModel.addProductToCart(userId, productId, quantity);
+    } catch (error) {
+        console.error('Error adding a product to the cart in Redis', error);
     }
-
-    // if the user has added this product before, then update the quantity
-    return dbPool.query(
-        `
-            UPDATE carts
-            SET quantity = $1
-            WHERE user_id = $2 AND product_id = $3
-        `,
-        [quantity, userId, productId]
-    );
 };
 
-export const deleteProductFromCart = (userId: number, productId: number) => {
-    return dbPool.query(
-        'DELETE FROM carts WHERE user_id = $1 AND product_id = $2',
-        [userId, productId]
-    );
+export const deleteProductFromCart = async (
+    userId: number,
+    productId: number
+): Promise<void> => {
+    await postgresCartModel.deleteProductFromCart(userId, productId);
+
+    try {
+        // if the cart cache is empty, this function won't do anything
+        // because fetching the cart from Postgres and then deleting a product from it would take too long
+        await redisCartModel.deleteProductFromCart(userId, productId);
+    } catch (error) {
+        console.error('Error deleting a product from the cart in Redis', error);
+    }
 };
 
-export const cleanCart = (userId: number, dbClient?: PoolClient) => {
-    const client = dbClient || dbPool;
+export const cleanCart = async (
+    userId: number,
+    postgresClient?: PoolClient
+) => {
+    await postgresCartModel.cleanCart(userId, postgresClient);
 
-    return client.query('DELETE FROM carts WHERE user_id = $1', [userId]);
+    try {
+        await redisCartModel.cleanCart(userId);
+    } catch (error) {
+        console.error('Error cleaning the cart in Redis', error);
+    }
 };
