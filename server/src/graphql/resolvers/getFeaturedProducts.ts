@@ -7,6 +7,7 @@ import DBProduct from '../../interfaces/DBProduct.js';
 import getRelevantProductFields from '../helpers/getRelevantProductFields.js';
 import knexInstance from '../../services/knex.service.js';
 import mapRequestedFieldsToProductInfo from '../helpers/mapRequestedFieldsToProductInfo.js';
+import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
 
 type GetFeaturedProductsOutput = Partial<DisplayProduct>[];
 
@@ -19,7 +20,7 @@ type PossibleGraphQLFields = {
 async function getFeaturedProducts(
     parent: any,
     args: void,
-    context: GraphQLResolveInfo,
+    context: ApolloServerContext,
     resolveInfo: GraphQLResolveInfo
 ): Promise<GetFeaturedProductsOutput> {
     const requestedFields = graphqlFields(resolveInfo) as PossibleGraphQLFields;
