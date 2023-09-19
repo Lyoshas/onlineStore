@@ -1,3 +1,14 @@
 import pg from 'pg';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
-export default new pg.Pool();
+// we can use "readFileSync" in this case, because it is executed only once during program startup
+export default new pg.Pool({
+    ssl: {
+        ca: readFileSync(
+            join(process.cwd(), 'src', 'config', 'eu-north-1-bundle.pem')
+        ).toString(),
+        requestCert: true,
+        rejectUnauthorized: true,
+    },
+});
