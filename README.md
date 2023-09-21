@@ -881,17 +881,46 @@ Some API endpoints require authentication using access tokens and refresh tokens
   ```JSON
   {
     "data": {
-      "product": {
-        "id": 5,
-        "title": "Intel Core i5-10400F 2.9GHz/12MB",
-        "price": 5375,
-        "category": "Laptops",
-        "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/ff042894-a2d5-457d-b9b2-82f7cde46255.png",
-        "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/1aab2da7-775e-4759-9d99-57f1d669b2e2.png",
-        "shortDescription": "A small description of the product",
-        "isAvailable": true,
-        "isRunningOut": false,
-        "isInTheCart": true
+      "products": {
+        "productList": [
+          {
+            "id": 6,
+            "title": "Asus PCI-Ex GeForce RTX 2060 Dual EVO OC Edition 6GB GDDR6",
+            "price": 14799,
+            "category": "Graphics Cards",
+            "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/bebfb189-c1f5-4b53-a47b-9ba97081025f.png",
+            "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/b624d139-5ed5-4844-9d55-cb6c34e87e1d.png",
+            "shortDescription": "A super powerful RTX card!",
+            "isAvailable": true,
+            "isRunningOut": false,
+            "isInTheCart": true
+          },
+          {
+            "id": 9,
+            "title": "Комп'ютер ARTLINE Gaming ASUS Edition X43 (X43v33) Ryzen 5 3600/RAM 16ГБ/HDD 1ТБ + SSD 240ГБ/GeForce RTX 3050 8ГБ/Wi-Fi",
+            "price": 31499,
+            "category": "Personal Computers",
+            "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/c7d3bf2a-8a81-4201-81ed-f20cb7912ac8.png",
+            "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/6732c7f9-ea53-48e5-901d-4faf43612348.png",
+            "shortDescription": "A small description of the productTTTT",
+            "isAvailable": true,
+            "isRunningOut": false,
+            "isInTheCart": false
+          },
+          {
+            "id": 4,
+            "title": "Western Digital Blue 1TB 7200rpm 64MB",
+            "price": 1529,
+            "category": "Laptops",
+            "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/9a62d620-5a6d-445f-94e1-d8f30730d923.png",
+            "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/33da72f1-77c0-4254-8eda-cfc83b484760.png",
+            "shortDescription": "A small description of the product",
+            "isAvailable": true,
+            "isRunningOut": false,
+            "isInTheCart": true
+          }
+        ],
+        "totalPages": 4
       }
     }
   }
