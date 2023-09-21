@@ -9,6 +9,8 @@ import ProductNotFoundError from '../errors/ProductNotFoundError.js';
 import getRelevantProductFields from '../helpers/getRelevantProductFields.js';
 import knexInstance from '../../services/knex.service.js';
 import mapRequestedFieldsToProductInfo from '../helpers/mapRequestedFieldsToProductInfo.js';
+import { isProductInTheCart } from '../../models/product.js';
+import { IsInTheCartError } from '../errors/IsInTheCartError.js';
 
 type GetProductOutput = Partial<DisplayProduct>;
 
@@ -23,12 +25,21 @@ async function getProduct(
     resolveInfo: GraphQLResolveInfo
 ): Promise<GetProductOutput> {
     const requestedFields = graphqlFields(resolveInfo) as PossibleGraphQLFields;
-    const requestedFieldsList = Object.keys(requestedFields) as (keyof PossibleGraphQLFields)[];
+    const requestedFieldsList = Object.keys(
+        requestedFields
+    ) as (keyof PossibleGraphQLFields)[];
+    const shouldGetIsInTheCart: boolean = 'isInTheCart' in requestedFields;
+
+    if (shouldGetIsInTheCart && context.user === null) {
+        throw new IsInTheCartError();
+    }
 
     const sqlQuery: string = knexInstance('products')
         .select(getRelevantProductFields(requestedFieldsList))
         .where({ id: args.id })
         .toString();
+
+    console.log(sqlQuery);
 
     const {
         rows: [product],
@@ -41,10 +52,12 @@ async function getProduct(
         throw new ProductNotFoundError();
     }
 
-    return mapRequestedFieldsToProductInfo(
-        product,
-        requestedFieldsList
-    ) as GetProductOutput;
+    return {
+        ...mapRequestedFieldsToProductInfo(product, requestedFieldsList),
+        isInTheCart: shouldGetIsInTheCart
+            ? await isProductInTheCart(context.user!.id, args.id)
+            : void 0,
+    } as GetProductOutput;
 }
 
 export default getProduct;

@@ -8,6 +8,8 @@ import getRelevantProductFields from '../helpers/getRelevantProductFields.js';
 import knexInstance from '../../services/knex.service.js';
 import mapRequestedFieldsToProductInfo from '../helpers/mapRequestedFieldsToProductInfo.js';
 import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
+import { IsInTheCartError } from '../errors/IsInTheCartError.js';
+import addIsInTheCartField from '../helpers/addIsInTheCartField.js';
 
 type GetFeaturedProductsOutput = Partial<DisplayProduct>[];
 
@@ -24,6 +26,15 @@ async function getFeaturedProducts(
     resolveInfo: GraphQLResolveInfo
 ): Promise<GetFeaturedProductsOutput> {
     const requestedFields = graphqlFields(resolveInfo) as PossibleGraphQLFields;
+
+    const shouldGetIsInTheCart: boolean = Boolean(requestedFields.isInTheCart);
+    if (shouldGetIsInTheCart && context.user === null) {
+        throw new IsInTheCartError();
+    } else if (shouldGetIsInTheCart) {
+        // we need to request the id of each product if the user requested the "isInTheCart" field
+        requestedFields.id = {};
+    }
+
     const requestedFieldsList = Object.keys(
         requestedFields
     ) as (keyof PossibleGraphQLFields)[];
@@ -38,9 +49,18 @@ async function getFeaturedProducts(
         Partial<Omit<DBProduct, 'max_order_quantity'>>
     >(sqlQuery);
 
-    return rows.map((product) =>
+    const productList = rows.map((product) =>
         mapRequestedFieldsToProductInfo(product, requestedFieldsList)
     ) as GetFeaturedProductsOutput;
+
+    return shouldGetIsInTheCart
+        ? addIsInTheCartField(
+              context.user!.id,
+              productList as ({
+                  id: number;
+              } & (typeof productList)[0])[]
+          )
+        : productList;
 }
 
 export default getFeaturedProducts;

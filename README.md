@@ -791,7 +791,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
 
 ### GraphQL Queries and Mutations
 #### 1. Get basic information about an individual product
-- **Who can access:** everyone
+- **Who can access:** everyone (but if you request the 'isInTheCart' field, you have to provide a valid access token)
 - **Required parameters:**
   - _id_ - the id of the product that you are trying to get information about. Must be a number.
 - **Example**:
@@ -807,6 +807,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
       shortDescription
       isAvailable
       isRunningOut
+      isInTheCart // indicates whether the product is the cart of the user who requested this query
     }
   }
   ```
@@ -823,7 +824,8 @@ Some API endpoints require authentication using access tokens and refresh tokens
         "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/1aab2da7-775e-4759-9d99-57f1d669b2e2.png",
         "shortDescription": "A small description of the product",
         "isAvailable": true,
-        "isRunningOut": false
+        "isRunningOut": false,
+        "isInTheCart": true
       }
     }
   }
@@ -840,8 +842,19 @@ Some API endpoints require authentication using access tokens and refresh tokens
       ]
     }
     ```
+  - The user is trying to access the 'isInTheCart' field while being unauthenticated
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "User must be authenticated to request the \"isInTheCart\" field"
+        }
+      ]
+    }
+    ```
 #### 2. Get a list of products by specifying a page
-- **Who can access:** everyone
+- **Who can access:** everyone (but if you request the 'isInTheCart' field, you have to provide a valid access token)
 - **Required parameters:**
   - _page_ - the product page that you are trying to access. Must be a number.
 - **Example**:
@@ -858,6 +871,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
         shortDescription
         isAvailable
         isRunningOut
+        isInTheCart // indicates whether the product is the cart of the user who requested this query
       }
       totalPages // indicates how many pages there are, used for pagination purposes
     }
@@ -876,7 +890,8 @@ Some API endpoints require authentication using access tokens and refresh tokens
         "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/1aab2da7-775e-4759-9d99-57f1d669b2e2.png",
         "shortDescription": "A small description of the product",
         "isAvailable": true,
-        "isRunningOut": false
+        "isRunningOut": false,
+        "isInTheCart": true
       }
     }
   }
@@ -893,8 +908,19 @@ Some API endpoints require authentication using access tokens and refresh tokens
       ]
     }
     ```
+  - The user is trying to access the 'isInTheCart' field while being unauthenticated
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "User must be authenticated to request the \"isInTheCart\" field"
+        }
+      ]
+    }
+    ```
 #### 3. Get featured products
-- **Who can access:** everyone
+- **Who can access:** everyone (but if you request the 'isInTheCart' field, you have to provide a valid access token)
 - **Required parameters:** none
 - **Example**:
   ```graphql
@@ -909,6 +935,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
       shortDescription
       isAvailable
       isRunningOut
+      isInTheCart // indicates whether the product is the cart of the user who requested this query
     }
   }
   ```
@@ -926,7 +953,8 @@ Some API endpoints require authentication using access tokens and refresh tokens
           "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/f1a9e141-1b95-4519-9a5f-f67c401da8a0.png",
           "shortDescription": "An extremely cool smartphone!!!",
           "isAvailable": true,
-          "isRunningOut": false
+          "isRunningOut": false,
+          "isInTheCart": true,
         },
         ... (11 more products)
       ]

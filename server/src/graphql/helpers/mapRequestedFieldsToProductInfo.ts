@@ -4,7 +4,7 @@ import camelCaseToSnakeCase from './camelCaseToSnakeCase.js';
 import isProductAvailable from './isProductAvailable.js';
 import isProductRunningOut from './isProductRunningOut.js';
 
-type PossibleResolverField =
+export type PossibleResolverField =
     | 'id'
     | 'title'
     | 'price'
@@ -17,7 +17,8 @@ type PossibleResolverField =
     | 'shortDescription'
     | 'maxOrderQuantity'
     | 'isAvailable'
-    | 'isRunningOut';
+    | 'isRunningOut'
+    | 'isInTheCart';
 
 type ResolverOutput = Partial<{
     [prop in PossibleResolverField]: unknown;
@@ -30,6 +31,8 @@ const mapRequestedFieldsToProductInfo = <T extends PossibleResolverField[]>(
     const objectToReturn: Partial<ResolverOutput> = {};
 
     for (let requestedField of requestedFields) {
+        if (requestedField === 'isInTheCart') continue;
+
         const value =
             requestedField === 'initialImageName'
                 ? getObjectKeyByImageUrl(productInfo.initial_image_url!)

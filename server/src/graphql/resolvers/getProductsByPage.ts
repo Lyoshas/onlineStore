@@ -10,6 +10,8 @@ import knexInstance from '../../services/knex.service.js';
 import getRelevantProductFields from '../helpers/getRelevantProductFields.js';
 import mapRequestedFieldsToProductInfo from '../helpers/mapRequestedFieldsToProductInfo.js';
 import RequireAtLeastOneProperty from '../../interfaces/RequireAtLeastOneProperty.js';
+import { IsInTheCartError } from '../errors/IsInTheCartError.js';
+import addIsInTheCartField from '../helpers/addIsInTheCartField.js';
 
 type GetProductsByPageOutput = RequireAtLeastOneProperty<{
     productList: Partial<DisplayProduct>[];
@@ -37,7 +39,17 @@ async function getProductsByPage(
     resolveInfo: GraphQLResolveInfo
 ): Promise<GetProductsByPageOutput> {
     const requestedFields = graphqlFields(resolveInfo) as PossibleGraphQLFields;
-    const resultProductList: GetProductsByPageOutput['productList'] = [];
+
+    const shouldGetIsInTheCart: boolean =
+        !!requestedFields.productList &&
+        'isInTheCart' in requestedFields.productList;
+
+    if (shouldGetIsInTheCart && context.user === null) {
+        throw new IsInTheCartError();
+    } else if (shouldGetIsInTheCart) {
+        // we need to request the id of each product if the user requested the "isInTheCart" field
+        requestedFields.productList!.id = {};
+    }
 
     if (args.page <= 0) {
         throw new PageOutOfRangeError();
@@ -46,6 +58,11 @@ async function getProductsByPage(
     const productsPerPage: number = parseInt(
         process.env.PRODUCTS_PER_PAGE as string
     );
+
+    let resultProductList: Exclude<
+        GetProductsByPageOutput['productList'],
+        undefined
+    > = [];
 
     // if the user requested products
     if (requestedFields.productList) {
@@ -62,7 +79,7 @@ async function getProductsByPage(
             .offset(productsPerPage * (+args.page - 1))
             .limit(productsPerPage)
             .toString();
-        
+
         const { rows } = await dbPool.query<
             Partial<Omit<DBProduct, 'max_order_quantity'>>
         >(sqlQuery);
@@ -75,6 +92,15 @@ async function getProductsByPage(
                 ) as Partial<DisplayProduct>
             );
         });
+    }
+
+    if (shouldGetIsInTheCart) {
+        resultProductList = await addIsInTheCartField(
+            context.user!.id,
+            resultProductList as ({
+                id: number;
+            } & (typeof resultProductList)[0])[]
+        );
     }
 
     return {

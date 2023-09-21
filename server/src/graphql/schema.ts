@@ -57,6 +57,7 @@ export const typeDefs = `#graphql
         initialImageUrl: String!
         additionalImageUrl: String!
         shortDescription: String!
+        isInTheCart: Boolean!
         isAvailable: Boolean!
         isRunningOut: Boolean!
     }
