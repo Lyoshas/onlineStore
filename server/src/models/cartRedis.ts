@@ -97,6 +97,19 @@ export const deleteProductFromCart = async (
     );
 };
 
-export const cleanCart = (userId: number) => {
-    return redis.del(getRedisCartKey(userId));
-};
+export function cleanCart(userId: number): Promise<number>;
+export function cleanCart(userIds: number[]): Promise<number>;
+
+export function cleanCart(userId: unknown): unknown {
+    const delKeys: string[] = [];
+
+    if (typeof userId === 'number') {
+        delKeys.push(getRedisCartKey(userId));
+    } else if (Array.isArray(userId)) {
+        delKeys.push(...userId.map((userId) => getRedisCartKey(userId)));
+    } else {
+        throw new Error('Unknown userId type: must be "number" or "number[]"');
+    }
+
+    return redis.del(...delKeys);
+}
