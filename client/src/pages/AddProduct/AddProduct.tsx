@@ -15,6 +15,8 @@ import AddProductForm, {
 import { useUploadImageToS3Mutation } from '../../store/apis/s3UploadApi';
 import ADD_PRODUCT from './graphql/addProduct';
 import SuccessMessage from './SuccessMessage/SuccessMessage';
+import apolloClient from '../../graphql/client';
+import GET_FEATURED_PRODUCTS from '../../components/ExploreProductsBlock/GraphQL/getFeaturedProducts';
 
 const deriveErrorMessage = (
     error: FetchBaseQueryError | SerializedError | undefined
@@ -189,6 +191,9 @@ const AddProduct = () => {
 
     // if the product has been uploaded successfully
     if (addProductData) {
+        // refetching the GET_FEATURED_PRODUCTS query
+        // this query is used to fetch products that will be displayed on the main page
+        apolloClient.refetchQueries({ include: [GET_FEATURED_PRODUCTS] });
         return <SuccessMessage />;
     }
 
