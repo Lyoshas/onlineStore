@@ -55,6 +55,7 @@ const EditProduct = () => {
             loading: isUpdateRequestLoading,
             error: updateProductError,
             data: updateProductData,
+            called: isUpdateProductMutationCalled,
         },
     ] = useMutation(UPDATE_PRODUCT);
     // "null" means that the form hasn't been submitted yet
@@ -80,7 +81,8 @@ const EditProduct = () => {
                 (includeAdditionalImage &&
                     (!additionalImageName ||
                         !wasInitialImageUploadSuccessful)) ||
-                !productDetailsData
+                !productDetailsData ||
+                isUpdateProductMutationCalled
             )
                 return;
 
@@ -203,6 +205,7 @@ const EditProduct = () => {
         wasInitialImageUploadSuccessful,
         wasAdditionalImageUploadSuccessful,
         productDetailsData,
+        isUpdateProductMutationCalled
     ]);
 
     if (
