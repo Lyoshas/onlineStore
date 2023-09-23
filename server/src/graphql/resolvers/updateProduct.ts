@@ -16,6 +16,8 @@ import checkImageNames from '../validators/checkImageNames.js';
 import GraphqlUpdateProductArgs from '../../interfaces/GraphqlUpdateProductArgs.js';
 import checkMaxOrderQuantity from '../validators/checkMaxOrderQuantity.js';
 import ProductUpsertReturnValue from '../../interfaces/ProductUpsertReturnValue.js';
+import { getUsersWithProductInCart } from '../../models/cartPostgres.js';
+import { cleanCart } from '../../models/cartRedis.js';
 
 export default async (
     _: any,
@@ -26,7 +28,7 @@ export default async (
     await validateUser(context.user);
 
     const {
-        id,
+        id: productId,
         title,
         price,
         category,
@@ -71,7 +73,7 @@ export default async (
                 shortDescription,
                 quantityInStock,
                 maxOrderQuantity,
-                id,
+                productId,
             ]
         );
 
@@ -79,8 +81,19 @@ export default async (
             throw new ProductNotFoundError();
         }
 
+        // this IIFE will run asynchronously, without the user having to wait until it's finished
+        (async function() {
+            // returns users who have the product that was updated in their cart
+            // we'll need to invalidate their cart cache in Redis to avoid inconsistencies
+            const affectedUserIds = await getUsersWithProductInCart(productId);
+            // since we have a feature that allows to cache carts in Redis,
+            // we need to invalidate the carts of those users who have this updated product in their cart
+            // this will be done in the background, no need for the user to wait until it's done
+            await cleanCart(affectedUserIds);
+        })();
+
         return {
-            id,
+            id: productId,
             title,
             price,
             category,
