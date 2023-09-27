@@ -141,6 +141,7 @@ const EditProduct = () => {
                         initialImageName: newInitialImageName,
                         additionalImageName: newAdditionalImageName,
                         maxOrderQuantity: maxOrderQuantity,
+                        __typename: productDetailsData.adminProduct.__typename,
                     },
                 },
                 variables: { productId: +productId! },
@@ -158,6 +159,9 @@ const EditProduct = () => {
                         isAvailable: updatedProduct.isAvailable,
                         isRunningOut: updatedProduct.isRunningOut,
                         shortDescription,
+                        __typename:
+                            apolloClient.readQuery({ query: GET_PRODUCT_BY_ID })
+                                ?.product?.__typename || 'Product',
                     },
                 },
                 variables: { productId: +productId! },
@@ -188,6 +192,7 @@ const EditProduct = () => {
                                 isAvailable: updatedProduct.isAvailable,
                                 isRunningOut: updatedProduct.isRunningOut,
                                 shortDescription,
+                                __typename: product.__typename,
                             };
                         }),
                     },
@@ -205,7 +210,7 @@ const EditProduct = () => {
         wasInitialImageUploadSuccessful,
         wasAdditionalImageUploadSuccessful,
         productDetailsData,
-        isUpdateProductMutationCalled
+        isUpdateProductMutationCalled,
     ]);
 
     if (
