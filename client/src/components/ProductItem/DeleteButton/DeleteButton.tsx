@@ -12,6 +12,7 @@ import ErrorModal from './ErrorModal/ErrorModal';
 import Loading from '../../UI/Loading/Loading';
 import apolloClient from '../../../graphql/client';
 import GET_FEATURED_PRODUCTS from '../../ExploreProductsBlock/GraphQL/getFeaturedProducts';
+import { deleteProductsByPageCache } from '../../../store/util/deleteProductsByPageCache';
 
 interface DeleteButtonProps {
     productId: number;
@@ -93,16 +94,10 @@ const DeleteButton: FC<DeleteButtonProps> = ({
         apolloClient.refetchQueries({
             include: [GET_FEATURED_PRODUCTS],
         });
-        apolloClient.cache.modify({
-            fields: {
-                // Deleting any cache associated with GET_PRODUCTS_BY_PAGE. We're deleting it because it may contain the recently deleted product
-                // The refetch won't happen automatically, because we don't need it
-                // The refetch will only happen if it's needed (for example if a user goes to "/products?page=3")
-                products(_, { DELETE }) {
-                    return DELETE;
-                },
-            },
-        });
+        // Deleting any cache associated with GET_PRODUCTS_BY_PAGE. We're deleting it because it may contain the recently deleted product
+        // The refetch won't happen automatically, because we don't need it
+        // The refetch will only happen if it's needed (for example if a user goes to "/products?page=3")
+        deleteProductsByPageCache();
     };
 
     return (

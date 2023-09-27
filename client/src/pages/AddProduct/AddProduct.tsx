@@ -17,6 +17,7 @@ import ADD_PRODUCT from './graphql/addProduct';
 import SuccessMessage from './SuccessMessage/SuccessMessage';
 import apolloClient from '../../graphql/client';
 import GET_FEATURED_PRODUCTS from '../../components/ExploreProductsBlock/GraphQL/getFeaturedProducts';
+import { deleteProductsByPageCache } from '../../store/util/deleteProductsByPageCache';
 
 const deriveErrorMessage = (
     error: FetchBaseQueryError | SerializedError | undefined
@@ -194,6 +195,10 @@ const AddProduct = () => {
         // refetching the GET_FEATURED_PRODUCTS query
         // this query is used to fetch products that will be displayed on the main page
         apolloClient.refetchQueries({ include: [GET_FEATURED_PRODUCTS] });
+        // Deleting any cache associated with GET_PRODUCTS_BY_PAGE. We're deleting it because it may contain the recently added product
+        // The refetch won't happen automatically, because we don't need it
+        // The refetch will only happen if it's needed (for example if a user goes to "/products?page=3")
+        deleteProductsByPageCache();
         return <SuccessMessage />;
     }
 
