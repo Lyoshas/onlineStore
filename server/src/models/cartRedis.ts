@@ -111,5 +111,8 @@ export function cleanCart(userId: unknown): unknown {
         throw new Error('Unknown userId type: must be "number" or "number[]"');
     }
 
+    // if there's nothing to delete, just return
+    if (delKeys.length === 0) return;
+
     return redis.del(...delKeys);
 }
