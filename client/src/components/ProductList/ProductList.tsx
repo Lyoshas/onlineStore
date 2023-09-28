@@ -5,9 +5,12 @@ import ProductItem from '../ProductItem/ProductItem';
 import classes from './ProductList.module.css';
 import { Product } from '../../__generated__/graphql';
 
-const ProductList: FC<{ products: (Omit<Product, 'category'> | null)[] }> = (
-    props
-) => {
+// copying everything from the Product type, but the 'isInTheCart' property is optional
+type ProductModified = Omit<Product, 'isInTheCart'> & Partial<Pick<Product, 'isInTheCart'>>;
+
+const ProductList: FC<{
+    products: (Omit<ProductModified, 'category'> | null)[];
+}> = (props) => {
     return (
         <section
             className={classNames(
@@ -29,6 +32,7 @@ const ProductList: FC<{ products: (Omit<Product, 'category'> | null)[] }> = (
                         shortDescription={product.shortDescription}
                         isAvailable={product.isAvailable}
                         isRunningOut={product.isRunningOut}
+                        isInTheCart={product.isInTheCart}
                     />
                 );
             })}

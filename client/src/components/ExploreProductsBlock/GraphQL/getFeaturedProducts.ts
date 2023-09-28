@@ -1,7 +1,7 @@
 import { gql } from '../../../__generated__';
 
-const GET_FEATURED_PRODUCTS = gql(`
-    query FeaturedProducts {
+export const GET_FEATURED_PRODUCTS_NO_AUTH = gql(`
+    query FeaturedProductsNoAuth {
         featuredProducts {
             id
             title
@@ -15,4 +15,18 @@ const GET_FEATURED_PRODUCTS = gql(`
     }
 `);
 
-export default GET_FEATURED_PRODUCTS;
+export const GET_FEATURED_PRODUCTS_WITH_AUTH = gql(`
+    query FeaturedProductsWithAuth {
+        featuredProducts {
+            id
+            title
+            price
+            initialImageUrl
+            additionalImageUrl
+            shortDescription
+            isAvailable
+            isRunningOut
+            isInTheCart
+        }
+    }
+`);

@@ -19,7 +19,7 @@ import apolloClient from '../../graphql/client';
 import GET_PRODUCT_BY_ID from '../../components/ProductInfo/GraphQL/GetProductByIdRequest';
 import useImageUpload from '../../components/hooks/useImageUpload';
 import deriveErrorMessage from '../../util/deriveErrorMessage';
-import GET_FEATURED_PRODUCTS from '../../components/ExploreProductsBlock/GraphQL/getFeaturedProducts';
+import { GET_FEATURED_PRODUCTS_WITH_AUTH } from '../../components/ExploreProductsBlock/GraphQL/getFeaturedProducts';
 
 const EditProduct = () => {
     const { productId } = useParams();
@@ -172,13 +172,13 @@ const EditProduct = () => {
 
             // first we need to get the cache
             const featuredProducts = apolloClient.readQuery({
-                query: GET_FEATURED_PRODUCTS,
+                query: GET_FEATURED_PRODUCTS_WITH_AUTH,
             })?.featuredProducts;
 
             // if this cache exists, modify it
             if (featuredProducts) {
                 apolloClient.writeQuery({
-                    query: GET_FEATURED_PRODUCTS,
+                    query: GET_FEATURED_PRODUCTS_WITH_AUTH,
                     data: {
                         featuredProducts: featuredProducts.map((product) => {
                             if (product === null || product.id !== +productId!)
@@ -192,6 +192,7 @@ const EditProduct = () => {
                                 isAvailable: updatedProduct.isAvailable,
                                 isRunningOut: updatedProduct.isRunningOut,
                                 shortDescription,
+                                isInTheCart: product.isInTheCart,
                                 __typename: product.__typename,
                             };
                         }),

@@ -20,6 +20,7 @@ interface ProductItemProps {
     shortDescription: string;
     isAvailable: boolean;
     isRunningOut: boolean;
+    isInTheCart?: boolean;
 }
 
 const ProductItem: FC<ProductItemProps> = (props) => {
@@ -81,7 +82,10 @@ const ProductItem: FC<ProductItemProps> = (props) => {
                     )}
                 >
                     {props.isAvailable && (
-                        <AddToCartButton productId={props.id} />
+                        <AddToCartButton
+                            productId={props.id}
+                            isInTheCart={props.isInTheCart}
+                        />
                     )}
                     {isAdmin && (
                         <Fragment>

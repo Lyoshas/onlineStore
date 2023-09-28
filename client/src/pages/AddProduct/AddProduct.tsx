@@ -16,7 +16,6 @@ import { useUploadImageToS3Mutation } from '../../store/apis/s3UploadApi';
 import ADD_PRODUCT from './graphql/addProduct';
 import SuccessMessage from './SuccessMessage/SuccessMessage';
 import apolloClient from '../../graphql/client';
-import GET_FEATURED_PRODUCTS from '../../components/ExploreProductsBlock/GraphQL/getFeaturedProducts';
 import { deleteProductsByPageCache } from '../../store/util/deleteProductsByPageCache';
 
 const deriveErrorMessage = (
@@ -192,9 +191,20 @@ const AddProduct = () => {
 
     // if the product has been uploaded successfully
     if (addProductData) {
-        // refetching the GET_FEATURED_PRODUCTS query
+        // deleting any cache associated with the getFeaturedProducts query
         // this query is used to fetch products that will be displayed on the main page
-        apolloClient.refetchQueries({ include: [GET_FEATURED_PRODUCTS] });
+        apolloClient.refetchQueries({
+            updateCache(cache) {
+                cache.modify({
+                    fields: {
+                        featuredProducts(_, { DELETE }) {
+                            return DELETE;
+                        }
+                    }
+                });
+            }
+        });
+
         // Deleting any cache associated with GET_PRODUCTS_BY_PAGE. We're deleting it because it may contain the recently added product
         // The refetch won't happen automatically, because we don't need it
         // The refetch will only happen if it's needed (for example if a user goes to "/products?page=3")

@@ -1,44 +1,67 @@
-import { useQuery } from '@apollo/client';
-import { useDispatch } from 'react-redux';
+import { Fragment, useEffect } from 'react';
+import { useLazyQuery } from '@apollo/client';
+import { useDispatch, useSelector } from 'react-redux';
 
 import ProductList from '../ProductList/ProductList';
 import ButtonLink from '../UI/ButtonLink/ButtonLink';
 import classes from './ExploreProductsBlock.module.css';
-import { gql } from '../../__generated__';
 import Loading from '../UI/Loading/Loading';
-import { Fragment, useEffect } from 'react';
 import { errorActions } from '../../store/slices/error';
 import ErrorIcon from '../UI/Icons/ErrorIcon';
-
-const GET_FEATURED_PRODUCTS = gql(`
-    query FeaturedProducts {
-        featuredProducts {
-            id
-            title
-            price
-            initialImageUrl
-            additionalImageUrl
-            shortDescription
-            isAvailable
-            isRunningOut
-        }
-    }
-`);
+import {
+    GET_FEATURED_PRODUCTS_NO_AUTH,
+    GET_FEATURED_PRODUCTS_WITH_AUTH,
+} from './GraphQL/getFeaturedProducts';
+import { RootState } from '../../store';
 
 const ExploreProductsBlock = () => {
-    const { loading, error, data } = useQuery(GET_FEATURED_PRODUCTS);
-
+    const isAuthenticated = useSelector(
+        (state: RootState) => state.auth.isAuthenticated
+    );
     const dispatch = useDispatch();
+    const [
+        getFeaturedProductsNoAuth,
+        {
+            loading: featuredProductsNoAuthLoading,
+            error: featuredProductsNoAuthError,
+            data: featuredProductsNoAuthData,
+        },
+    ] = useLazyQuery(GET_FEATURED_PRODUCTS_NO_AUTH);
+    const [
+        getFeaturedProductsWithAuth,
+        {
+            loading: featuredProductsWithAuthLoading,
+            error: featuredProductsWithAuthError,
+            data: featuredProductsWithAuthData,
+        },
+    ] = useLazyQuery(GET_FEATURED_PRODUCTS_WITH_AUTH);
+
+    const featuredProductsLoading =
+        featuredProductsNoAuthLoading || featuredProductsWithAuthLoading;
+    const featuredProductsError =
+        featuredProductsNoAuthError || featuredProductsWithAuthError;
+    const featuredProducts =
+        featuredProductsNoAuthData?.featuredProducts ||
+        featuredProductsWithAuthData?.featuredProducts;
 
     useEffect(() => {
-        if (!error) return;
+        // once the React app has established the authentication status of the user,
+        // make a request to get featured products
+        if (isAuthenticated === null) return;
+        isAuthenticated
+            ? getFeaturedProductsWithAuth()
+            : getFeaturedProductsNoAuth();
+    }, [isAuthenticated]);
+
+    useEffect(() => {
+        if (!featuredProductsError) return;
 
         dispatch(
             errorActions.showNotificationError(
                 'Something went wrong while loading the products'
             )
         );
-    }, [error]);
+    }, [featuredProductsError]);
 
     return (
         <section className={classes['explore-products']}>
@@ -46,15 +69,19 @@ const ExploreProductsBlock = () => {
                 Explore Our Products
             </h2>
             <div className={classes['explore-products__request-status']}>
-                {loading && <Loading />}
-                {error && (
+                {featuredProductsLoading && <Loading />}
+                {featuredProductsError && (
                     <Fragment>
                         <ErrorIcon className="icon" />
                         <p>An error occurred while loading products.</p>
                     </Fragment>
                 )}
             </div>
-            {data && <ProductList products={data.featuredProducts} />}
+            {featuredProducts ? (
+                <ProductList products={featuredProducts} />
+            ) : (
+                ''
+            )}
             <ButtonLink
                 to="/products"
                 className={classes['explore-products__more-btn']}

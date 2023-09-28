@@ -1,7 +1,7 @@
 import { gql } from '../../../__generated__';
 
-const GET_PRODUCTS_BY_PAGE = gql(`
-    query GetProductsByPage($page: Int!) {
+export const GET_PRODUCTS_BY_PAGE_NO_AUTH = gql(`
+    query GetProductsByPageNoAuth($page: Int!) {
         products(page: $page) {
             productList {
                 id
@@ -19,4 +19,22 @@ const GET_PRODUCTS_BY_PAGE = gql(`
     }
 `);
 
-export default GET_PRODUCTS_BY_PAGE;
+export const GET_PRODUCTS_BY_PAGE_WITH_AUTH = gql(`
+    query GetProductsByPageWithAuth($page: Int!) {
+        products(page: $page) {
+            productList {
+                id
+                title
+                price
+                category
+                initialImageUrl
+                additionalImageUrl
+                shortDescription
+                isAvailable
+                isRunningOut
+                isInTheCart
+            }
+            totalPages
+        }
+    }
+`);

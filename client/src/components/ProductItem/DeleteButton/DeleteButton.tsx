@@ -11,8 +11,8 @@ import SuccessModal from './SuccessModal/SuccessModal';
 import ErrorModal from './ErrorModal/ErrorModal';
 import Loading from '../../UI/Loading/Loading';
 import apolloClient from '../../../graphql/client';
-import GET_FEATURED_PRODUCTS from '../../ExploreProductsBlock/GraphQL/getFeaturedProducts';
 import { deleteProductsByPageCache } from '../../../store/util/deleteProductsByPageCache';
+import { GET_FEATURED_PRODUCTS_WITH_AUTH } from '../../ExploreProductsBlock/GraphQL/getFeaturedProducts';
 
 interface DeleteButtonProps {
     productId: number;
@@ -92,7 +92,7 @@ const DeleteButton: FC<DeleteButtonProps> = ({
         // after the product has been successfully deleted it's important to refetch GET_FEATURED_PRODUCTS
         // changing the cache directly wouldn't do much good because in this case it would lack 1 product
         apolloClient.refetchQueries({
-            include: [GET_FEATURED_PRODUCTS],
+            include: [GET_FEATURED_PRODUCTS_WITH_AUTH],
         });
         // Deleting any cache associated with GET_PRODUCTS_BY_PAGE. We're deleting it because it may contain the recently deleted product
         // The refetch won't happen automatically, because we don't need it
