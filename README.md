@@ -1667,7 +1667,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
 - **Rate limiting:** none
 - **Request body:**
   - _productId_ - must be a number that points to an existing product
-  - _quantity_ - how many products with the given ID you want to add to the cart. Must be a number that is greater than 0 and must not exceed the current stock of this product in the warehouse
+  - _quantity_ - how many products with the given ID you want to add to the cart. Must be a number that is greater than 0, and must not exceed the current stock of this product in the warehouse, and must not exceed the 'max_order_quantity' value (the maximum number of products a user can order in a single transaction)
 - **Request params:** none
 - **Query string parameters:** none
 - **Required cookies:** none
@@ -1747,6 +1747,19 @@ Some API endpoints require authentication using access tokens and refresh tokens
         "errors": [
           {
             "message": "insufficient stock available for this product"
+          }
+        ]
+      }
+      ```
+  - You are trying to add more products to the cart than allowed
+    - **Status code**: 409 Conflict
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "more products are added to the cart than allowed",
+            "maximumAllowedProducts": 1
           }
         ]
       }

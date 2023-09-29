@@ -8,6 +8,7 @@ import validateRequest from '../middlewares/validate-request.js';
 import dbPool from '../services/postgres.service.js';
 import { getProduct } from '../models/product.js';
 import InsufficientProductStockError from '../errors/InsufficientProductStockError.js';
+import { ExceededMaxOrderQuantityError } from '../errors/ExceededMaxOrderQuantity.js';
 
 const router = express.Router();
 
@@ -46,17 +47,23 @@ router.put(
             .withMessage('quantity must be an integer and greater than zero'),
         validateRequest,
         // we need to check whether we have this many products in stock
-        // we're doing it separately from the initial validation, because this check may return the 409 status code
+        // and whether the user is trying to order more products than it's allowed
+        // we're doing it separately from the initial validation, because these checks may return the 409 status code
         asyncHandler(async (req, res, next) => {
             const { quantity: requestedQuantity, productId } = req.body;
 
-            const { quantity_in_stock: productQuantity } = await getProduct(
-                productId,
-                ['quantity_in_stock']
-            );
+            const {
+                quantity_in_stock: productQuantity,
+                max_order_quantity: maxOrderQuantity,
+            } = await getProduct(productId, [
+                'quantity_in_stock',
+                'max_order_quantity',
+            ]);
 
             if (productQuantity < requestedQuantity) {
                 throw new InsufficientProductStockError();
+            } else if (requestedQuantity > maxOrderQuantity) {
+                throw new ExceededMaxOrderQuantityError(maxOrderQuantity);
             }
 
             next();
