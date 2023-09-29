@@ -1740,14 +1740,13 @@ Some API endpoints require authentication using access tokens and refresh tokens
       }
       ```
   - There aren't enough products in stock
-    - **Status code**: 422 Unprocessable Entity
+    - **Status code**: 409 Conflict
     - **Content**:
       ```JSON
       {
         "errors": [
           {
-            "message": "insufficient stock available for this product",
-            "field": "quantity"
+            "message": "insufficient stock available for this product"
           }
         ]
       }
