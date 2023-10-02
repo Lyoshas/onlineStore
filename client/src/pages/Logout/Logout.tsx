@@ -12,19 +12,22 @@ import ButtonLink from '../../components/UI/ButtonLink/ButtonLink';
 import classes from './Logout.module.css';
 
 const Logout = () => {
-    const [logout, { isError, isLoading, isSuccess, error }] =
-        useLogoutMutation();
+    const [logout, { isError, isSuccess, error }] = useLogoutMutation();
     const expectedErrorResponse = useApiError(isError, error, []);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     useEffect(() => {
-        logout();
+        const request = logout();
+
+        // if the component unmount or the useEffect runs again, abort the request
+        // this useEffect can run twice because we are using React StrictMode (the production environment won't be affected though)
+        return () => request.abort();
     }, []);
 
     useEffect(() => {
         if (!isSuccess) return;
-        
+
         dispatch(authActions.invalidateUser());
         navigate('/');
     }, [isSuccess]);
