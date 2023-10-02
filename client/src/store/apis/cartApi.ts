@@ -8,6 +8,7 @@ export const cartApi = createApi({
         baseUrl: 'http://localhost/api/user',
         includeAccessToken: true,
     }),
+    tagTypes: ['CartItemCount'],
     endpoints: (builder) => ({
         countCartItems: builder.query<{ cartItemCount: number }, void>({
             query: () => {
@@ -16,8 +17,25 @@ export const cartApi = createApi({
                     method: 'GET',
                 };
             },
+            providesTags: ['CartItemCount'],
+        }),
+        // this function adds a new item to the cart with the specified quantity
+        // if the product is already in the cart, the quantity is replaced
+        pushToCart: builder.mutation<
+            void,
+            { productId: number; quantity: number }
+        >({
+            query: (productData) => {
+                return {
+                    url: '/cart',
+                    method: 'PUT',
+                    body: productData,
+                };
+            },
+            // refetch countCartItems whenever this endpoint is executed
+            invalidatesTags: ['CartItemCount'],
         }),
     }),
 });
 
-export const { useCountCartItemsQuery } = cartApi;
+export const { useCountCartItemsQuery, usePushToCartMutation } = cartApi;

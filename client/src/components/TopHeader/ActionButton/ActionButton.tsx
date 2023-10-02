@@ -1,4 +1,5 @@
 import { FC, Fragment } from 'react';
+import classNames from 'classnames';
 
 import Button from '../../UI/Button/Button';
 import classes from './ActionButton.module.css';
@@ -15,10 +16,11 @@ interface ActionButtonProps {
     content: React.ReactNode;
     // onClick will be ignored if props.to is specified
     onClick?: () => void;
+    className?: string;
 }
 
 const ActionButton: FC<ActionButtonProps> = (props) => {
-    const classname = classes['action-button'];
+    const classname = classNames(classes['action-button'], props.className);
     const content = (
         <Fragment>
             <Image src={props.imageURL} alt={props.imageAlt} />
