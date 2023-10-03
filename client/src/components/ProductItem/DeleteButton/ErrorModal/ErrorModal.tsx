@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { FC } from 'react';
 
 import Modal from '../../../UI/Modal/Modal';
 import Button from '../../../UI/Button/Button';
@@ -9,7 +9,7 @@ interface ErrorModalProps {
     onClose: () => void;
 }
 
-const ErrorModal = forwardRef<HTMLDivElement, ErrorModalProps>((props, ref) => {
+const ErrorModal: FC<ErrorModalProps> = (props) => {
     return (
         <Modal
             title={props.title}
@@ -17,9 +17,8 @@ const ErrorModal = forwardRef<HTMLDivElement, ErrorModalProps>((props, ref) => {
             onClose={props.onClose}
             includeCancelButton={false}
             actions={<Button onClick={props.onClose}>OK</Button>}
-            ref={ref}
         />
     );
-});
+};
 
 export default ErrorModal;

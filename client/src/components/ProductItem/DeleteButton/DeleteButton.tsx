@@ -1,5 +1,4 @@
-import { FC, Fragment, useState, useEffect, useCallback } from 'react';
-import { enableBodyScroll, disableBodyScroll } from 'body-scroll-lock';
+import { FC, Fragment, useState, useEffect } from 'react';
 import { useMutation } from '@apollo/client';
 import classNames from 'classnames';
 
@@ -29,16 +28,6 @@ const DeleteButton: FC<DeleteButtonProps> = ({
         useState<boolean>(false);
     const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
     const [showErrorModal, setShowErrorModal] = useState<boolean>(false);
-    const [modalElement, setModalElement] = useState<HTMLDivElement | null>(
-        null
-    );
-
-    // when a modal is rendered, this function will automatically disable scrolling
-    const modalRef = useCallback((modalNode: HTMLDivElement | null) => {
-        if (!modalNode) return;
-        disableBodyScroll(modalNode);
-        setModalElement(modalNode);
-    }, []);
 
     const [
         deleteProduct,
@@ -61,15 +50,6 @@ const DeleteButton: FC<DeleteButtonProps> = ({
         // changing the cache directly wouldn't do much good because in this case it would lack 1 product
         setShowSuccessModal(true);
     }, [responseData]);
-
-    useEffect(() => {
-        // if any modal window is shown, skip the execution
-        if (!modalElement) return;
-        // if we specified that at least one modal window needs to be shown, skip the execution
-        if (showConfirmationModal || showSuccessModal || showErrorModal) return;
-
-        enableBodyScroll(modalElement);
-    }, [modalElement, showConfirmationModal, showSuccessModal, showErrorModal]);
 
     const handleModalClose = () => {
         setShowConfirmationModal(false);
@@ -107,22 +87,17 @@ const DeleteButton: FC<DeleteButtonProps> = ({
                     productTitle={productTitle}
                     onDeleteProduct={handleProductDelete}
                     onModalClose={handleModalClose}
-                    ref={modalRef}
                 />
             )}
             {/* if there is data, it means the delete request was successful */}
             {showSuccessModal && responseData && (
-                <SuccessModal
-                    onClose={handleSuccessModalClose}
-                    ref={modalRef}
-                />
+                <SuccessModal onClose={handleSuccessModalClose} />
             )}
             {showErrorModal && responseError && (
                 <ErrorModal
                     title="Error while deleting the product"
                     errorMessage={responseError.message}
                     onClose={handleModalClose}
-                    ref={modalRef}
                 />
             )}
             <Button
