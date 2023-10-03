@@ -15,7 +15,7 @@ function useDebounce<T extends any[], V>(
 } {
     const [isActionExecuting, setIsActionExecuting] = useState<boolean>(false);
 
-    let timer: number;
+    let timer: ReturnType<typeof setTimeout>;
 
     const debouncedFunction: (...args: T) => Promise<V> = useCallback(
         (...args: T) => {
