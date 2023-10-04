@@ -4,73 +4,9 @@
     align-items: center;
 }
 
-.quantity-selector__input {
-    width: 100px;
-    border-radius: 30px;
-    padding: 5px;
-    text-align: center;
-    font-size: 1rem;
-    appearance: textfield;
-    -moz-appearance: textfield;
-}
-
-.quantity-selector__input::-webkit-outer-spin-button,
-.quantity-selector__input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-.product-cart-actions__quantity-selector {
-    position: relative;
-    height: 40px;
-    margin-right: 20px;
-    display: flex;
-    align-items: center;
-}
-
-.quantity-selector__input {
-    height: 100%;
-    box-sizing: border-box;
-}
-
-.quantity-selector__input:focus {
-    outline: none;
-}
-
-.quantity-selector__action-wrapper {
-    position: absolute;
-    height: 100%;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    user-select: none;
-}
-
-.quantity-selector__action-wrapper path {
-    transition: 0.3s stroke ease;
-}
-
-.quantity-selector__action-wrapper:hover path {
-    stroke: blue;
-}
-
-.action-wrapper__add-item {
-    right: 5px;
-}
-
-.action-wrapper__remove-item {
-    left: 5px;
-}
-
 @media screen and (max-width: 280px) {
     .product-cart-actions {
         flex-direction: column;
         align-items: center;
-    }
-
-    .product-cart-actions__quantity-selector {
-        margin-right: 0;
-        margin-bottom: 10px;
     }
 }
