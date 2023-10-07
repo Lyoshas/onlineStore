@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef } from 'react';
+import { FC, Fragment, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { enableBodyScroll, disableBodyScroll } from 'body-scroll-lock';
 
@@ -39,10 +39,10 @@ const Modal: FC<ModalProps> = ({ includeCancelButton = true, ...props }) => {
     }, [modalRef]);
 
     return createPortal(
-        <Backdrop onClick={props.onClose}>
+        <Fragment>
+            <Backdrop onClick={props.onClose} />
             <Card
                 className={classes.modal}
-                onClick={(event) => event.stopPropagation()}
                 ref={modalRef}
             >
                 {/* if props.title is defined and its length is bigger than 0 */}
@@ -70,7 +70,7 @@ const Modal: FC<ModalProps> = ({ includeCancelButton = true, ...props }) => {
                     </div>
                 ) : null}
             </Card>
-        </Backdrop>,
+        </Fragment>,
         document.getElementById('modal-window')!
     );
 };
