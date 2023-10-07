@@ -37,6 +37,14 @@ export const countCartItems = async (userId: number): Promise<number> => {
     return postgresCartModel.countCartItems(userId);
 };
 
+export const getCartTotalPrice = (cartContent: CartEntry[]): number => {
+    return cartContent.reduce(
+        (acc, cartProduct) =>
+            acc + Number(cartProduct.price) * Number(cartProduct.quantity),
+        0
+    );
+};
+
 export const addProductToCart = async (
     userId: number,
     productId: number,

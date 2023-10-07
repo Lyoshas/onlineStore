@@ -1553,7 +1553,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
 #### 1. Get the contents of your shopping cart
 - **URL:** /api/user/cart
 - **Method:** GET
-- **Description:** returns the cart of the user who made a request to this endpoint
+- **Description:** returns the cart of the user who made a request to this endpoint. It returns products in the cart and the total price
 - **Who can access:** only authenticated users with the provided [access token](#access-token)
 - **Rate limiting:** none
 - **Request body:** none
@@ -1570,7 +1570,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
         {
           "productId": 1,
           "title": "Монітор 24\" Samsung LF24T450 Black",
-          "price": 6399.99,
+          "price": 4000,
           "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/7f5e2915-66f7-45e0-9802-775db86b86dd.png",
           "quantity": 50
         },
@@ -1581,7 +1581,8 @@ Some API endpoints require authentication using access tokens and refresh tokens
           "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/64d22b21-b6be-4038-b37c-7e5696b7bd14.png",
           "quantity": 2
         }
-      ]
+      ],
+      "totalPrice": 257998
     }
     ```
   - **Content (if there are no items in the cart):**

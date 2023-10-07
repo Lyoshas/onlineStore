@@ -10,12 +10,15 @@ import CartEntry from '../interfaces/CartEntry.js';
 
 export const getUserCart: RequestHandler<
     unknown,
-    { products: CartEntry[] }
+    { products: CartEntry[]; totalPrice: number }
 > = async (req, res, next) => {
+    const cartProducts = await cartModel.getUserCart(
+        (req.user as VerifiedUserInfo).id
+    );
+
     res.json({
-        products: await cartModel.getUserCart(
-            (req.user as VerifiedUserInfo).id
-        ),
+        products: cartProducts,
+        totalPrice: cartModel.getCartTotalPrice(cartProducts),
     });
 };
 
