@@ -31,7 +31,10 @@ export const getProduct = async <T extends PossibleProductFields>(
     const result: AnyObject = {};
 
     for (let productField of productFields) {
-        result[productField] = productData[productField];
+        result[productField] =
+            productField === 'price'
+                ? Number(productData[productField])
+                : productData[productField];
     }
 
     return result as Awaited<ReturnType<typeof getProduct<T>>>;
