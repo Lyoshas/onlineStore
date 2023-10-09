@@ -12,6 +12,8 @@ const ProductCartActions = () => {
             {/* hardcoding 'initialValue' for now */}
             <QuantitySelector
                 initialValue={1}
+                minValue={1}
+                maxValue={32767}
                 onQuantityChange={handleQuantityChange}
             />
             <Button>Add to Cart</Button>
