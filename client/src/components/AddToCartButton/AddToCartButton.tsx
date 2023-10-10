@@ -5,7 +5,7 @@ import Button from '../UI/Button/Button';
 import classes from './AddToCartButton.module.css';
 import getStaticAssetUrl from '../../util/getStaticAssetUrl';
 import ButtonLink from '../UI/ButtonLink/ButtonLink';
-import { usePushToCartMutation } from '../../store/apis/cartApi';
+import { useUpsertCartProductMutation } from '../../store/apis/cartApi';
 import useApiError from '../hooks/useApiError';
 import { errorActions } from '../../store/slices/error';
 import ServerErrorResponse from '../../interfaces/ServerErrorResponse';
@@ -27,23 +27,23 @@ interface AddToCartButtonProps {
 
 const AddToCartButton: FC<AddToCartButtonProps> = (props) => {
     const [
-        pushToCart,
+        upsertCartProduct,
         {
-            isSuccess: isPushToCartSuccess,
-            isError: isPushToCartError,
-            error: pushToCartError,
-            isLoading: isPushingToCart,
+            isSuccess: isUpsertSuccessful,
+            isError: isUpsertError,
+            error: productUpsertError,
+            isLoading: isUpserting,
         },
-    ] = usePushToCartMutation();
-    const pushToCartErrorResponse = useApiError(
-        isPushToCartError,
-        pushToCartError,
+    ] = useUpsertCartProductMutation();
+    const upsertErrorResponse = useApiError(
+        isUpsertError,
+        productUpsertError,
         [422, 409]
     );
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (!isPushToCartSuccess) return;
+        if (!isUpsertSuccessful) return;
 
         // since we've added this product to the cart, we need to modify the local cache so that the user sees that the product was indeed added to the cart
         // this doesn't cause any new API requests to the server
@@ -56,12 +56,12 @@ const AddToCartButton: FC<AddToCartButtonProps> = (props) => {
                 },
             },
         });
-    }, [isPushToCartSuccess, apolloClient, props.productId]);
+    }, [isUpsertSuccessful, apolloClient, props.productId]);
 
     useEffect(() => {
-        if (!pushToCartErrorResponse) return;
+        if (!upsertErrorResponse) return;
 
-        const serverErrorResponse = pushToCartErrorResponse.serverResponse;
+        const serverErrorResponse = upsertErrorResponse.serverResponse;
 
         let errorMessage =
             'Something went wrong while adding the product to the cart';
@@ -75,10 +75,10 @@ const AddToCartButton: FC<AddToCartButtonProps> = (props) => {
         }
 
         dispatch(errorActions.showNotificationError(errorMessage));
-    }, [pushToCartErrorResponse]);
+    }, [upsertErrorResponse]);
 
     const handleAddToCart = () => {
-        pushToCart({ productId: props.productId, quantity: 1 });
+        upsertCartProduct({ productId: props.productId, quantity: 1 });
     };
 
     const showCartItems = () => {
@@ -108,16 +108,16 @@ const AddToCartButton: FC<AddToCartButtonProps> = (props) => {
             className={classes['product-item__cart-btn']}
             onClick={
                 // if an item is being added to the cart, the user can't do anything
-                isPushingToCart
+                isUpserting
                     ? function () {}
                     // if the addition to the cart was successful OR the item was already in the cart, the user can only view existing cart items
-                    : isPushToCartSuccess || props.isInTheCart
+                    : isUpsertSuccessful || props.isInTheCart
                     ? showCartItems
                     // otherwise the user can add an item to the cart
                     : handleAddToCart
             }
         >
-            {isPushingToCart ? <Loading width="30px" height="30px" /> : cartImg}
+            {isUpserting ? <Loading width="30px" height="30px" /> : cartImg}
         </Button>
     );
 };

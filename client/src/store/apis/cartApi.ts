@@ -21,7 +21,7 @@ export const cartApi = createApi({
         }),
         // this function adds a new item to the cart with the specified quantity
         // if the product is already in the cart, the quantity is replaced
-        pushToCart: builder.mutation<
+        upsertCartProduct: builder.mutation<
             void,
             { productId: number; quantity: number }
         >({
@@ -38,4 +38,4 @@ export const cartApi = createApi({
     }),
 });
 
-export const { useCountCartItemsQuery, usePushToCartMutation } = cartApi;
+export const { useCountCartItemsQuery, useUpsertCartProductMutation } = cartApi;
