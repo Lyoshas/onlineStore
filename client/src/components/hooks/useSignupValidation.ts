@@ -33,7 +33,7 @@ const useSignupValidation = () => {
     const {
         debouncedFunction: debouncedIsEmailAvailable,
         isActionExecuting: isValidatingEmail,
-    } = useDebounce(isEmailAvailable, 1000);
+    } = useDebounce(isEmailAvailable, 1000, true);
 
     const validationSchema = Yup.object({
         firstName: returnNameValidation('First name'),
