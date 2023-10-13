@@ -17,8 +17,24 @@ const useNumberRange = ({
     incrementValue: () => void;
     decrementValue: () => void;
     setValue: (currentValue: number) => void;
+    isValueChanged: boolean;
 } => {
-    const [currentValue, setCurrentValue] = useState<number>(initialValue);
+    const [currentValue, _setCurrentValue] = useState<number>(initialValue);
+    const [isValueChanged, setIsValueChanged] = useState<boolean>(false);
+
+    const setCurrentValue = (newCurrentValue: number) => {
+        _setCurrentValue((prevCurrentValue) => {
+            setIsValueChanged((prevIsValueChanged) => {
+                if (!prevIsValueChanged && newCurrentValue === prevCurrentValue) {
+                    // if the previous value wasn't changed and the new value equals to the previous value, then "isValueChanged" is false because nothing changed
+                    return false;
+                }
+                return true;
+            });
+
+            return newCurrentValue;
+        });
+    };
 
     const clipValue = (newValue: number) => {
         return clipNumber({ min: minValue, max: maxValue, value: newValue });
@@ -41,6 +57,7 @@ const useNumberRange = ({
         incrementValue,
         decrementValue,
         setValue,
+        isValueChanged,
     };
 };
 

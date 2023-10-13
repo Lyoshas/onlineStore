@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { FC, useEffect, useRef } from 'react';
+import { FC, useEffect } from 'react';
 
 import classes from './QuantitySelector.module.css';
 import MinusIcon from '../UI/CartIcons/MinusIcon';
@@ -14,12 +14,12 @@ interface QuantitySelectorProps {
 }
 
 const QuantitySelector: FC<QuantitySelectorProps> = (props) => {
-    const isFirstRender = useRef(true);
     const {
         currentValue: productQuantity,
         incrementValue: incrementProductQuantity,
         decrementValue: decrementProductQuantity,
         setValue: setProductQuantity,
+        isValueChanged: isProductQuantityChanged,
     } = useNumberRange({
         minValue: props.minValue,
         maxValue: props.maxValue,
@@ -27,14 +27,11 @@ const QuantitySelector: FC<QuantitySelectorProps> = (props) => {
     });
 
     useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            return;
-        }
+        // if the product quantity wasn't changed using "incrementValue", "decrementValue", "setValue", then do nothing
+        if (!isProductQuantityChanged) return;
 
-        // if this is not the first render, only then call props.onQuantityChange
         props.onQuantityChange(productQuantity);
-    }, [productQuantity]);
+    }, [productQuantity, isProductQuantityChanged]);
 
     return (
         <div className={classes['product-cart-actions__quantity-selector']}>
