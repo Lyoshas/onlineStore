@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "concurrently \"vite --host\" \"graphql-codegen -w --config ./src/graphql/codegen.ts\"",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@apollo/client": "^3.7.12",
