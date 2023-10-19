@@ -8,20 +8,25 @@ import { useCallback, useRef, useState } from 'react';
 function useDebounce<T extends unknown[], V>(
     fn: (...args: T) => V,
     ms: number, // the amount of time, in milliseconds, that must pass after the last invocation of the debounced function before that function is executed
-    leadingEdge: boolean = false,
+    leadingEdge: boolean = false
 ): {
     isActionExecuting: boolean; // specifies whether the provided function is executing
     debouncedFunction: (...args: T) => Promise<Awaited<V>>;
+    cancelDebouncedExecution: () => void;
 } {
     const [isActionExecuting, setIsActionExecuting] = useState<boolean>(false);
     const isFirstCallRef = useRef(true);
 
-    let timer: ReturnType<typeof setTimeout>;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    const cancelDebouncedExecution = useCallback(() => {
+        if (timer !== null) clearTimeout(timer);
+    }, [timer]);
 
     const debouncedFunction: (...args: T) => Promise<Awaited<V>> = useCallback(
         (...args: T) => {
             return new Promise((resolve, reject) => {
-                clearTimeout(timer);
+                cancelDebouncedExecution();
 
                 function runAction() {
                     setIsActionExecuting(true);
@@ -50,7 +55,7 @@ function useDebounce<T extends unknown[], V>(
         [fn]
     );
 
-    return { isActionExecuting, debouncedFunction };
+    return { isActionExecuting, debouncedFunction, cancelDebouncedExecution };
 }
 
 export default useDebounce;
