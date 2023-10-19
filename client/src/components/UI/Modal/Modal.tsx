@@ -1,6 +1,7 @@
 import { FC, Fragment, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { enableBodyScroll, disableBodyScroll } from 'body-scroll-lock';
+import classNames from 'classnames';
 
 import Backdrop from '../Backdrop/Backdrop';
 import Button from '../Button/Button';
@@ -25,6 +26,8 @@ interface ModalProps {
     actions?: JSX.Element;
     onClose: () => void;
     includeCancelButton?: boolean;
+    // this class will be added to the div block with class = 'modal__actions'
+    modalActionsClassName?: string;
 }
 
 const Modal: FC<ModalProps> = ({ includeCancelButton = true, ...props }) => {
@@ -41,10 +44,7 @@ const Modal: FC<ModalProps> = ({ includeCancelButton = true, ...props }) => {
     return createPortal(
         <Fragment>
             <Backdrop onClick={props.onClose} />
-            <Card
-                className={classes.modal}
-                ref={modalRef}
-            >
+            <Card className={classes.modal} ref={modalRef}>
                 {/* if props.title is defined and its length is bigger than 0 */}
                 {props.title?.length && (
                     <div className={classes['modal__header']}>
@@ -55,7 +55,12 @@ const Modal: FC<ModalProps> = ({ includeCancelButton = true, ...props }) => {
                 )}
                 <div className={classes['modal__body']}>{props.message}</div>
                 {includeCancelButton || props.actions ? (
-                    <div className={classes['modal__actions']}>
+                    <div
+                        className={classNames(
+                            classes['modal__actions'],
+                            props.modalActionsClassName
+                        )}
+                    >
                         {includeCancelButton && (
                             <Button
                                 className={
