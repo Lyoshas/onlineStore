@@ -1,9 +1,28 @@
 import { FC } from 'react';
+import classNames from 'classnames';
 
 import classes from './Image.module.css';
 
-const Image: FC<{ src: string; alt: string }> = (props) => {
-    return <img src={props.src} className={classes.icon} alt={props.alt} />;
+interface ImageProps {
+    src: string;
+    alt: string;
+    // "invertImage" specifies whether the 'filter: invert(100%)' property should be applied to the image
+    invertColor?: boolean;
+    className?: string;
+}
+
+const Image: FC<ImageProps> = ({ src, alt, invertColor = true, className }) => {
+    return (
+        <img
+            src={src}
+            className={classNames(
+                classes.icon,
+                className,
+                invertColor && classes['invert-color']
+            )}
+            alt={alt}
+        />
+    );
 };
 
 export default Image;

@@ -1,6 +1,9 @@
 .icon {
     width: 30px;
     height: 30px;
-    filter: invert(100%);
     margin-right: 5px;
+}
+
+.icon.invert-color {
+    filter: invert(100%);
 }
