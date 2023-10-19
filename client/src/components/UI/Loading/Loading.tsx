@@ -1,13 +1,21 @@
 import { FC } from 'react';
+import classNames from 'classnames';
 
 import classes from './Loading.module.css';
 
-const Loading: FC<{ width?: string; height?: string; color?: string }> = (
-    props
-) => {
+interface LoadingProps {
+    width?: string;
+    height?: string;
+    color?: string;
+    className?: string;
+}
+
+const Loading: FC<LoadingProps> = (props) => {
+    const className = classNames(classes.loader, props.className);
+
     return (
         <span
-            className={classes.loader}
+            className={className}
             style={{
                 width: props.width,
                 height: props.height,

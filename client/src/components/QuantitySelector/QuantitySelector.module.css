@@ -56,10 +56,3 @@
 .action-wrapper__remove-item {
     left: 5px;
 }
-
-@media screen and (max-width: 280px) {
-    .product-cart-actions__quantity-selector {
-        margin-right: 0;
-        margin-bottom: 10px;
-    }
-}

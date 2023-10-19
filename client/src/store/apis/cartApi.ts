@@ -1,6 +1,7 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 
 import createBaseQuery from '../util/createBaseQuery';
+import CartProduct from '../../interfaces/CartProduct';
 
 export const cartApi = createApi({
     reducerPath: 'cartApi',
@@ -8,7 +9,7 @@ export const cartApi = createApi({
         baseUrl: 'http://localhost/api/user',
         includeAccessToken: true,
     }),
-    tagTypes: ['CartItemCount'],
+    tagTypes: ['CartItemCount', 'GetCart'],
     endpoints: (builder) => ({
         countCartItems: builder.query<{ cartItemCount: number }, void>({
             query: () => {
@@ -33,9 +34,35 @@ export const cartApi = createApi({
                 };
             },
             // refetch countCartItems whenever this endpoint is executed
-            invalidatesTags: ['CartItemCount'],
+            invalidatesTags: ['CartItemCount', 'GetCart'],
+        }),
+        getCart: builder.query<
+            { products: CartProduct[]; totalPrice: number },
+            void
+        >({
+            query: () => {
+                return {
+                    url: '/cart',
+                    method: 'GET',
+                };
+            },
+            providesTags: ['GetCart'],
+        }),
+        deleteCartProduct: builder.mutation<void, { productId: number }>({
+            query: ({ productId }) => {
+                return {
+                    url: `/cart/${productId}`,
+                    method: 'DELETE',
+                };
+            },
+            invalidatesTags: ['CartItemCount', 'GetCart'],
         }),
     }),
 });
 
-export const { useCountCartItemsQuery, useUpsertCartProductMutation } = cartApi;
+export const {
+    useCountCartItemsQuery,
+    useUpsertCartProductMutation,
+    useGetCartQuery,
+    useDeleteCartProductMutation,
+} = cartApi;

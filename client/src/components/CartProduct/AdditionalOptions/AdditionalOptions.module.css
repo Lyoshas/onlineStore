@@ -1,0 +1,31 @@
+.additional-options {
+    position: relative;
+}
+
+.cart-product__delete-from-cart-btn {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.additional-options-img,
+.delete-from-cart-btn__img {
+    width: 30px;
+}
+
+.additional-options-img {
+    transition: 0.25s filter ease;
+    cursor: pointer;
+}
+
+.additional-options-img:hover {
+    filter: invert(76%) sepia(45%) saturate(6013%) hue-rotate(319deg) brightness(103%) contrast(104%);
+}
+
+.delete-from-cart-btn__img {
+    width: 30px;
+    filter: invert(100%);
+    margin-right: 5px;
+}

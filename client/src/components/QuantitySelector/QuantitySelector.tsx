@@ -1,61 +1,47 @@
 import classNames from 'classnames';
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 
 import classes from './QuantitySelector.module.css';
 import MinusIcon from '../UI/CartIcons/MinusIcon';
 import PlusIcon from '../UI/CartIcons/PlusIcon';
-import useNumberRange from '../hooks/useNumberRange';
 
 interface QuantitySelectorProps {
-    onQuantityChange: (productQuantity: number) => unknown;
-    initialValue: number;
-    minValue: number;
-    maxValue: number;
+    currentValue: number;
+    onIncrementValue: () => void;
+    onDecrementValue: () => void;
+    onSetValue: (newValue: number) => void;
+    className?: string;
 }
 
 const QuantitySelector: FC<QuantitySelectorProps> = (props) => {
-    const {
-        currentValue: productQuantity,
-        incrementValue: incrementProductQuantity,
-        decrementValue: decrementProductQuantity,
-        setValue: setProductQuantity,
-        isValueChanged: isProductQuantityChanged,
-    } = useNumberRange({
-        minValue: props.minValue,
-        maxValue: props.maxValue,
-        initialValue: props.initialValue,
-    });
-
-    useEffect(() => {
-        // if the product quantity wasn't changed using "incrementValue", "decrementValue", "setValue", then do nothing
-        if (!isProductQuantityChanged) return;
-
-        props.onQuantityChange(productQuantity);
-    }, [productQuantity, isProductQuantityChanged]);
-
     return (
-        <div className={classes['product-cart-actions__quantity-selector']}>
+        <div
+            className={classNames(
+                classes['product-cart-actions__quantity-selector'],
+                props.className
+            )}
+        >
             <div
                 className={classNames(
                     classes['quantity-selector__action-wrapper'],
                     classes['action-wrapper__remove-item']
                 )}
-                onClick={() => decrementProductQuantity()}
+                onClick={() => props.onDecrementValue()}
             >
                 <MinusIcon />
             </div>
             <input
                 type="number"
                 className={classes['quantity-selector__input']}
-                value={productQuantity}
-                onChange={(event) => setProductQuantity(+event.target.value)}
+                value={props.currentValue}
+                onChange={(event) => props.onSetValue(+event.target.value)}
             />
             <div
                 className={classNames(
                     classes['quantity-selector__action-wrapper'],
                     classes['action-wrapper__add-item']
                 )}
-                onClick={() => incrementProductQuantity()}
+                onClick={() => props.onIncrementValue()}
             >
                 <PlusIcon />
             </div>

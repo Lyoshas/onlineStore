@@ -8,11 +8,13 @@ import { productCategoryApi } from './apis/productCategoryApi';
 import { s3PresignedUrlApi } from './apis/s3PresignedApi';
 import { s3UploadApi } from './apis/s3UploadApi';
 import { cartApi } from './apis/cartApi';
+import cartModalSlice from './slices/cartModal';
 
 const store = configureStore({
     reducer: {
         auth: authSlice.reducer,
         error: errorSlice.reducer,
+        cartModal: cartModalSlice.reducer,
         [authApi.reducerPath]: authApi.reducer,
         [productCategoryApi.reducerPath]: productCategoryApi.reducer,
         [s3PresignedUrlApi.reducerPath]: s3PresignedUrlApi.reducer,

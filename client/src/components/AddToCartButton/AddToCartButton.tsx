@@ -11,6 +11,7 @@ import { errorActions } from '../../store/slices/error';
 import ServerErrorResponse from '../../interfaces/ServerErrorResponse';
 import Loading from '../UI/Loading/Loading';
 import apolloClient from '../../graphql/client';
+import { cartModalActions } from '../../store/slices/cartModal';
 
 function includesError(
     errorMessage: string,
@@ -82,7 +83,7 @@ const AddToCartButton: FC<AddToCartButtonProps> = (props) => {
     };
 
     const showCartItems = () => {
-        console.log('showing cart items...');
+        dispatch(cartModalActions.showCartModal());
     };
 
     const cartImg = (
@@ -96,25 +97,29 @@ const AddToCartButton: FC<AddToCartButtonProps> = (props) => {
     );
 
     // if the "isInTheCart" property wasn't provided, then the user isn't authenticated
-    return props.isInTheCart == null ? (
-        <ButtonLink
-            to="/auth/sign-in"
-            className={classes['product-item__cart-btn']}
-        >
-            {cartImg}
-        </ButtonLink>
-    ) : (
+    if (props.isInTheCart == null) {
+        return (
+            <ButtonLink
+                to="/auth/sign-in"
+                className={classes['product-item__cart-btn']}
+            >
+                {cartImg}
+            </ButtonLink>
+        );
+    }
+
+    return (
         <Button
             className={classes['product-item__cart-btn']}
             onClick={
                 // if an item is being added to the cart, the user can't do anything
                 isUpserting
                     ? function () {}
-                    // if the addition to the cart was successful OR the item was already in the cart, the user can only view existing cart items
-                    : isUpsertSuccessful || props.isInTheCart
+                    : // if the addition to the cart was successful OR the item was already in the cart, the user can only view existing cart items
+                    isUpsertSuccessful || props.isInTheCart
                     ? showCartItems
-                    // otherwise the user can add an item to the cart
-                    : handleAddToCart
+                    : // otherwise the user can add an item to the cart
+                      handleAddToCart
             }
         >
             {isUpserting ? <Loading width="30px" height="30px" /> : cartImg}

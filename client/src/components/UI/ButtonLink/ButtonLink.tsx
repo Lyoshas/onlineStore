@@ -9,6 +9,7 @@ interface ButtonLinkProps {
     to: string;
     className?: string;
     children?: React.ReactNode;
+    onClick?: () => void;
 }
 
 // "to" is the link itself
@@ -20,7 +21,7 @@ const ButtonLink: FC<ButtonLinkProps> = (props) => {
     );
 
     return (
-        <Link to={props.to} className={className}>
+        <Link to={props.to} className={className} onClick={props.onClick}>
             {props.children}
         </Link>
     );

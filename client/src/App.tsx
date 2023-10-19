@@ -25,10 +25,15 @@ import ProductInfo from './components/ProductInfo/ProductInfo';
 import EditProduct from './pages/EditProduct/EditProduct';
 import AddProduct from './pages/AddProduct/AddProduct';
 import ProductListPage from './pages/ProductListPage/ProductListPage';
+import CartContentsModal from './components/CartContentsModal/CartContentsModal';
+import { cartModalActions } from './store/slices/cartModal';
 
 const App: FC = () => {
     const { errorMessage, isErrorNotificationShown } = useSelector(
         (state: RootState) => state.error
+    );
+    const isCartModalShown = useSelector(
+        (state: RootState) => state.cartModal.isCartModalShown
     );
     const dispatch = useDispatch();
     const { data, isSuccess, isFetching, isError, error } =
@@ -56,6 +61,13 @@ const App: FC = () => {
                     onClose={() =>
                         dispatch(errorActions.hideNotificationError())
                     }
+                />
+            )}
+            {isCartModalShown && (
+                <CartContentsModal
+                    onClose={() => {
+                        dispatch(cartModalActions.hideCartModal());
+                    }}
                 />
             )}
             <Routes>

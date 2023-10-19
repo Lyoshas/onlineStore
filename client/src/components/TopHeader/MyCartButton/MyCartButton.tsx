@@ -1,10 +1,12 @@
 import { Fragment, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 import ActionButton from '../ActionButton/ActionButton';
 import getStaticAssetUrl from '../../../util/getStaticAssetUrl';
 import { useCountCartItemsQuery } from '../../../store/apis/cartApi';
 import useApiError from '../../hooks/useApiError';
 import classes from './MyCartButton.module.css';
+import { cartModalActions } from '../../../store/slices/cartModal';
 
 const MyCartButton = () => {
     const { isError, error, data, isSuccess, requestId } =
@@ -14,6 +16,7 @@ const MyCartButton = () => {
     const [initialRequestId, setInitialRequestId] = useState<string | null>(
         null
     );
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if (!requestId || initialRequestId !== null) return;
@@ -39,7 +42,7 @@ const MyCartButton = () => {
     }, [isSuccess, requestId, initialRequestId]);
 
     const handleClick = () => {
-        console.log('showing the cart...');
+        dispatch(cartModalActions.showCartModal());
     };
 
     return (
