@@ -11,7 +11,7 @@ import ErrorIcon from '../UI/Icons/ErrorIcon';
 import {
     GET_FEATURED_PRODUCTS_NO_AUTH,
     GET_FEATURED_PRODUCTS_WITH_AUTH,
-} from './GraphQL/getFeaturedProducts';
+} from '../../graphql/queries/getFeaturedProducts';
 import { RootState } from '../../store';
 
 const ExploreProductsBlock = () => {

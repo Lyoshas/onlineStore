@@ -6,7 +6,7 @@ import ProductList from '../../components/ProductList/ProductList';
 import {
     GET_PRODUCTS_BY_PAGE_NO_AUTH,
     GET_PRODUCTS_BY_PAGE_WITH_AUTH,
-} from './GraphQL/getProductsByPage';
+} from '../../graphql/queries/getProductsByPage';
 import Loading from '../../components/UI/Loading/Loading';
 import ErrorMessageBlock from '../../components/UI/ErrorMessageBlock/ErrorMessageBlock';
 import Layout from '../../components/Layout/Layout';

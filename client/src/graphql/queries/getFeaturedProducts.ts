@@ -1,4 +1,4 @@
-import { gql } from '../../../__generated__';
+import { gql } from '../../__generated__';
 
 export const GET_FEATURED_PRODUCTS_NO_AUTH = gql(`
     query FeaturedProductsNoAuth {

@@ -8,18 +8,18 @@ import SuccessMessage from './SuccessMessage/SuccessMessage';
 import EditProductForm from './EditProductForm/EditProductForm';
 import CenterBlock from '../../components/UI/CenterBlock/CenterBlock';
 import classes from './EditProduct.module.css';
-import GET_ADMIN_PRODUCT_DETAILS from './GraphQL/getProductRequest';
-import UPDATE_PRODUCT from './GraphQL/updateProductRequest';
+import GET_ADMIN_PRODUCT_DETAILS from '../../graphql/queries/getAdminProductById';
+import UPDATE_PRODUCT from '../../graphql/mutations/updateProduct';
 import { useProductCategoriesQuery } from '../../store/apis/productCategoryApi';
 import {
     OnFormSubmitArgs as OnAddProductArgs,
     OnFormSubmitArgs,
 } from '../../components/AddProductForm/AddProductForm';
 import apolloClient from '../../graphql/client';
-import GET_PRODUCT_BY_ID from '../../components/ProductInfo/GraphQL/GetProductByIdRequest';
+import GET_PRODUCT_BY_ID from '../../graphql/queries/getProductById';
 import useImageUpload from '../../components/hooks/useImageUpload';
 import deriveErrorMessage from '../../util/deriveErrorMessage';
-import { GET_FEATURED_PRODUCTS_WITH_AUTH } from '../../components/ExploreProductsBlock/GraphQL/getFeaturedProducts';
+import { GET_FEATURED_PRODUCTS_WITH_AUTH } from '../../graphql/queries/getFeaturedProducts';
 
 const EditProduct = () => {
     const { productId } = useParams();

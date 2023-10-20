@@ -4,14 +4,14 @@ import classNames from 'classnames';
 
 import Button from '../../UI/Button/Button';
 import classes from './DeleteButton.module.css';
-import DELETE_PRODUCT from './GraphQL/deleteProduct';
+import DELETE_PRODUCT from '../../../graphql/mutations/deleteProduct';
 import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
 import SuccessModal from './SuccessModal/SuccessModal';
 import ErrorModal from './ErrorModal/ErrorModal';
 import Loading from '../../UI/Loading/Loading';
 import apolloClient from '../../../graphql/client';
 import { deleteProductsByPageCache } from '../../../store/util/deleteProductsByPageCache';
-import { GET_FEATURED_PRODUCTS_WITH_AUTH } from '../../ExploreProductsBlock/GraphQL/getFeaturedProducts';
+import { GET_FEATURED_PRODUCTS_WITH_AUTH } from '../../../graphql/queries/getFeaturedProducts';
 
 interface DeleteButtonProps {
     productId: number;

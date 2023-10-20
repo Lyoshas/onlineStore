@@ -11,7 +11,7 @@ import Layout from '../Layout/Layout';
 import ProductImages from './ProductImages/ProductImages';
 import SelectedImage from './SelectedImage/SelectedImage';
 import ProductDescription from './ProductDescription/ProductDescription';
-import GET_PRODUCT_BY_ID from './GraphQL/GetProductByIdRequest';
+import GET_PRODUCT_BY_ID from '../../graphql/queries/getProductById';
 
 const createErrorBlock = (errorMessage: string) => {
     return (

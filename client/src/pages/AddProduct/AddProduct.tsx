@@ -13,7 +13,7 @@ import AddProductForm, {
     OnFormSubmitArgs,
 } from '../../components/AddProductForm/AddProductForm';
 import { useUploadImageToS3Mutation } from '../../store/apis/s3UploadApi';
-import ADD_PRODUCT from './graphql/addProduct';
+import ADD_PRODUCT from '../../graphql/mutations/addProduct';
 import SuccessMessage from './SuccessMessage/SuccessMessage';
 import apolloClient from '../../graphql/client';
 import { deleteProductsByPageCache } from '../../store/util/deleteProductsByPageCache';

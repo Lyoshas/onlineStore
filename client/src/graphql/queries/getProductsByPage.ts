@@ -1,4 +1,4 @@
-import { gql } from '../../../__generated__';
+import { gql } from '../../__generated__';
 
 export const GET_PRODUCTS_BY_PAGE_NO_AUTH = gql(`
     query GetProductsByPageNoAuth($page: Int!) {

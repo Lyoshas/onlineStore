@@ -1,4 +1,4 @@
-import { gql } from '../../../__generated__';
+import { gql } from '../../__generated__';
 
 const GET_PRODUCT_BY_ID = gql(`
     query GetProductById($productId: Int!) {

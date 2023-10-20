@@ -1,4 +1,4 @@
-import { gql } from '../../../../__generated__';
+import { gql } from '../../__generated__';
 
 const DELETE_PRODUCT = gql(`
     mutation DeleteProduct($deleteProductId: Int!) {
