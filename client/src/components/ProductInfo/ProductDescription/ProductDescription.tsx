@@ -1,8 +1,7 @@
 import { FC } from 'react';
+import classNames from 'classnames';
 
 import classes from './ProductDescription.module.css';
-import ProductCartActions from '../ProductCartActions/ProductCartActions';
-import classNames from 'classnames';
 
 interface ProductDescriptionProps {
     title: string;
@@ -44,7 +43,6 @@ const ProductDescription: FC<ProductDescriptionProps> = ({
             <p className={classes['product-description__short-description']}>
                 {shortDescription}
             </p>
-            {isProductAvailable && <ProductCartActions />}
         </section>
     );
 };
