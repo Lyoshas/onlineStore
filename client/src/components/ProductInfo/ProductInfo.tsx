@@ -11,7 +11,7 @@ import Layout from '../Layout/Layout';
 import ProductImages from './ProductImages/ProductImages';
 import SelectedImage from './SelectedImage/SelectedImage';
 import ProductDescription from './ProductDescription/ProductDescription';
-import GET_PRODUCT_BY_ID from '../../graphql/queries/getProductById';
+import { GET_PRODUCT_BY_ID_NO_AUTH } from '../../graphql/queries/getProductById';
 
 const createErrorBlock = (errorMessage: string) => {
     return (
@@ -32,7 +32,7 @@ const ProductInfo = () => {
     // if 'id' is a string
     if (!isValidId) return createErrorBlock('Invalid product identifier');
 
-    let { loading, error, data } = useQuery(GET_PRODUCT_BY_ID, {
+    let { loading, error, data } = useQuery(GET_PRODUCT_BY_ID_NO_AUTH, {
         variables: { productId: +productId! },
     });
 

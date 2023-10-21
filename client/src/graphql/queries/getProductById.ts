@@ -1,7 +1,7 @@
 import { gql } from '../../__generated__';
 
-const GET_PRODUCT_BY_ID = gql(`
-    query GetProductById($productId: Int!) {
+export const GET_PRODUCT_BY_ID_NO_AUTH = gql(`
+    query GetProductByIdNoAuth($productId: Int!) {
         product(id: $productId) {
             title
             price
@@ -14,4 +14,17 @@ const GET_PRODUCT_BY_ID = gql(`
     } 
 `);
 
-export default GET_PRODUCT_BY_ID;
+export const GET_PRODUCT_BY_ID_WITH_AUTH = gql(`
+    query GetProductByIdWithAuth($productId: Int!) {
+        product(id: $productId) {
+            title
+            price
+            initialImageUrl
+            additionalImageUrl
+            shortDescription
+            isAvailable
+            isRunningOut
+            isInTheCart
+        }
+    }
+`);
