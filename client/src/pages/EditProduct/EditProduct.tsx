@@ -16,7 +16,6 @@ import {
     OnFormSubmitArgs,
 } from '../../components/AddProductForm/AddProductForm';
 import apolloClient from '../../graphql/client';
-import { GET_PRODUCT_BY_ID_NO_AUTH } from '../../graphql/queries/getProductById';
 import useImageUpload from '../../components/hooks/useImageUpload';
 import deriveErrorMessage from '../../util/deriveErrorMessage';
 import { GET_FEATURED_PRODUCTS_WITH_AUTH } from '../../graphql/queries/getFeaturedProducts';
@@ -148,28 +147,32 @@ const EditProduct = () => {
             });
             // updating cache associated with "query Product($productId: Int!)" if it exists
             // this query is used when the user tries to go to the product details page
-            const cachedGetProductByIdNoAuth = apolloClient.readQuery({
-                query: GET_PRODUCT_BY_ID_NO_AUTH,
-                variables: { productId: +productId! }
-            })?.product;
-            if (cachedGetProductByIdNoAuth) {
-                apolloClient.writeQuery({
-                    query: GET_PRODUCT_BY_ID_NO_AUTH,
-                    data: {
-                        product: {
-                            title,
-                            price,
-                            initialImageUrl,
-                            additionalImageUrl,
-                            isAvailable: updatedProduct.isAvailable,
-                            isRunningOut: updatedProduct.isRunningOut,
-                            shortDescription,
-                            __typename: cachedGetProductByIdNoAuth.__typename,
-                        },
+            apolloClient.cache.modify({
+                id: `Product:${productId!}`,
+                fields: {
+                    title() {
+                        return title;
                     },
-                    variables: { productId: +productId! },
-                });
-            }
+                    price() {
+                        return price;
+                    },
+                    initialImageUrl() {
+                        return initialImageUrl;
+                    },
+                    additionalImageUrl() {
+                        return additionalImageUrl;
+                    },
+                    isAvailable() {
+                        return updatedProduct.isAvailable;
+                    },
+                    isRunningOut() {
+                        return updatedProduct.isRunningOut;
+                    },
+                    shortDescription() {
+                        return shortDescription;
+                    },
+                },
+            });
 
             // updating cache associated with "query featuredProducts"
             // this query is used when the user goes to the main page

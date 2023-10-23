@@ -6,7 +6,15 @@
     padding-bottom: 5px;
 }
 
+a.product-item__cart-btn {
+    width: fit-content;
+}
+
 .cart-btn__icon {
     width: 30px;
     height: 30px;
+}
+
+.product-item__cart-btn.text-offset .cart-btn__icon {
+    margin-right: 5px;
 }

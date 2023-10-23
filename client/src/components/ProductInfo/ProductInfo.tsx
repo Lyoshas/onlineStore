@@ -1,7 +1,8 @@
 import { useParams } from 'react-router-dom';
-import { useQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
 import classNames from 'classnames';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import classes from './ProductInfo.module.css';
 import ButtonLink from '../UI/ButtonLink/ButtonLink';
@@ -11,7 +12,15 @@ import Layout from '../Layout/Layout';
 import ProductImages from './ProductImages/ProductImages';
 import SelectedImage from './SelectedImage/SelectedImage';
 import ProductDescription from './ProductDescription/ProductDescription';
-import { GET_PRODUCT_BY_ID_NO_AUTH } from '../../graphql/queries/getProductById';
+import {
+    GET_PRODUCT_BY_ID_WITH_AUTH,
+    GET_PRODUCT_BY_ID_NO_AUTH,
+} from '../../graphql/queries/getProductById';
+import { RootState } from '../../store';
+import {
+    GetProductByIdNoAuthQuery,
+    GetProductByIdWithAuthQuery,
+} from '../../__generated__/graphql';
 
 const createErrorBlock = (errorMessage: string) => {
     return (
@@ -24,27 +33,51 @@ const createErrorBlock = (errorMessage: string) => {
 };
 
 const ProductInfo = () => {
-    const { productId } = useParams();
+    const { productId: stringProductId } = useParams();
     const [selectedImage, setSelectedImage] = useState<0 | 1>(0);
+    const isAuthenticated = useSelector(
+        (state: RootState) => state.auth.isAuthenticated
+    );
 
-    const isValidId = !Number.isNaN(+productId!);
+    const productId: number = +stringProductId!;
+    const isValidId = !Number.isNaN(productId);
 
     // if 'id' is a string
     if (!isValidId) return createErrorBlock('Invalid product identifier');
 
-    let { loading, error, data } = useQuery(GET_PRODUCT_BY_ID_NO_AUTH, {
-        variables: { productId: +productId! },
+    let [
+        getProductByIdNoAuth,
+        {
+            loading: getProductNoAuthLoading,
+            error: getProductNoAuthError,
+            data: getProductNoAuthData,
+        },
+    ] = useLazyQuery(GET_PRODUCT_BY_ID_NO_AUTH, {
+        variables: { productId },
+    });
+    let [
+        getProductByIdWithAuth,
+        {
+            loading: getProductWithAuthLoading,
+            error: getProductWithAuthError,
+            data: getProductWithAuthData,
+        },
+    ] = useLazyQuery(GET_PRODUCT_BY_ID_WITH_AUTH, {
+        variables: { productId },
     });
 
-    if (error) {
-        return createErrorBlock(
-            error?.message === 'Product not found'
-                ? 'Product not found'
-                : 'Something went wrong while loading the product'
-        );
-    }
+    useEffect(() => {
+        if (isAuthenticated === null) return;
+        isAuthenticated ? getProductByIdWithAuth() : getProductByIdNoAuth();
+    }, [isAuthenticated, productId]);
 
-    if (loading) {
+    // if the auth status hasn't been determined yet or if one of the requests are loading
+    if (
+        isAuthenticated === null ||
+        getProductNoAuthLoading ||
+        getProductWithAuthLoading ||
+        (!getProductNoAuthData && !getProductWithAuthData)
+    ) {
         return (
             <div className="flex-wrapper">
                 <Loading />
@@ -52,8 +85,22 @@ const ProductInfo = () => {
         );
     }
 
+    if (getProductNoAuthError || getProductWithAuthError) {
+        return createErrorBlock(
+            getProductNoAuthError?.message === 'Product not found' ||
+                getProductWithAuthError?.message === 'Product not found'
+                ? 'Product not found'
+                : 'Something went wrong while loading the product'
+        );
+    }
+
     // by this point the data has been loaded
-    data = data!;
+    const productData: (
+        | GetProductByIdNoAuthQuery['product']
+        | GetProductByIdWithAuthQuery['product']
+    ) & { isInTheCart?: boolean } =
+        getProductNoAuthData?.product! || getProductWithAuthData?.product!;
+
     const {
         title,
         price,
@@ -62,7 +109,8 @@ const ProductInfo = () => {
         isAvailable,
         isRunningOut,
         shortDescription,
-    } = data.product!;
+        isInTheCart,
+    } = productData!;
 
     const productImages = [initialImageUrl, additionalImageUrl];
     const onNextImage = () => {
@@ -95,11 +143,13 @@ const ProductInfo = () => {
                     onPreviousImage={onPreviousImage}
                 />
                 <ProductDescription
+                    productId={productId}
                     title={title}
                     price={price}
                     shortDescription={shortDescription}
                     isProductAvailable={isAvailable}
                     isProductRunningOut={isRunningOut}
+                    isInTheCart={isInTheCart}
                 />
             </article>
         </Layout>

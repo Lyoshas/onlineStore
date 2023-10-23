@@ -2,21 +2,26 @@ import { FC } from 'react';
 import classNames from 'classnames';
 
 import classes from './ProductDescription.module.css';
+import AddToCartButton from '../../AddToCartButton/AddToCartButton';
 
 interface ProductDescriptionProps {
+    productId: number;
     title: string;
     price: number;
     shortDescription: string;
     isProductAvailable: boolean;
     isProductRunningOut: boolean;
+    isInTheCart?: boolean;
 }
 
 const ProductDescription: FC<ProductDescriptionProps> = ({
+    productId,
     title,
     price,
     shortDescription,
     isProductAvailable,
     isProductRunningOut,
+    isInTheCart,
 }) => {
     return (
         <section className={classes['product-info__description']}>
@@ -43,6 +48,14 @@ const ProductDescription: FC<ProductDescriptionProps> = ({
             <p className={classes['product-description__short-description']}>
                 {shortDescription}
             </p>
+            {isProductAvailable && (
+                <AddToCartButton
+                    productId={productId}
+                    isInTheCart={isInTheCart}
+                    addLabels={true}
+                    className={classes['product-description__add-to-cart-btn']}
+                />
+            )}
         </section>
     );
 };

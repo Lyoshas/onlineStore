@@ -1,5 +1,6 @@
-import { FC, useEffect } from 'react';
+import { FC, useEffect, Fragment } from 'react';
 import { useDispatch } from 'react-redux';
+import classNames from 'classnames';
 
 import Button from '../UI/Button/Button';
 import classes from './AddToCartButton.module.css';
@@ -24,9 +25,14 @@ interface AddToCartButtonProps {
     productId: number;
     // "isInTheCart" indicates whether an item is already in the cart
     isInTheCart?: boolean;
+    addLabels?: boolean;
+    className?: string;
 }
 
-const AddToCartButton: FC<AddToCartButtonProps> = (props) => {
+const AddToCartButton: FC<AddToCartButtonProps> = ({
+    addLabels = false,
+    ...props
+}) => {
     const [
         upsertCartProduct,
         {
@@ -96,21 +102,25 @@ const AddToCartButton: FC<AddToCartButtonProps> = (props) => {
         />
     );
 
+    const className = classNames(
+        classes['product-item__cart-btn'],
+        addLabels && classes['text-offset'],
+        props.className
+    );
+
     // if the "isInTheCart" property wasn't provided, then the user isn't authenticated
     if (props.isInTheCart == null) {
         return (
-            <ButtonLink
-                to="/auth/sign-in"
-                className={classes['product-item__cart-btn']}
-            >
+            <ButtonLink to="/auth/sign-in" className={className}>
                 {cartImg}
+                {addLabels && 'Add to cart'}
             </ButtonLink>
         );
     }
 
     return (
         <Button
-            className={classes['product-item__cart-btn']}
+            className={className}
             onClick={
                 // if an item is being added to the cart, the user can't do anything
                 isUpserting
@@ -122,7 +132,18 @@ const AddToCartButton: FC<AddToCartButtonProps> = (props) => {
                       handleAddToCart
             }
         >
-            {isUpserting ? <Loading width="30px" height="30px" /> : cartImg}
+            {isUpserting ? (
+                <Loading width="30px" height="30px" />
+            ) : (
+                <Fragment>
+                    {cartImg}
+                    {addLabels
+                        ? props.isInTheCart
+                            ? 'In cart'
+                            : 'Add to cart'
+                        : ''}
+                </Fragment>
+            )}
         </Button>
     );
 };
