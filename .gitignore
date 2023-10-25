@@ -9,3 +9,4 @@ client/src/__generated__
 redis/redis.conf
 aws/lambda-functions/**/node_modules
 aws/lambda-functions/**/dist
+pg-admin/dev.env

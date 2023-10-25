@@ -28,3 +28,9 @@ services:
       context: ./redis
     ports:
       - '6379:6379'
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - 5000:80
+    env_file:
+      - ./pg-admin/dev.env
