@@ -1,6 +1,7 @@
 import { FC, Fragment, useState, useEffect } from 'react';
 import { useMutation } from '@apollo/client';
 import classNames from 'classnames';
+import { useDispatch } from 'react-redux';
 
 import Button from '../../UI/Button/Button';
 import classes from './DeleteButton.module.css';
@@ -12,6 +13,7 @@ import Loading from '../../UI/Loading/Loading';
 import apolloClient from '../../../graphql/client';
 import { deleteProductsByPageCache } from '../../../store/util/deleteProductsByPageCache';
 import { GET_FEATURED_PRODUCTS_WITH_AUTH } from '../../../graphql/queries/getFeaturedProducts';
+import { cartApi } from '../../../store/apis/cartApi';
 
 interface DeleteButtonProps {
     productId: number;
@@ -28,6 +30,7 @@ const DeleteButton: FC<DeleteButtonProps> = ({
         useState<boolean>(false);
     const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
     const [showErrorModal, setShowErrorModal] = useState<boolean>(false);
+    const dispatch = useDispatch();
 
     const [
         deleteProduct,
@@ -46,9 +49,11 @@ const DeleteButton: FC<DeleteButtonProps> = ({
         // if the product hasn't been deleted yet, skip the execution
         if (!responseData) return;
 
-        // after the product has been successfully deleted it's important to refetch GET_FEATURED_PRODUCTS
-        // changing the cache directly wouldn't do much good because in this case it would lack 1 product
         setShowSuccessModal(true);
+
+        // refetching the cart
+        // if a product is deleted, there's a chance this product was in the cart, so we need to refetch it
+        dispatch(cartApi.util.invalidateTags(['CartItemCount', 'GetCart']));
     }, [responseData]);
 
     const handleModalClose = () => {
