@@ -19,6 +19,7 @@ import apolloClient from '../../graphql/client';
 import useImageUpload from '../../components/hooks/useImageUpload';
 import deriveErrorMessage from '../../util/deriveErrorMessage';
 import { GET_FEATURED_PRODUCTS_WITH_AUTH } from '../../graphql/queries/getFeaturedProducts';
+import LoadingScreen from '../../components/UI/LoadingScreen/LoadingScreen';
 
 const EditProduct = () => {
     const { productId } = useParams();
@@ -228,11 +229,7 @@ const EditProduct = () => {
         isAdditionalImageUploading ||
         isUpdateRequestLoading
     ) {
-        return (
-            <div className="flex-wrapper">
-                <Loading />
-            </div>
-        );
+        return <LoadingScreen />;
     }
 
     if (

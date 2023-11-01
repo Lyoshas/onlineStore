@@ -12,6 +12,7 @@ import Layout from '../Layout/Layout';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import HamburgerMenuIcon from './HambugerMenuIcon/HamburgerMenuIcon';
+import LoadingScreen from '../UI/LoadingScreen/LoadingScreen';
 
 // "isAuthenticated: null" means that the client hasn't sent the request yet
 const TopHeader: FC<{
@@ -54,9 +55,7 @@ const TopHeader: FC<{
     };
 
     return isAuthenticated === null ? (
-        <div className="flex-wrapper">
-            <Loading />
-        </div>
+        <LoadingScreen />
     ) : (
         <Fragment>
             <header

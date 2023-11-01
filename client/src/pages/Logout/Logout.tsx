@@ -10,6 +10,7 @@ import ErrorIcon from '../../components/UI/Icons/ErrorIcon';
 import { authActions } from '../../store/slices/auth';
 import ButtonLink from '../../components/UI/ButtonLink/ButtonLink';
 import classes from './Logout.module.css';
+import LoadingScreen from '../../components/UI/LoadingScreen/LoadingScreen';
 
 const Logout = () => {
     const [logout, { isError, isSuccess, error }] = useLogoutMutation();
@@ -32,11 +33,7 @@ const Logout = () => {
         navigate('/');
     }, [isSuccess]);
 
-    let render: JSX.Element = (
-        <div className="flex-wrapper">
-            <Loading />
-        </div>
-    );
+    let render: JSX.Element = <LoadingScreen />;
 
     if (isError) {
         render = (

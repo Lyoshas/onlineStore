@@ -17,6 +17,7 @@ import ADD_PRODUCT from '../../graphql/mutations/addProduct';
 import SuccessMessage from './SuccessMessage/SuccessMessage';
 import apolloClient from '../../graphql/client';
 import { deleteProductsByPageCache } from '../../store/util/deleteProductsByPageCache';
+import LoadingScreen from '../../components/UI/LoadingScreen/LoadingScreen';
 
 const deriveErrorMessage = (
     error: FetchBaseQueryError | SerializedError | undefined
@@ -162,11 +163,7 @@ const AddProduct = () => {
         isAdditionalImageUploading ||
         isAddProductLoading
     ) {
-        return (
-            <div className="flex-wrapper">
-                <Loading />
-            </div>
-        );
+        return <LoadingScreen />;
     }
 
     if (
@@ -199,10 +196,10 @@ const AddProduct = () => {
                     fields: {
                         featuredProducts(_, { DELETE }) {
                             return DELETE;
-                        }
-                    }
+                        },
+                    },
                 });
-            }
+            },
         });
 
         // Deleting any cache associated with GET_PRODUCTS_BY_PAGE. We're deleting it because it may contain the recently added product

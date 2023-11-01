@@ -4,6 +4,7 @@ import { Navigate } from 'react-router-dom';
 
 import { RootState } from '../../store';
 import Loading from '../UI/Loading/Loading';
+import LoadingScreen from '../UI/LoadingScreen/LoadingScreen';
 
 // this component is used to create protected routes
 // this can be used to redirect users if they are unauthenticated or authenticated or if they are not admins
@@ -20,18 +21,14 @@ const EnsureStatus: FC<{
     const navigateElem = <Navigate to="/" replace />;
 
     if (isAuthenticated === null || isAdmin === null) {
-        render = (
-            <div className="flex-wrapper">
-                <Loading />
-            </div>
-        );
+        render = <LoadingScreen />;
     } else if (
         // if the 'auth' option is specified and the user is NOT authenticated
-        props.auth && !isAuthenticated ||
+        (props.auth && !isAuthenticated) ||
         // if the 'auth' option is not specified and the user IS authenticated
-        !props.auth && isAuthenticated ||
+        (!props.auth && isAuthenticated) ||
         // if the 'admin' option is specified and the user is not an admin
-        props.admin && !isAdmin
+        (props.admin && !isAdmin)
     ) {
         // redirect the user
         render = navigateElem;

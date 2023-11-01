@@ -21,6 +21,7 @@ import {
     GetProductByIdNoAuthQuery,
     GetProductByIdWithAuthQuery,
 } from '../../__generated__/graphql';
+import LoadingScreen from '../UI/LoadingScreen/LoadingScreen';
 
 const createErrorBlock = (errorMessage: string) => {
     return (
@@ -80,11 +81,7 @@ const ProductInfo = () => {
         getProductWithAuthLoading ||
         (!isGetProductNoAuthCalled && !isGetProductWithAuthCalled)
     ) {
-        return (
-            <div className="flex-wrapper">
-                <Loading />
-            </div>
-        );
+        return <LoadingScreen />;
     }
 
     if (getProductNoAuthError || getProductWithAuthError) {

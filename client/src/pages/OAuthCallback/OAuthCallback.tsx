@@ -9,6 +9,7 @@ import { useOAuthCallbackMutation } from '../../store/apis/authApi';
 import classes from './OAuthCallback.module.css';
 import ButtonLink from '../../components/UI/ButtonLink/ButtonLink';
 import { authActions } from '../../store/slices/auth';
+import LoadingScreen from '../../components/UI/LoadingScreen/LoadingScreen';
 
 const OAuthCallback = () => {
     const [searchParams] = useSearchParams();
@@ -33,9 +34,7 @@ const OAuthCallback = () => {
     }, [isSuccess]);
 
     return isLoading || isUninitialized || isSuccess ? (
-        <div className="flex-wrapper">
-            <Loading />
-        </div>
+        <LoadingScreen />
     ) : (
         <CenterBlock className={classes['oauth-block']}>
             <ErrorIcon className="icon" />

@@ -14,6 +14,7 @@ import classes from './ProductListPage.module.css';
 import Pagination from './Pagination/Pagination';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
+import LoadingScreen from '../../components/UI/LoadingScreen/LoadingScreen';
 
 const ProductListPage = () => {
     const [searchParams] = useSearchParams();
@@ -71,11 +72,7 @@ const ProductListPage = () => {
     }, [products, navigate]);
 
     if (productsLoading || !products || products.productList.length === 0) {
-        return (
-            <div className="flex-wrapper">
-                <Loading />
-            </div>
-        );
+        return <LoadingScreen />;
     }
 
     if (productsFetchError) {

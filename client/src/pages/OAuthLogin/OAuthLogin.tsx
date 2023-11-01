@@ -10,6 +10,7 @@ import ButtonLink from '../../components/UI/ButtonLink/ButtonLink';
 import { useGetOAuthLinkQuery } from '../../store/apis/authApi';
 import ServerErrorResponse from '../../interfaces/ServerErrorResponse';
 import useApiError from '../../components/hooks/useApiError';
+import LoadingScreen from '../../components/UI/LoadingScreen/LoadingScreen';
 
 const OAuthLogin = () => {
     const { oauthProvider } = useParams<{ oauthProvider: string }>();
@@ -19,16 +20,15 @@ const OAuthLogin = () => {
         }
     );
     const expectedErrorResponse = useApiError(isError, error, [422]);
-    const statusCode = expectedErrorResponse && expectedErrorResponse.statusCode;
+    const statusCode =
+        expectedErrorResponse && expectedErrorResponse.statusCode;
 
     useEffect(() => {
         if (isSuccess) location.href = data.URL;
     }, [isSuccess, data]);
 
     return isLoading || isSuccess ? (
-        <div className="flex-wrapper">
-            <Loading />
-        </div>
+        <LoadingScreen />
     ) : (
         <CenterBlock className={classes['oauth-block']}>
             {isError && (
