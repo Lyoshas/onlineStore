@@ -51,6 +51,7 @@ const ProductInfo = () => {
             loading: getProductNoAuthLoading,
             error: getProductNoAuthError,
             data: getProductNoAuthData,
+            called: isGetProductNoAuthCalled,
         },
     ] = useLazyQuery(GET_PRODUCT_BY_ID_NO_AUTH, {
         variables: { productId },
@@ -61,6 +62,7 @@ const ProductInfo = () => {
             loading: getProductWithAuthLoading,
             error: getProductWithAuthError,
             data: getProductWithAuthData,
+            called: isGetProductWithAuthCalled,
         },
     ] = useLazyQuery(GET_PRODUCT_BY_ID_WITH_AUTH, {
         variables: { productId },
@@ -76,7 +78,7 @@ const ProductInfo = () => {
         isAuthenticated === null ||
         getProductNoAuthLoading ||
         getProductWithAuthLoading ||
-        (!getProductNoAuthData && !getProductWithAuthData)
+        (!isGetProductNoAuthCalled && !isGetProductWithAuthCalled)
     ) {
         return (
             <div className="flex-wrapper">
@@ -86,10 +88,12 @@ const ProductInfo = () => {
     }
 
     if (getProductNoAuthError || getProductWithAuthError) {
+        const productNotFoundMessage =
+            'A product with the specified id does not exist';
         return createErrorBlock(
-            getProductNoAuthError?.message === 'Product not found' ||
-                getProductWithAuthError?.message === 'Product not found'
-                ? 'Product not found'
+            getProductNoAuthError?.message === productNotFoundMessage ||
+                getProductWithAuthError?.message === productNotFoundMessage
+                ? productNotFoundMessage
                 : 'Something went wrong while loading the product'
         );
     }
