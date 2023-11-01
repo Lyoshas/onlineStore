@@ -8,7 +8,10 @@
     "start": "ts-node --esm --transpileOnly ./src/server.ts",
     "dev": "nodemon --ext ts --exec \"ts-node --esm --transpileOnly ./src/server.ts\"",
     "test": "vitest --reporter verbose",
-    "test:ci": "vitest run --watch false"
+    "test:ci": "vitest run --watch false",
+    "db:migrate:up": "node --loader ts-node/esm ./node_modules/.bin/knex migrate:latest --knexfile ./knexfile.ts",
+    "db:migrate:rollback": "node --loader ts-node/esm ./node_modules/.bin/knex migrate:rollback --all --knexfile ./knexfile.ts",
+    "db:seed:run": "node --loader ts-node/esm ./node_modules/.bin/knex seed:run --knexfile ./knexfile.ts"
   },
   "repository": {
     "type": "git",
@@ -50,6 +53,7 @@
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.0",
     "cookie-parser": "^1.4.6",
+    "dotenv": "^16.3.1",
     "express": "^4.18.1",
     "express-async-handler": "^1.2.0",
     "express-validator": "^6.14.2",
