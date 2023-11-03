@@ -71,12 +71,16 @@ const ProductListPage = () => {
         navigate(`?page=1`);
     }, [products, navigate]);
 
-    if (productsLoading || !products || products.productList.length === 0) {
-        return <LoadingScreen />;
+    if (productsFetchError) {
+        return (
+            <ErrorMessageBlock
+                message={'Something went wrong while loading products'}
+            />
+        );
     }
 
-    if (productsFetchError) {
-        return <ErrorMessageBlock message={productsFetchError.message} />;
+    if (productsLoading || !products || products.productList.length === 0) {
+        return <LoadingScreen />;
     }
 
     return (
