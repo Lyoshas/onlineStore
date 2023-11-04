@@ -1,6 +1,8 @@
 import CamelCaseProperties from '../interfaces/CamelCaseProperties.js';
 import snakeCaseToCamelCase from './snakeCaseToCamelCase.js';
 
+// Example:
+// camelCaseObject({ first_key: 'val1', second_key: 'val2' }) -> { firstKey: 'val1', secondKey: 'val2' }
 const camelCaseObject = <T extends object>(
     inputObject: T
 ): CamelCaseProperties<T> => {
