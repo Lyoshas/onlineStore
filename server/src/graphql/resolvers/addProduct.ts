@@ -16,7 +16,7 @@ import checkQuantityInStock from '../validators/checkQuantityInStock.js';
 import checkShortDescription from '../validators/checkShortDescription.js';
 import checkMaxOrderQuantity from '../validators/checkMaxOrderQuantity.js';
 import ProductUpsertReturnValue from '../../interfaces/ProductUpsertReturnValue.js';
-import knexInstance from '../../services/knex.service.js';
+import knex from '../../services/knex.service.js';
 import AnyObject from '../../interfaces/AnyObject.js';
 import snakeCaseObject from '../../util/snakeCaseObject.js';
 
@@ -58,7 +58,10 @@ export default async (
         let insertParameters: AnyObject = snakeCaseObject({
             title,
             price,
-            category,
+            categoryId: knex
+                .select('id')
+                .from('product_categories')
+                .where({ category }),
             quantityInStock,
             shortDescription,
             initialImageUrl,
@@ -68,8 +71,9 @@ export default async (
 
         // since we have parameters that may or may not exist (in our case it's "max_order_quantity"), it wouldn't be really practical to use the native pg driver
         // so we're building a dynamic query with Knex
-        const sqlQuery: string = knexInstance('products')
+        const sqlQuery: string = knex
             .insert(insertParameters)
+            .into('products')
             .returning(['id', 'max_order_quantity'])
             .toString();
 

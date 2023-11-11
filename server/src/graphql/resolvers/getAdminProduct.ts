@@ -7,12 +7,13 @@ import validateUser from '../validators/validateUser.js';
 import dbPool from '../../services/postgres.service.js';
 import CamelCaseProperties from '../../interfaces/CamelCaseProperties.js';
 import ProductNotFoundError from '../errors/ProductNotFoundError.js';
-import knexInstance from '../../services/knex.service.js';
+import knex from '../../services/knex.service.js';
 import getRelevantProductFields from '../helpers/getRelevantProductFields.js';
 import mapRequestedFieldsToProductInfo from '../helpers/mapRequestedFieldsToProductInfo.js';
 
 type GetAdminProductOutput = Partial<
-    CamelCaseProperties<DBProduct> & {
+    CamelCaseProperties<Omit<DBProduct, 'category_id'>> & {
+        category: string;
         initialImageName: string;
         additionalImageName: string;
     }
@@ -30,17 +31,33 @@ const getAdminProduct = async (
 ): Promise<GetAdminProductOutput> => {
     await validateUser(context.user);
 
-    const requestedFields = graphqlFields(resolveInfo) as PossibleGraphQLFields;
+    const requestedFields = graphqlFields(
+        resolveInfo
+    ) as PossibleGraphQLFields;
     const requestedFieldsList = Object.keys(
         requestedFields
     ) as (keyof PossibleGraphQLFields)[];
 
     // instead of fetching everything, we can be more granular by dynamically building a SELECT query
     // this way, the query will execute faster
-    const sqlQuery: string = knexInstance('products')
-        .select(getRelevantProductFields(requestedFieldsList))
-        .where({ id: args.productId })
-        .toString();
+    let queryBuilder = knex('products').select(
+        getRelevantProductFields(requestedFieldsList)
+    );
+
+    if ('category' in requestedFields) {
+        queryBuilder = queryBuilder.innerJoin(
+            'product_categories',
+            'products.category_id',
+            '=',
+            'product_categories.id'
+        );
+    }
+
+    queryBuilder = queryBuilder.where({ 'products.id': args.productId });
+
+    const sqlQuery: string = queryBuilder.toString();
+
+    console.log(sqlQuery);
 
     const {
         rows: [product],

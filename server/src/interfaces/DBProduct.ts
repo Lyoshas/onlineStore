@@ -7,6 +7,6 @@ export default interface DBProduct {
     additional_image_url: string;
     quantity_in_stock: number;
     short_description: string;
-    category: string;
+    category_id: number;
     max_order_quantity: number;
 }

@@ -1,49 +1,88 @@
-import DBProduct from '../../interfaces/DBProduct';
-import arrayIntersection from './arrayIntersection.js';
 import camelCaseToSnakeCase from './camelCaseToSnakeCase.js';
 
+export type GetRelevantProductFieldsInput = (
+    | 'id'
+    | 'title'
+    | 'price'
+    | 'initialImageUrl'
+    | 'additionalImageUrl'
+    | 'initialImageName'
+    | 'additionalImageName'
+    | 'isAvailable'
+    | 'isRunningOut'
+    | 'shortDescription'
+    | 'category'
+    | 'maxOrderQuantity'
+    | 'quantityInStock'
+    // 'isInTheCart', 'initialImageName', 'additionalImageName', '__typename' will be ignored
+    | 'isInTheCart'
+    | 'initialImageName'
+    | 'additionalImageName'
+    | '__typename'
+)[];
+
+// Examples:
+// prefixProductField('id') => 'products.id'
+// prefixProductField('title') => 'products.title'
+const prefixProductField = <T extends string>(
+    productField: T
+): `products.${T}` => {
+    return `products.${productField}`;
+};
+
+// Examples:
+// prefixCategoryField('id') => 'product_categories.id'
+// prefixCategoryField('title') => 'product_categories.title'
+const prefixCategoryField = <T extends string>(
+    productField: T
+): `product_categories.${T}` => {
+    return `product_categories.${productField}`;
+};
+
 // this function is used to find which product fields we need to fetch from the DB
-const getRelevantProductFields = (requestedFields: string[]): string[] => {
-    const productFields: (keyof DBProduct)[] = [
-        'id',
-        'title',
-        'price',
-        'initial_image_url',
-        'additional_image_url',
-        'quantity_in_stock',
-        'short_description',
-        'category',
-        'max_order_quantity',
-    ];
+// when a user requests which product fields they want to get, we need to translate it to the fields that are stored in the DB
+const getRelevantProductFields = (
+    requestedFields: GetRelevantProductFieldsInput
+): string[] => {
+    let dbFields = new Set<string>();
 
-    let relevantFields = arrayIntersection(
-        productFields,
-        requestedFields.map((field) => camelCaseToSnakeCase(field))
-    );
+    for (let requestedField of requestedFields) {
+        if (
+            [
+                'isInTheCart',
+                'initialImageName',
+                'additionalImageName',
+                '__typename',
+            ].includes(requestedField)
+        ) {
+            continue;
+        }
 
-    // 'initialImageName' and 'additionalImageName' aren't in the DB, we need to derive these from the image URLs
-    // so if the user requested 'initialImageName' or 'additionalImageName', we need to fetch 'initialImageUrl' and/or 'additionalImageUrl' from the DB
-    if (
-        requestedFields.includes('initialImageName') &&
-        !relevantFields.includes('initial_image_url')
-    )
-        relevantFields.push('initial_image_url');
+        switch (requestedField) {
+            case 'isAvailable':
+            case 'isRunningOut':
+                dbFields.add(prefixProductField('quantity_in_stock'));
+                break;
+            case 'initialImageName':
+                dbFields.add(prefixProductField('initial_image_url'));
+                break;
+            case 'additionalImageName':
+                dbFields.add(prefixProductField('additional_image_url'));
+                break;
+            case 'category':
+                dbFields.add(
+                    prefixCategoryField(camelCaseToSnakeCase(requestedField))
+                );
+                break;
+            default:
+                dbFields.add(
+                    prefixProductField(camelCaseToSnakeCase(requestedField))
+                );
+                break;
+        }
+    }
 
-    if (
-        requestedFields.includes('additionalImageName') &&
-        !relevantFields.includes('additional_image_url')
-    )
-        relevantFields.push('additional_image_url');
-
-    // if the user requested 'isAvailable' or 'isRunningOut', we need to fetch 'quantity_in_stock' from the DB
-    if (
-        (requestedFields.includes('isAvailable') ||
-            requestedFields.includes('isRunningOut')) &&
-        !relevantFields.includes('quantity_in_stock')
-    )
-        relevantFields.push('quantity_in_stock');
-
-    return relevantFields;
+    return Array.from(dbFields);
 };
 
 export default getRelevantProductFields;

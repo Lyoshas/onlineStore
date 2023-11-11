@@ -57,7 +57,7 @@ export default async (
             SET
                 title = $1,
                 price = $2,
-                category = $3,
+                category_id = (SELECT id FROM product_categories WHERE category = $3),
                 initial_image_url = $4,
                 additional_image_url = $5,
                 short_description = $6,
@@ -82,7 +82,7 @@ export default async (
         }
 
         // this IIFE will run asynchronously, without the user having to wait until it's finished
-        (async function() {
+        (async function () {
             // returns users who have the product that was updated in their cart
             // we'll need to invalidate their cart cache in Redis to avoid inconsistencies
             const affectedUserIds = await getUsersWithProductInCart(productId);

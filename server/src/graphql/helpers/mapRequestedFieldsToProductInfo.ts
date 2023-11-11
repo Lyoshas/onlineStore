@@ -24,15 +24,19 @@ type ResolverOutput = Partial<{
     [prop in PossibleResolverField]: unknown;
 }>;
 
+// after constructing a dynamic SQL query we need to map requested GraphQL fields to actual values
+// this function does just that
+// T - specifies which fields the user requested
+// productInfo - actual data from the DB
 const mapRequestedFieldsToProductInfo = <T extends PossibleResolverField[]>(
-    productInfo: Partial<DBProduct>,
+    productInfo: Partial<
+        DBProduct & { is_in_the_cart: boolean; category: string }
+    >,
     requestedFields: T
 ): ResolverOutput => {
     const objectToReturn: Partial<ResolverOutput> = {};
 
     for (let requestedField of requestedFields) {
-        if (requestedField === 'isInTheCart') continue;
-
         const value =
             requestedField === 'initialImageName'
                 ? getObjectKeyByImageUrl(productInfo.initial_image_url!)

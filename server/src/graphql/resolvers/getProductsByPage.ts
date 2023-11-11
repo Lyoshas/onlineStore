@@ -1,27 +1,29 @@
 import { GraphQLResolveInfo } from 'graphql';
+import { Knex } from 'knex';
 import graphqlFields from 'graphql-fields';
 
-import DBProduct from '../../interfaces/DBProduct.js';
 import DisplayProduct from '../../interfaces/DisplayProduct.js';
 import dbPool from '../../services/postgres.service.js';
 import { PageOutOfRangeError } from '../errors/PageOutOfRangeError.js';
 import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
-import knexInstance from '../../services/knex.service.js';
+import knex from '../../services/knex.service.js';
 import getRelevantProductFields from '../helpers/getRelevantProductFields.js';
 import mapRequestedFieldsToProductInfo from '../helpers/mapRequestedFieldsToProductInfo.js';
 import RequireAtLeastOneProperty from '../../interfaces/RequireAtLeastOneProperty.js';
 import { IsInTheCartError } from '../errors/IsInTheCartError.js';
-import addIsInTheCartField from '../helpers/addIsInTheCartField.js';
+import formatSqlQuery from '../helpers/formatSqlQuery.js';
 
 type GetProductsByPageOutput = RequireAtLeastOneProperty<{
     productList: Partial<DisplayProduct>[];
     totalPages: number;
 }>;
 
+type ProductInfo = {
+    [productField in keyof DisplayProduct]: {};
+};
+
 interface PossibleGraphQLFields {
-    productList?: {
-        [productField in keyof DisplayProduct]?: {};
-    };
+    productList?: Partial<ProductInfo>;
     totalPages?: {};
 }
 
@@ -38,7 +40,9 @@ async function getProductsByPage(
     context: ApolloServerContext,
     resolveInfo: GraphQLResolveInfo
 ): Promise<GetProductsByPageOutput> {
-    const requestedFields = graphqlFields(resolveInfo) as PossibleGraphQLFields;
+    const requestedFields = graphqlFields(
+        resolveInfo
+    ) as PossibleGraphQLFields;
 
     const shouldGetIsInTheCart: boolean =
         !!requestedFields.productList &&
@@ -59,58 +63,85 @@ async function getProductsByPage(
         process.env.PRODUCTS_PER_PAGE as string
     );
 
-    let resultProductList: Exclude<
+    const resultProductList: Exclude<
         GetProductsByPageOutput['productList'],
         undefined
     > = [];
 
-    // if the user requested products
     if (requestedFields.productList) {
-        // instead of fetching every field of a product, we can be more granular by dynamically building a SELECT query
-        // this way, the query will execute faster
-
-        // getting products fields that the user requested
-        const requestedProductFields = Object.keys(
+        const requestedFieldsList = Object.keys(
             requestedFields.productList
-        ) as (keyof DisplayProduct)[];
+        ) as (keyof Exclude<PossibleGraphQLFields['productList'], undefined>)[];
+        const fieldsToFetch: (string | Knex.Raw)[] = [
+            ...getRelevantProductFields(requestedFieldsList),
+        ];
 
-        const sqlQuery: string = knexInstance('products')
-            .select(getRelevantProductFields(requestedProductFields))
-            .offset(productsPerPage * (+args.page - 1))
-            .limit(productsPerPage)
-            .toString();
-
-        const { rows } = await dbPool.query<
-            Partial<Omit<DBProduct, 'max_order_quantity'>>
-        >(sqlQuery);
-
-        rows.forEach((productInfo) => {
-            resultProductList.push(
-                mapRequestedFieldsToProductInfo(
-                    productInfo,
-                    requestedProductFields
-                ) as Partial<DisplayProduct>
+        if (shouldGetIsInTheCart) {
+            fieldsToFetch.push(
+                knex.raw(`
+                    CASE
+                        WHEN relevant_cart_entries.product_id IS NOT NULL THEN true
+                        ELSE false
+                    END AS is_in_the_cart
+                `)
             );
-        });
-    }
+        }
 
-    if (shouldGetIsInTheCart) {
-        resultProductList = await addIsInTheCartField(
-            context.user!.id,
-            resultProductList as ({
-                id: number;
-            } & (typeof resultProductList)[0])[]
+        let queryBuilder = knex.select(fieldsToFetch).from('products');
+
+        if ('category' in requestedFields.productList) {
+            queryBuilder = queryBuilder.innerJoin(
+                'product_categories',
+                'product_categories.id',
+                '=',
+                'products.category_id'
+            );
+        }
+
+        if (shouldGetIsInTheCart) {
+            queryBuilder = queryBuilder.leftJoin(
+                knex
+                    .select('product_id')
+                    .from('carts')
+                    .where({ user_id: context.user!.id })
+                    .as('relevant_cart_entries'),
+                'products.id',
+                '=',
+                'relevant_cart_entries.product_id'
+            );
+        }
+
+        queryBuilder = queryBuilder
+            // PostgreSQL doesn't guarantee the order of rows when using JOINs, so we need to order them by product id
+            .orderBy('products.id')
+            .offset(productsPerPage * (+args.page - 1))
+            .limit(productsPerPage);
+
+        const sqlQuery: string = formatSqlQuery(queryBuilder.toString());
+
+        console.log(sqlQuery);
+
+        const { rows: products } = await dbPool.query(sqlQuery);
+
+        resultProductList.push(
+            ...(products.map((product) => {
+                return mapRequestedFieldsToProductInfo(
+                    product,
+                    requestedFieldsList
+                );
+            }) as typeof resultProductList)
         );
     }
 
-    return {
-        ...(requestedFields.productList
-            ? { productList: resultProductList }
-            : {}),
-        ...(requestedFields.totalPages
-            ? { totalPages: await getTotalPages(productsPerPage) }
-            : {}),
-    } as GetProductsByPageOutput;
+    const resultData: GetProductsByPageOutput = {
+        productList: resultProductList,
+    };
+
+    if ('totalPages' in requestedFields) {
+        resultData.totalPages = await getTotalPages(productsPerPage);
+    }
+
+    return resultData;
 }
 
 export default getProductsByPage;

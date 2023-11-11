@@ -1,15 +1,15 @@
 import { GraphQLResolveInfo } from 'graphql';
+import { Knex } from 'knex';
 import graphqlFields from 'graphql-fields';
 
-import dbPool from '../../services/postgres.service.js';
 import DisplayProduct from '../../interfaces/DisplayProduct.js';
-import DBProduct from '../../interfaces/DBProduct.js';
 import getRelevantProductFields from '../helpers/getRelevantProductFields.js';
-import knexInstance from '../../services/knex.service.js';
-import mapRequestedFieldsToProductInfo from '../helpers/mapRequestedFieldsToProductInfo.js';
+import knex from '../../services/knex.service.js';
 import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
 import { IsInTheCartError } from '../errors/IsInTheCartError.js';
-import addIsInTheCartField from '../helpers/addIsInTheCartField.js';
+import dbPool from '../../services/postgres.service.js';
+import mapRequestedFieldsToProductInfo from '../helpers/mapRequestedFieldsToProductInfo.js';
+import formatSqlQuery from '../helpers/formatSqlQuery.js';
 
 type GetFeaturedProductsOutput = Partial<DisplayProduct>[];
 
@@ -25,42 +25,68 @@ async function getFeaturedProducts(
     context: ApolloServerContext,
     resolveInfo: GraphQLResolveInfo
 ): Promise<GetFeaturedProductsOutput> {
-    const requestedFields = graphqlFields(resolveInfo) as PossibleGraphQLFields;
+    const requestedFields = graphqlFields(
+        resolveInfo
+    ) as PossibleGraphQLFields;
 
-    const shouldGetIsInTheCart: boolean = Boolean(requestedFields.isInTheCart);
+    const shouldGetIsInTheCart: boolean = 'isInTheCart' in requestedFields;
+
     if (shouldGetIsInTheCart && context.user === null) {
         throw new IsInTheCartError();
-    } else if (shouldGetIsInTheCart) {
-        // we need to request the id of each product if the user requested the "isInTheCart" field
-        requestedFields.id = {};
     }
 
     const requestedFieldsList = Object.keys(
         requestedFields
     ) as (keyof PossibleGraphQLFields)[];
 
-    const sqlQuery: string = knexInstance('products')
-        .select(getRelevantProductFields(requestedFieldsList))
-        .orderByRaw('RANDOM()')
-        .limit(12)
-        .toString();
+    const fieldsToFetch: (string | Knex.Raw)[] =
+        getRelevantProductFields(requestedFieldsList);
 
-    const { rows } = await dbPool.query<
-        Partial<Omit<DBProduct, 'max_order_quantity'>>
-    >(sqlQuery);
+    if (shouldGetIsInTheCart) {
+        fieldsToFetch.push(
+            knex.raw(`
+                CASE
+                    WHEN relevant_cart_entries.product_id IS NOT NULL THEN true
+                    ELSE false
+                END AS is_in_the_cart
+            `)
+        );
+    }
 
-    const productList = rows.map((product) =>
-        mapRequestedFieldsToProductInfo(product, requestedFieldsList)
+    let queryBuilder = knex.select(fieldsToFetch).from('products');
+
+    if ('category' in requestedFields) {
+        queryBuilder = queryBuilder.innerJoin(
+            'product_categories',
+            'product_categories.id',
+            '=',
+            'products.category_id'
+        );
+    }
+
+    if (shouldGetIsInTheCart) {
+        queryBuilder = queryBuilder.leftJoin(
+            knex
+                .select('product_id')
+                .from('carts')
+                .where({ user_id: context.user!.id })
+                .as('relevant_cart_entries'),
+            'products.id',
+            '=',
+            'relevant_cart_entries.product_id'
+        );
+    }
+
+    queryBuilder = queryBuilder.orderByRaw('RANDOM()').limit(12);
+
+    const sqlQuery: string = formatSqlQuery(queryBuilder.toString());
+    console.log(sqlQuery);
+
+    const { rows: products } = await dbPool.query(sqlQuery);
+
+    return products.map((dbProduct) =>
+        mapRequestedFieldsToProductInfo(dbProduct, requestedFieldsList)
     ) as GetFeaturedProductsOutput;
-
-    return shouldGetIsInTheCart
-        ? addIsInTheCartField(
-              context.user!.id,
-              productList as ({
-                  id: number;
-              } & (typeof productList)[0])[]
-          )
-        : productList;
 }
 
 export default getFeaturedProducts;
