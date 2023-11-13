@@ -5,5 +5,5 @@ export async function seed(knex: Knex): Promise<void> {
     await knex('token_types').del();
 
     // Inserts seed entries
-    await knex('token_types').insert([{ type: 'refresh' }, { type: 'reset' }]);
+    await knex('token_types').insert([{ type: 'refresh' }]);
 }
