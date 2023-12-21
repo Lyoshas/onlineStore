@@ -1,0 +1,35 @@
+.product-category-item {
+    background: #5262a7;
+    padding: 20px;
+    transition: 0.2s background ease;
+    cursor: pointer;
+    width: 400px;
+    text-align: center;
+    margin-right: 30px;
+    margin-bottom: 30px;
+}
+
+.product-category-item:hover {
+    background: #707db4;
+}
+
+.product-category-item__name {
+    margin: 0;
+    margin-bottom: 1rem;
+}
+
+.product-category-item__preview-url {
+    max-height: 200px;
+    max-width: 100%;
+}
+
+.product-category-item__link {
+    text-decoration: none;
+    color: inherit;
+}
+
+@media screen and (max-width: 700px) {
+    .product-category-item {
+        margin-right: 0;
+    }
+}

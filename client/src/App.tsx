@@ -24,9 +24,9 @@ import LandingPage from './pages/LandingPage/LandingPage';
 import ProductInfo from './components/ProductInfo/ProductInfo';
 import EditProduct from './pages/EditProduct/EditProduct';
 import AddProduct from './pages/AddProduct/AddProduct';
-import ProductListPage from './pages/ProductListPage/ProductListPage';
 import CartContentsModal from './components/CartContentsModal/CartContentsModal';
 import { cartModalActions } from './store/slices/cartModal';
+import ProductCategoryList from './pages/ProductCategoryList/ProductCategoryList';
 
 const App: FC = () => {
     const { errorMessage, isErrorNotificationShown } = useSelector(
@@ -151,7 +151,7 @@ const App: FC = () => {
                     path="/products"
                     element={
                         <TopHeader
-                            RenderAfter={<ProductListPage />}
+                            RenderAfter={<ProductCategoryList />}
                             addOffset={true}
                         />
                     }
