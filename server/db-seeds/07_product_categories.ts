@@ -61,5 +61,9 @@ export async function seed(knex: Knex): Promise<void> {
             preview_url:
                 'https://onlinestore-react-assets.s3.amazonaws.com/product-categories/monitors.png',
         },
+        {
+            category: 'Дрони',
+            preview_url: 'https://onlinestore-react-assets.s3.amazonaws.com/product-categories/drones.png'
+        }
     ]);
 }
