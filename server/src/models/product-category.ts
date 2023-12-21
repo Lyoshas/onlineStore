@@ -1,11 +1,16 @@
 import dbPool from '../services/postgres.service.js';
+import ProductCategory from '../interfaces/ProductCategory.js';
 
-export const getProductCategories = async (): Promise<string[]> => {
-    const { rows } = await dbPool.query<{ category: string }>(
-        'SELECT category FROM product_categories'
-    );
+export const getProductCategories = async (): Promise<ProductCategory[]> => {
+    const { rows } = await dbPool.query<{
+        category: string;
+        preview_url: string;
+    }>('SELECT category, preview_url FROM product_categories');
 
-    return rows.map((row) => row.category);
+    return rows.map((row) => ({
+        name: row.category,
+        previewURL: row.preview_url,
+    }));
 };
 
 export const productCategoryExists = async (

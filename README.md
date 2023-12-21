@@ -740,16 +740,50 @@ Some API endpoints require authentication using access tokens and refresh tokens
     ```JSON
     {
       "categories": [
-        "Game Consoles",
-        "Laptops",
-        "Data Storage",
-        "Computer Processors",
-        "Graphics Cards",
-        "RAM",
-        "Personal Computers",
-        "Tablets",
-        "Smartphones",
-        "Monitors"
+        {
+          "name": "Ігрові консолі",
+          "previewURL": "https://onlinestore-react-assets.s3.amazonaws.com/product-categories/consoles.png"
+        },
+        {
+          "name": "Ноутбуки",
+          "previewURL": "https://onlinestore-react-assets.s3.amazonaws.com/product-categories/laptops.png"
+        },
+        {
+          "name": "Персональні комп'ютери",
+          "previewURL": "https://onlinestore-react-assets.s3.amazonaws.com/product-categories/personal-computers.png"
+        },
+        {
+          "name": "Планшети",
+          "previewURL": "https://onlinestore-react-assets.s3.amazonaws.com/product-categories/tablets.png"
+        },
+        {
+          "name": "Смартфони",
+          "previewURL": "https://onlinestore-react-assets.s3.amazonaws.com/product-categories/smartphones.png"
+        },
+        {
+          "name": "HDD",
+          "previewURL": "https://onlinestore-react-assets.s3.amazonaws.com/product-categories/hdd.png"
+        },
+        {
+          "name": "SSD",
+          "previewURL": "https://onlinestore-react-assets.s3.amazonaws.com/product-categories/ssd.png"
+        },
+        {
+          "name": "Процесори",
+          "previewURL": "https://onlinestore-react-assets.s3.amazonaws.com/product-categories/processors.png"
+        },
+        {
+          "name": "Відеокарти",
+          "previewURL": "https://onlinestore-react-assets.s3.amazonaws.com/product-categories/gpus.png"
+        },
+        {
+          "name": "Оперативна пам'ять",
+          "previewURL": "https://onlinestore-react-assets.s3.amazonaws.com/product-categories/ram.png"
+        },
+        {
+          "name": "Монітори",
+          "previewURL": "https://onlinestore-react-assets.s3.amazonaws.com/product-categories/monitors.png"
+        }
       ]
     }
     ```
