@@ -25,9 +25,7 @@ async function getFeaturedProducts(
     context: ApolloServerContext,
     resolveInfo: GraphQLResolveInfo
 ): Promise<GetFeaturedProductsOutput> {
-    const requestedFields = graphqlFields(
-        resolveInfo
-    ) as PossibleGraphQLFields;
+    const requestedFields = graphqlFields(resolveInfo) as PossibleGraphQLFields;
 
     const shouldGetIsInTheCart: boolean = 'isInTheCart' in requestedFields;
 
@@ -77,7 +75,10 @@ async function getFeaturedProducts(
         );
     }
 
-    queryBuilder = queryBuilder.orderByRaw('RANDOM()').limit(12);
+    queryBuilder = queryBuilder
+        .orderByRaw('RANDOM()')
+        .where('quantity_in_stock', '>', 0)
+        .limit(12);
 
     const sqlQuery: string = formatSqlQuery(queryBuilder.toString());
     console.log(sqlQuery);
