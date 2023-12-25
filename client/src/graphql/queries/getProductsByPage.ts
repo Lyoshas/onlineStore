@@ -1,8 +1,8 @@
 import { gql } from '../../__generated__';
 
 export const GET_PRODUCTS_BY_PAGE_NO_AUTH = gql(`
-    query GetProductsByPageNoAuth($page: Int!) {
-        products(page: $page) {
+    query GetProductsByPageNoAuth($category: String!, $page: Int!) {
+        products(category: $category, page: $page) {
             productList {
                 id
                 title
@@ -20,8 +20,8 @@ export const GET_PRODUCTS_BY_PAGE_NO_AUTH = gql(`
 `);
 
 export const GET_PRODUCTS_BY_PAGE_WITH_AUTH = gql(`
-    query GetProductsByPageWithAuth($page: Int!) {
-        products(page: $page) {
+    query GetProductsByPageWithAuth($category: String!, $page: Int!) {
+        products(category: $category, page: $page) {
             productList {
                 id
                 title
