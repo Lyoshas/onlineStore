@@ -1,19 +1,20 @@
 import { GraphQLResolveInfo } from 'graphql';
-import { Knex } from 'knex';
 import graphqlFields from 'graphql-fields';
+import { Knex } from 'knex';
 
+import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
+import RequireAtLeastOneProperty from '../../interfaces/RequireAtLeastOneProperty.js';
 import DisplayProduct from '../../interfaces/DisplayProduct.js';
 import dbPool from '../../services/postgres.service.js';
-import { PageOutOfRangeError } from '../errors/PageOutOfRangeError.js';
-import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
-import knex from '../../services/knex.service.js';
-import getRelevantProductFields from '../helpers/getRelevantProductFields.js';
-import mapRequestedFieldsToProductInfo from '../helpers/mapRequestedFieldsToProductInfo.js';
-import RequireAtLeastOneProperty from '../../interfaces/RequireAtLeastOneProperty.js';
 import { IsInTheCartError } from '../errors/IsInTheCartError.js';
+import { PageOutOfRangeError } from '../errors/PageOutOfRangeError.js';
+import getRelevantProductFields from '../helpers/getRelevantProductFields.js';
+import knex from '../../services/knex.service.js';
 import formatSqlQuery from '../helpers/formatSqlQuery.js';
+import mapRequestedFieldsToProductInfo from '../helpers/mapRequestedFieldsToProductInfo.js';
+import checkProductCategory from '../validators/checkProductCategory.js';
 
-type GetProductsByPageOutput = RequireAtLeastOneProperty<{
+type GetProductsByCategoryAndPageOutput = RequireAtLeastOneProperty<{
     productList: Partial<DisplayProduct>[];
     totalPages: number;
 }>;
@@ -27,22 +28,31 @@ interface PossibleGraphQLFields {
     totalPages?: {};
 }
 
-async function getTotalPages(productsPerPage: number): Promise<number> {
+async function getTotalPages(
+    productsPerPage: number,
+    productCategory: string
+): Promise<number> {
     const { rows } = await dbPool.query<{ total_products: number }>(
-        'SELECT COUNT(id) AS total_products FROM products'
+        `
+            SELECT COUNT(*) AS total_products
+            FROM products AS p
+            INNER JOIN product_categories AS p_c ON p.category_id = p_c.id
+            WHERE p_c.category = $1
+        `,
+        [productCategory]
     );
     return Math.ceil(rows[0].total_products / productsPerPage);
 }
 
-async function getProductsByPage(
-    parent: any,
-    args: { page: number },
+async function getProductsByCategoryAndPage(
+    parent: unknown,
+    args: { category: string; page: number },
     context: ApolloServerContext,
     resolveInfo: GraphQLResolveInfo
-): Promise<GetProductsByPageOutput> {
-    const requestedFields = graphqlFields(
-        resolveInfo
-    ) as PossibleGraphQLFields;
+): Promise<GetProductsByCategoryAndPageOutput> {
+    await checkProductCategory(args.category);
+
+    const requestedFields = graphqlFields(resolveInfo) as PossibleGraphQLFields;
 
     const shouldGetIsInTheCart: boolean =
         !!requestedFields.productList &&
@@ -64,7 +74,7 @@ async function getProductsByPage(
     );
 
     const resultProductList: Exclude<
-        GetProductsByPageOutput['productList'],
+        GetProductsByCategoryAndPageOutput['productList'],
         undefined
     > = [];
 
@@ -89,14 +99,12 @@ async function getProductsByPage(
 
         let queryBuilder = knex.select(fieldsToFetch).from('products');
 
-        if ('category' in requestedFields.productList) {
-            queryBuilder = queryBuilder.innerJoin(
-                'product_categories',
-                'product_categories.id',
-                '=',
-                'products.category_id'
-            );
-        }
+        queryBuilder = queryBuilder.innerJoin(
+            'product_categories',
+            'product_categories.id',
+            '=',
+            'products.category_id'
+        );
 
         if (shouldGetIsInTheCart) {
             queryBuilder = queryBuilder.leftJoin(
@@ -110,6 +118,12 @@ async function getProductsByPage(
                 'relevant_cart_entries.product_id'
             );
         }
+
+        queryBuilder = queryBuilder.where(
+            'product_categories.category',
+            '=',
+            args.category
+        );
 
         queryBuilder = queryBuilder
             // PostgreSQL doesn't guarantee the order of rows when using JOINs, so we need to order them by product id
@@ -133,15 +147,18 @@ async function getProductsByPage(
         );
     }
 
-    const resultData: GetProductsByPageOutput = {
+    const resultData: GetProductsByCategoryAndPageOutput = {
         productList: resultProductList,
     };
 
     if ('totalPages' in requestedFields) {
-        resultData.totalPages = await getTotalPages(productsPerPage);
+        resultData.totalPages = await getTotalPages(
+            productsPerPage,
+            args.category
+        );
     }
 
     return resultData;
 }
 
-export default getProductsByPage;
+export default getProductsByCategoryAndPage;

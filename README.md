@@ -887,14 +887,15 @@ Some API endpoints require authentication using access tokens and refresh tokens
       ]
     }
     ```
-#### 2. Get a list of products by specifying a page
+#### 2. Get a list of products by specifying a category and a page
 - **Who can access:** everyone (but if you request the 'isInTheCart' field, you have to provide a valid access token)
 - **Required parameters:**
+  - _category_ - the category of the products you are trying to fetch. Must be a string and must be an existing product category
   - _page_ - the product page that you are trying to access. Must be a number.
 - **Example**:
   ```graphql
-  query Products($page: Int!) {
-    products(page: $page) {
+  query Products($category: String!, $page: Int!) {
+    products(category: $category, page: $page) {
       productList {
         id
         title
@@ -918,43 +919,40 @@ Some API endpoints require authentication using access tokens and refresh tokens
       "products": {
         "productList": [
           {
-            "id": 6,
-            "title": "Asus PCI-Ex GeForce RTX 2060 Dual EVO OC Edition 6GB GDDR6",
-            "price": 14799,
-            "category": "Graphics Cards",
-            "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/bebfb189-c1f5-4b53-a47b-9ba97081025f.png",
-            "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/b624d139-5ed5-4844-9d55-cb6c34e87e1d.png",
-            "shortDescription": "A super powerful RTX card!",
+            "id": 159,
+            "title": "Apple MacBook Pro 16\" M1 Pro 512GB 2021",
+            "price": 114970,
+            "category": "Ноутбуки",
+            "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/8bd44131-8cc9-4503-9d38-a784e90220f4.png",
+            "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/14f5c601-96a6-41f2-a22e-9922bb207376.png",
+            "shortDescription": "Екран 16.2\" Liquid Retina XDR (3456x2234) 120 Гц, глянсовий / Apple M1 Pro / RAM 16 ГБ / SSD 512 ГБ / Apple M1 Pro Graphics (16 ядер) / без ОД / Wi-Fi / Bluetooth / веб-камера / macOS Monterey / 2.1 кг / сірий",
             "isAvailable": true,
-            "isRunningOut": false,
-            "isInTheCart": true
+            "isRunningOut": false
           },
           {
-            "id": 9,
-            "title": "Комп'ютер ARTLINE Gaming ASUS Edition X43 (X43v33) Ryzen 5 3600/RAM 16ГБ/HDD 1ТБ + SSD 240ГБ/GeForce RTX 3050 8ГБ/Wi-Fi",
-            "price": 31499,
-            "category": "Personal Computers",
-            "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/c7d3bf2a-8a81-4201-81ed-f20cb7912ac8.png",
-            "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/6732c7f9-ea53-48e5-901d-4faf43612348.png",
-            "shortDescription": "A small description of the productTTTT",
+            "id": 160,
+            "title": "Ноутбук Acer Aspire 7 A715-42G-R5B1",
+            "price": 36999,
+            "category": "Ноутбуки",
+            "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/255a898a-49da-4df6-88bd-0cf13a44dd2d.png",
+            "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/0d51e340-f487-4f58-a25e-35f977eb6098.png",
+            "shortDescription": "Екран 15.6\" IPS (1920x1080) Full HD 144 Гц, матовий / AMD Ryzen 5 5500U (2.1 - 4.0 ГГц) / RAM 8 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050, 4 ГБ / без ОД / LAN / Wi-Fi / Bluetooth / веб-камера / без ОС / 2.15 кг / чорний",
             "isAvailable": true,
-            "isRunningOut": false,
-            "isInTheCart": false
+            "isRunningOut": true
           },
           {
-            "id": 4,
-            "title": "Western Digital Blue 1TB 7200rpm 64MB",
-            "price": 1529,
-            "category": "Laptops",
-            "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/9a62d620-5a6d-445f-94e1-d8f30730d923.png",
-            "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/33da72f1-77c0-4254-8eda-cfc83b484760.png",
-            "shortDescription": "A small description of the product",
+            "id": 161,
+            "title": "Ноутбук ASUS Laptop X515MA-BR874W Transparent Silver",
+            "price": 14999,
+            "category": "Ноутбуки",
+            "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/f9c0b15a-2f54-49c8-a407-007c4cc1c2cc.png",
+            "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/67c8dc18-3347-498c-a61a-028131b2cf69.png",
+            "shortDescription": "Екран 15.6\" (1366x768) WXGA HD, матовий / Intel Celeron N4020 (1.1 - 2.8 ГГц) / RAM 4 ГБ / SSD 256 ГБ / Intel UHD Graphics 600 / без ОД / Wi-Fi / Bluetooth / веб-камера / Windows 11 / 1.8 кг / сріблястий",
             "isAvailable": true,
-            "isRunningOut": false,
-            "isInTheCart": true
+            "isRunningOut": false
           }
         ],
-        "totalPages": 4
+        "totalPages": 2
       }
     }
   }
@@ -978,6 +976,17 @@ Some API endpoints require authentication using access tokens and refresh tokens
       "errors": [
         {
           "message": "User must be authenticated to request the \"isInTheCart\" field"
+        }
+      ]
+    }
+    ```
+  - The user specified a non-existent product category
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "The specified category does not exist"
         }
       ]
     }
