@@ -23,7 +23,9 @@ const TextBlock = () => {
                 clearInterval(timer);
                 // next word
                 setTypedWordIndex((prevIndex) => {
-                    return prevIndex === products.length - 1 ? 0 : prevIndex + 1
+                    return prevIndex === products.length - 1
+                        ? 0
+                        : prevIndex + 1;
                 });
                 return;
             }
@@ -46,13 +48,15 @@ const TextBlock = () => {
         <div className={classes['hero__text-block']}>
             <h1 className={classes['text-block__heading']}>
                 A wide range of{' '}
-                <span className={classes['text-block__typed']}>{typedText}</span>
+                <span className={classes['text-block__typed']}>
+                    {typedText}
+                </span>
                 <span className={classes['text-block__typed-cursor']}>|</span>
             </h1>
             <p className={classes['text-block__p']}>
                 From smartphones and laptops to cutting-edge gadgets and beyond.
             </p>
-            <ButtonLink to="#products-demo">Explore Products</ButtonLink>
+            <ButtonLink to="/products">Explore Products</ButtonLink>
         </div>
     );
 };
