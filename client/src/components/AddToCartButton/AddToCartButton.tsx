@@ -126,7 +126,7 @@ const AddToCartButton: FC<AddToCartButtonProps> = ({
                 isUpserting
                     ? function () {}
                     : // if the addition to the cart was successful OR the item was already in the cart, the user can only view existing cart items
-                    isUpsertSuccessful || props.isInTheCart
+                    props.isInTheCart
                     ? showCartItems
                     : // otherwise the user can add an item to the cart
                       handleAddToCart
