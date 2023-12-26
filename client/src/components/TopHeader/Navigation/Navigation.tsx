@@ -42,12 +42,16 @@ const NavigationLink: FC<NavigationLinkProps> = (props) => {
 const Navigation: FC<{ className?: string; onNavItemClick: () => void }> = (
     props
 ) => {
-    const isAdmin = useSelector((state: RootState) => state.auth.isAdmin);
+    const { isAuthenticated, isAdmin } = useSelector(
+        (state: RootState) => state.auth
+    );
 
     const linksInfo = [
         ['/', 'Home', getStaticAssetUrl('home-icon.svg')],
         ['/products', 'Products', getStaticAssetUrl('product-icon.svg')],
-        ['/orders', 'Orders', getStaticAssetUrl('order-icon.svg')],
+        isAuthenticated
+            ? ['/orders', 'Orders', getStaticAssetUrl('order-icon.svg')]
+            : null,
         isAdmin
             ? [
                   '/add-product',
