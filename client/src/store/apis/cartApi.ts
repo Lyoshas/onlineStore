@@ -61,7 +61,7 @@ export const cartApi = createApi({
 });
 
 export const {
-    useCountCartItemsQuery,
+    useLazyCountCartItemsQuery,
     useUpsertCartProductMutation,
     useGetCartQuery,
     useDeleteCartProductMutation,

@@ -3,8 +3,7 @@ import { FC, Fragment } from 'react';
 import classes from './HeaderButtons.module.css';
 import MyCartButton from '../MyCartButton/MyCartButton';
 import LogoutButton from '../LogoutButton/LogoutButton';
-import SigninButton from '../SigninButton/SigninButton';
-import SignupButton from '../SignupButton/SignupButton';
+import SignInOrSignUpButton from '../SignInOrSignUpButton/SignInOrSignUp';
 
 const HeaderButtons: FC<{ isAuth: boolean }> = ({ isAuth }) => {
     return (
@@ -16,8 +15,8 @@ const HeaderButtons: FC<{ isAuth: boolean }> = ({ isAuth }) => {
                 </Fragment>
             ) : (
                 <Fragment>
-                    <SigninButton />
-                    <SignupButton />
+                    <MyCartButton />
+                    <SignInOrSignUpButton />
                 </Fragment>
             )}
         </nav>

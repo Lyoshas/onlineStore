@@ -1,22 +1,30 @@
 import { Fragment, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import ActionButton from '../ActionButton/ActionButton';
 import getStaticAssetUrl from '../../../util/getStaticAssetUrl';
-import { useCountCartItemsQuery } from '../../../store/apis/cartApi';
+import { useLazyCountCartItemsQuery } from '../../../store/apis/cartApi';
 import useApiError from '../../hooks/useApiError';
 import classes from './MyCartButton.module.css';
 import { cartModalActions } from '../../../store/slices/cartModal';
+import { RootState } from '../../../store';
 
 const MyCartButton = () => {
-    const { isError, error, data, isSuccess, requestId } =
-        useCountCartItemsQuery();
+    const isAuthenticated = useSelector(
+        (state: RootState) => state.auth.isAuthenticated
+    );
+    const [countCartItems, { isError, error, data, isSuccess, requestId }] =
+        useLazyCountCartItemsQuery();
     useApiError(isError, error, []);
     const [highlightCart, setHighlightCart] = useState<boolean>(false);
     const [initialRequestId, setInitialRequestId] = useState<string | null>(
         null
     );
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (isAuthenticated) countCartItems();
+    }, [isAuthenticated]);
 
     useEffect(() => {
         if (!requestId || initialRequestId !== null) return;

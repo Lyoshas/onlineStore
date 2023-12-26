@@ -1,15 +1,15 @@
 import getStaticAssetUrl from '../../../util/getStaticAssetUrl';
 import ActionButton from '../ActionButton/ActionButton';
 
-const SigninButton = () => {
+const SignInOrSignUpButton = () => {
     return (
         <ActionButton
             to="/auth/sign-in"
-            content="Sign In"
+            content="Sign In / Sign Up"
             imageURL={getStaticAssetUrl('user-icon.svg')}
-            imageAlt="Sign in icon"
+            imageAlt="User icon"
         />
     );
 };
 
-export default SigninButton;
+export default SignInOrSignUpButton
