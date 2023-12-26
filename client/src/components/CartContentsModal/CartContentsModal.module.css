@@ -39,6 +39,11 @@
     margin-bottom: 0;
 }
 
+.cart-products__error-message-block {
+    margin: 20px 0;
+    text-align: center;
+}
+
 @media screen and (max-width: 390px) {
     .modal-actions-media-query {
         flex-direction: column-reverse;
