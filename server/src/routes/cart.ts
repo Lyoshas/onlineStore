@@ -1,5 +1,5 @@
 import express from 'express';
-import { body, param } from 'express-validator';
+import { body, param, query } from 'express-validator';
 import asyncHandler from 'express-async-handler';
 
 import * as cartController from '../controllers/cart.js';
@@ -78,6 +78,22 @@ router.delete(
     param('productId').isNumeric().withMessage('productId must be a number'),
     validateRequest,
     cartController.deleteProductFromCart
+);
+
+router.get(
+    '/cart/is-safe-to-add-product',
+    [
+        query('productId')
+            .isNumeric()
+            .withMessage('productId must be a number'),
+        query('quantityToAdd')
+            .isInt({ gt: 0 })
+            .withMessage(
+                'quantityToAdd must be an integer and greater than zero'
+            ),
+        validateRequest,
+    ],
+    cartController.isSafeToAddProductToCart
 );
 
 export default router;

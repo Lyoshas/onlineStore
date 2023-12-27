@@ -4,6 +4,7 @@ import DBProduct from '../interfaces/DBProduct.js';
 import knexInstance from '../services/knex.service.js';
 import dbPool from '../services/postgres.service.js';
 import { getUserCart as getRedisUserCart } from './cartRedis.js';
+import ProductNotFoundError from '../errors/ProductNotFoundError.js';
 
 export type PossibleProductFields = (keyof DBProduct)[];
 
@@ -26,7 +27,12 @@ export const getProduct = async <T extends PossibleProductFields>(
 
     const {
         rows: [productData],
+        rowCount
     } = await dbPool.query<Partial<DBProduct>>(sqlQuery);
+
+    if (rowCount === 0) {
+        throw new ProductNotFoundError();
+    }
 
     const result: AnyObject = {};
 

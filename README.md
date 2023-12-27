@@ -39,6 +39,7 @@
       - [2. Get the total number of items in the cart](#2-get-the-total-number-of-items-in-the-cart)
       - [3. Add an item to the cart or change its quantity in the cart](#3-add-an-item-to-the-cart-or-change-its-quantity-in-the-cart)
       - [4. Remove the specified product from the cart](#4-remove-the-specified-product-from-the-cart)
+      - [5. Check if it's safe to add a product to the local cart](#5-check-if-its-safe-to-add-a-product-to-the-local-cart)
 
 ## Prerequisites
 - Install Docker and Docker Compose
@@ -1859,6 +1860,80 @@ Some API endpoints require authentication using access tokens and refresh tokens
           {
             "message": "productId must be a number",
             "field": "productId"
+          }
+        ]
+      }
+      ```
+#### 5. Check if it's safe to add a product to the local cart
+- **URL:** /api/user/cart/is-safe-to-add-product
+- **Method:** GET
+- **Description:** checks whether the product is available in the specified quantity. Useful when anonymous users try to work with their cart locally with localStorage. For example, if they try to add 5 instances of some product, the React app can initiate a request to this endpoint to check whether there are enough products in stock and whether a user can order the specified number of products. If everything is okay, the specified product is added to localStorage, otherwise the operation is aborted.
+- **Who can access:** everyone
+- **Rate limiting:** 1 request per second per IP address
+- **Request body:** empty
+- **Request params:** none
+- **Query string parameters:**
+  - _productId_ - must be a number and must point to an existing product
+  - _quantityToAdd_ - specifies how many instances of one product the user is trying to add. Must be a positive number.
+- **Required cookies:** none
+- **Success responses:**
+  1. There are enough products in stock and the specified quantity doesn't exceed a predetermined limit
+      - **Example request:** /api/user/cart/is-safe-to-add-product?productId=155&quantityToAdd=2
+      - **Status code:** 200 OK
+      - **Description:** the user can add the specified product safely, because there are enough products in stock and the specified quantity doesn't exceed the 'max_order_quantity' attribute
+      - **Content**:
+        ```JSON
+        {
+          "safeToAdd": true,
+          "reason": null
+        }
+        ```
+  2. The user is trying to order more items than available in stock
+      - **Example request:** /api/user/cart/is-safe-to-add-product?productId=155&quantityToAdd=23524
+      - **Status code:** 200 OK
+      - **Description:** the server returns that it's not recommended to add the specified product to the local cart because there aren't enough products in stock
+      - **Content**:
+        ```JSON
+        {
+          "safeToAdd": false,
+          "reason": "InsufficentProductStock"
+        }
+        ```
+  3. The user is trying to add more products than allowed (for example one user can only order 2 copies of one product at a time)
+      - **Example request:** /api/user/cart/is-safe-to-add-product?productId=155&quantityToAdd=23524
+      - **Status code:** 200 OK
+      - **Description:** the server returns that it's not recommended to add the specified product to the local cart because there aren't enough products in stock
+      - **Content**:
+        ```JSON
+        {
+          "safeToAdd": false,
+          "reason": "ExceededMaxOrderQuantity",
+          "maxOrderQuantity": 2
+        }
+        ```
+- **Error responses**:
+  - The provided product id is not a number
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "productId must be a number",
+            "field": "productId"
+          }
+        ]
+      }
+      ```
+  - The provided quantityToAdd parameter is not a positive number or is not a number at all
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "quantityToAdd must be an integer and greater than zero",
+            "field": "quantityToAdd"
           }
         ]
       }
