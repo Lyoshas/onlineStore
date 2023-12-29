@@ -124,6 +124,13 @@ const CartProductQuantity: FC<{
         dispatch(errorActions.showNotificationError(errorMessageToDisplay));
     }, [upsertErrorResponse]);
 
+    useEffect(() => {
+        // whenever the user changes the cart product quantity, hide any errors that were previously shown
+        // HOWEVER, if currentProductQuantity === lastValidQuantity, then don't hide any errors
+        if (currentProductQuantity === lastValidQuantity) return;
+        dispatch(errorActions.hideNotificationError());
+    }, [currentProductQuantity, currentProductQuantity, lastValidQuantity]);
+
     return (
         <QuantitySelector
             currentValue={currentProductQuantity}
