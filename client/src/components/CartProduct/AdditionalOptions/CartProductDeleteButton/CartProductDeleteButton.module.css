@@ -1,0 +1,13 @@
+.cart-product__delete-from-cart-btn {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.delete-from-cart-btn__img {
+    width: 30px;
+    filter: invert(100%);
+    margin-right: 5px;
+}

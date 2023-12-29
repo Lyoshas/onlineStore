@@ -1,5 +1,6 @@
 import { FC, Fragment, useEffect, useState } from 'react';
 import classNames from 'classnames';
+import { useSelector } from 'react-redux';
 
 import Modal from '../UI/Modal/Modal';
 import ButtonLink from '../UI/ButtonLink/ButtonLink';
@@ -10,6 +11,7 @@ import CartProduct from '../CartProduct/CartProduct';
 import CartLoadingOverlay from './CartLoadingOverlay/CartLoadingOverlay';
 import Image from '../TopHeader/Image/Image';
 import ErrorIcon from '../UI/Icons/ErrorIcon';
+import { RootState } from '../../store';
 
 interface CartContentsModalProps {
     onClose: () => void;
@@ -28,8 +30,9 @@ const CartContentsModal: FC<CartContentsModalProps> = (props) => {
     const [initialGetCartRequestId, setInitialGetCartRequestId] = useState<
         string | null
     >(null);
-    const [isCartBeingChanged, setIsCartBeingChanged] =
-        useState<boolean>(false);
+    const isCartBeingChangedByAPI = useSelector(
+        (state: RootState) => state.cartModal.isCartBeingChangedByAPI
+    );
 
     useEffect(() => {
         // if no requests have been made, don't do anything
@@ -41,10 +44,6 @@ const CartContentsModal: FC<CartContentsModalProps> = (props) => {
                 : previousGetCartRequestId;
         });
     }, [currentGetCartRequestId]);
-
-    const handleCartLoadingChange = (isLoading: boolean) => {
-        setIsCartBeingChanged(isLoading);
-    };
 
     return (
         <Modal
@@ -68,8 +67,8 @@ const CartContentsModal: FC<CartContentsModalProps> = (props) => {
                                     classes['no-cart-products']
                             )}
                         >
-                            {/* if the user is trying to add a product to the cart OR if the user is trying to fetch the cart and this is NOT the first time fetching the cart, then display <CartLoadingOverlay />*/}
-                            {(isCartBeingChanged ||
+                            {/* if the user is trying to add a product to the cart OR delete a product from the cart OR if the user is trying to fetch the cart and this is NOT the first time fetching the cart, then display <CartLoadingOverlay />*/}
+                            {(isCartBeingChangedByAPI ||
                                 (isFetchingCart &&
                                     initialGetCartRequestId &&
                                     currentGetCartRequestId !==
@@ -121,10 +120,6 @@ const CartContentsModal: FC<CartContentsModalProps> = (props) => {
                                                     }
                                                     productId={
                                                         cartProduct.productId
-                                                    }
-                                                    // onCartLoadingChange will be called by the child component if a user tries to change the quantity of an item in the cart or completely delete it from the cart
-                                                    onCartLoadingChange={
-                                                        handleCartLoadingChange
                                                     }
                                                     key={i}
                                                 />

@@ -1,34 +1,31 @@
 import { FC, useEffect, useState } from 'react';
 
 import classes from './AdditionalOptions.module.css';
-import Button from '../../UI/Button/Button';
+import CartProductDeleteButton from './CartProductDeleteButton/CartProductDeleteButton';
 
 interface AdditionalOptionsProps {
-    onDeleteProductFromCart: () => void;
+    productId: number;
 }
 
 const AdditionalOptions: FC<AdditionalOptionsProps> = (props) => {
-    const [showDeleteButton, setShowDeleteButton] = useState<boolean>(false);
+    const [showAdditionalOptions, setShowAdditionalOptions] =
+        useState<boolean>(false);
 
     useEffect(() => {
-        if (!showDeleteButton) return;
+        if (!showAdditionalOptions) return;
 
         document.body.addEventListener(
             'click',
-            () => setShowDeleteButton(false),
+            () => setShowAdditionalOptions(false),
             { once: true }
         );
-    }, [showDeleteButton]);
+    }, [showAdditionalOptions]);
 
     const handleImgClick = (
         event: React.MouseEvent<HTMLImageElement, MouseEvent>
     ) => {
         event.stopPropagation();
-        setShowDeleteButton(true);
-    };
-
-    const handleCartProductDelete = () => {
-        props.onDeleteProductFromCart();
+        setShowAdditionalOptions(true);
     };
 
     return (
@@ -41,20 +38,8 @@ const AdditionalOptions: FC<AdditionalOptionsProps> = (props) => {
                 alt="Additional options"
                 onClick={handleImgClick}
             />
-            {showDeleteButton && (
-                <Button
-                    className={classes['cart-product__delete-from-cart-btn']}
-                    onClick={handleCartProductDelete}
-                >
-                    <img
-                        className={classes['delete-from-cart-btn__img']}
-                        src={
-                            'https://onlinestore-react-assets.s3.eu-north-1.amazonaws.com/delete-icon.svg'
-                        }
-                        alt="Delete icon"
-                    />
-                    Delete
-                </Button>
+            {showAdditionalOptions && (
+                <CartProductDeleteButton productId={props.productId} />
             )}
         </div>
     );

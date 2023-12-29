@@ -1,11 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { PayloadAction } from '@reduxjs/toolkit';
 
 interface CartModalState {
     isCartModalShown: boolean;
+    // 'isCartBeingChangedByAPI' will be used to specify whether ANY request to the API is loading from the cart modal window
+    isCartBeingChangedByAPI: boolean;
 }
 
 const initialState: CartModalState = {
     isCartModalShown: false,
+    isCartBeingChangedByAPI: false,
 };
 
 // this slice will be used to display the <CartContentsModal /> component
@@ -20,6 +24,9 @@ const cartModalSlice = createSlice({
         },
         hideCartModal(state) {
             state.isCartModalShown = false;
+        },
+        setIsApiRequestLoading(state, action: PayloadAction<boolean>) {
+            state.isCartBeingChangedByAPI = action.payload;
         },
     },
 });
