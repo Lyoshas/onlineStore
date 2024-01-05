@@ -2,12 +2,14 @@ import { FC, useEffect, useState } from 'react';
 
 import classes from './AdditionalOptions.module.css';
 import CartProductDeleteButton from './CartProductDeleteButton/CartProductDeleteButton';
+import useCartProductDelete from './hooks/useCartProductDelete';
 
 interface AdditionalOptionsProps {
     productId: number;
 }
 
 const AdditionalOptions: FC<AdditionalOptionsProps> = (props) => {
+    const { deleteCartProduct } = useCartProductDelete(props.productId);
     const [showAdditionalOptions, setShowAdditionalOptions] =
         useState<boolean>(false);
 
@@ -39,7 +41,9 @@ const AdditionalOptions: FC<AdditionalOptionsProps> = (props) => {
                 onClick={handleImgClick}
             />
             {showAdditionalOptions && (
-                <CartProductDeleteButton productId={props.productId} />
+                <CartProductDeleteButton
+                    onCartProductDelete={() => deleteCartProduct()}
+                />
             )}
         </div>
     );

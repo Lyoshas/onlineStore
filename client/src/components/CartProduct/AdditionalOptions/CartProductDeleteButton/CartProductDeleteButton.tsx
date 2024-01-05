@@ -1,67 +1,13 @@
-import { FC, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { FC } from 'react';
 
-import { useDeleteCartProductMutation } from '../../../../store/apis/cartApi';
 import Button from '../../../UI/Button/Button';
 import classes from './CartProductDeleteButton.module.css';
-import useApiError from '../../../hooks/useApiError';
-import { cartModalActions } from '../../../../store/slices/cartModal';
-import { errorActions } from '../../../../store/slices/error';
-import apolloClient from '../../../../graphql/client';
 
-const CartProductDeleteButton: FC<{ productId: number }> = (props) => {
-    const dispatch = useDispatch();
-    const [
-        deleteCartProduct,
-        {
-            isError: isDeleteCartProductError,
-            error: deleteCartProductError,
-            isLoading: isDeleteCartProductLoading,
-            isSuccess: isDeleteCartProductSuccess,
-            isUninitialized: isDeleteCartProductUninitialized,
-        },
-    ] = useDeleteCartProductMutation({
-        // setting "fixedCacheKey" prevents a bug where multiple cached products get affected when only one should be affected
-        fixedCacheKey: `delete-cart-product-${props.productId}`,
-    });
-
-    const deleteErrorResponse = useApiError(
-        isDeleteCartProductError,
-        deleteCartProductError,
-        []
-    );
-
-    useEffect(() => {
-        dispatch(
-            cartModalActions.setIsApiRequestLoading(isDeleteCartProductLoading)
-        );
-    }, [isDeleteCartProductLoading]);
-
-    useEffect(() => {
-        if (deleteErrorResponse === null) return;
-
-        dispatch(
-            errorActions.showNotificationError(
-                'Something went wrong while deleting the product from the cart'
-            )
-        );
-    }, [deleteErrorResponse]);
-
-    useEffect(() => {
-        if (!isDeleteCartProductSuccess) return;
-        // modifying the GraphQL cache associated with the deleted cart product
-        apolloClient.cache.modify({
-            id: `Product:${props.productId}`,
-            fields: {
-                isInTheCart() {
-                    return false;
-                },
-            },
-        });
-    }, [isDeleteCartProductSuccess, props.productId]);
-
+const CartProductDeleteButton: FC<{ onCartProductDelete: () => void }> = (
+    props
+) => {
     const handleCartProductDelete = () => {
-        deleteCartProduct({ productId: props.productId });
+        props.onCartProductDelete();
     };
 
     return (
