@@ -34,12 +34,12 @@ export const getCartItemCount: RequestHandler<
     });
 };
 
-export const addProductToCart: RequestHandler<
+export const upsertProductToCart: RequestHandler<
     {},
     {},
     { productId: number; quantity: number } // req.body
 > = asyncHandler(async (req, res, next) => {
-    await cartModel.addProductToCart(
+    await cartModel.upsertProductToCart(
         (req.user as VerifiedUserInfo).id,
         req.body.productId,
         req.body.quantity

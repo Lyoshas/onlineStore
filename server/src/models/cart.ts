@@ -45,17 +45,17 @@ export const getCartTotalPrice = (cartContent: CartEntry[]): number => {
     );
 };
 
-export const addProductToCart = async (
+export const upsertProductToCart = async (
     userId: number,
     productId: number,
     quantity: number
 ): Promise<void> => {
-    await postgresCartModel.addProductToCart(userId, productId, quantity);
+    await postgresCartModel.upsertProductToCart(userId, productId, quantity);
 
     try {
         // if the cart cache is empty, this function won't do anything
         // because fetching the cart from Postgres and then adding a product to it would take too long
-        await redisCartModel.addProductToCart(userId, productId, quantity);
+        await redisCartModel.upsertProductToCart(userId, productId, quantity);
     } catch (error) {
         console.error('Error adding a product to the cart in Redis', error);
     }

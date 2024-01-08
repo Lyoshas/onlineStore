@@ -46,7 +46,7 @@ export const countCartItems = async (
     return cart.reduce((acc, cartItem) => acc + cartItem.quantity, 0);
 };
 
-export const addProductToCart = async (
+export const upsertProductToCart = async (
     userId: number,
     productId: number,
     quantity: number

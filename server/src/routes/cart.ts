@@ -69,7 +69,7 @@ router.put(
             next();
         }),
     ],
-    cartController.addProductToCart
+    cartController.upsertProductToCart
 );
 
 router.delete(

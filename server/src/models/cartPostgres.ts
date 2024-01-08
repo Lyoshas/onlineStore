@@ -41,7 +41,7 @@ export const countCartItems = async (userId: number): Promise<number> => {
     return +total_quantity;
 };
 
-export const addProductToCart = async (
+export const upsertProductToCart = async (
     userId: number,
     productId: number,
     quantity: number
@@ -49,10 +49,10 @@ export const addProductToCart = async (
     const existingCartEntry = await dbPool
         .query(
             `
-        SELECT EXISTS(
-            SELECT 1 FROM carts WHERE user_id = $1 AND product_id = $2 
-        )
-        `,
+                SELECT EXISTS(
+                    SELECT 1 FROM carts WHERE user_id = $1 AND product_id = $2
+                )
+            `,
             [userId, productId]
         )
         .then(({ rows }) => rows[0].exists);
@@ -62,8 +62,8 @@ export const addProductToCart = async (
         console.log('this entry does not exist');
         return dbPool.query(
             `
-            INSERT INTO carts (user_id, product_id, quantity)
-            VALUES ($1, $2, $3)
+                INSERT INTO carts (user_id, product_id, quantity)
+                VALUES ($1, $2, $3)
             `,
             [userId, productId, quantity]
         );
