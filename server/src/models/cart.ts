@@ -23,19 +23,35 @@ export const getUserCart = async (userId: number): Promise<CartEntry[]> => {
     return postgresCart;
 };
 
-// this function will first try to count cart items that are stored in Redis
+// This function counts how many products are in the cart
+// it will first try to count cart items that are stored in Redis
 // if it fails, the function will fall back to using PostgreSQL
-export const countCartItems = async (userId: number): Promise<number> => {
+export const countCartItems = async (
+    userId: number,
+    // 'includeDuplicates' specifies whether the function should take duplicate
+    // products into account or not
+    // for example: [{ productId: 1, quantity: 5 }, { productId: 2, quantity: 15 }]
+    // "includeDuplicates = true" => 20 products in the cart (incl. duplicates)
+    // "includeDuplicates = false" => 2 products in the cart (excl. duplicates)
+    includeDuplicates: boolean
+): Promise<number> => {
     try {
-        const cartItemsCountRedis = await redisCartModel.countCartItems(userId);
+        const cartItemsCountRedis = await redisCartModel.countCartItems(
+            userId,
+            includeDuplicates
+        );
 
         if (cartItemsCountRedis !== null) return cartItemsCountRedis;
     } catch (error) {
         console.error('Error counting cart items in Redis:', error);
     }
 
-    return postgresCartModel.countCartItems(userId);
+    return postgresCartModel.countCartItems(userId, includeDuplicates);
 };
+
+// this function counts how many products are in the cart (excl. duplicates)
+// it will first try to count cart items that are stored in Redis
+// if it fails, the function will fall back to using PostgreSQL
 
 export const getCartTotalPrice = (cartContent: CartEntry[]): number => {
     return cartContent.reduce(
@@ -104,4 +120,16 @@ export const isProductInTheCart = async (
 
     // if the Redis server fails, fall back to Postgres
     return postgresCartModel.isProductInTheCart(userId, productId);
+};
+
+// returns the IDs of unique products in the cart
+export const getCartProductIDs = async (userId: number): Promise<number[]> => {
+    try {
+        const redisCart = await redisCartModel.getUserCart(userId);
+        if (redisCart === null) throw new Error('No cart products in Redis');
+        return redisCart.map((cartProduct) => cartProduct.productId);
+    } catch (e) {
+        console.error(e);
+        return postgresCartModel.getCartProductIDs(userId);
+    }
 };

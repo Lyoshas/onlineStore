@@ -37,12 +37,14 @@ export const cacheUserCart = async (
 
 // null means the cart isn't cached
 export const countCartItems = async (
-    userId: number
+    userId: number,
+    includeDuplicates: boolean
 ): Promise<number | null> => {
     const cart = await getUserCart(userId);
 
     if (cart === null) return null;
 
+    if (!includeDuplicates) return cart.length;
     return cart.reduce((acc, cartItem) => acc + cartItem.quantity, 0);
 };
 

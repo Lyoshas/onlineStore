@@ -1796,7 +1796,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
         ]
       }
       ```
-  - You are trying to add more products to the cart than allowed
+  - The user is trying to add more instances of the same product than allowed. In other words, the user is trying to exceed the 'maxOrderQuantity' parameter, which is specified on every product.
     - **Status code**: 409 Conflict
     - **Content**:
       ```JSON
@@ -1805,6 +1805,19 @@ Some API endpoints require authentication using access tokens and refresh tokens
           {
             "message": "more products are added to the cart than allowed",
             "maximumAllowedProducts": 1
+          }
+        ]
+      }
+      ```
+  - The user is trying to add more products to the cart than allowed. There is a limit on how many unique products a user can add to their cart. This error will be shown if a user tries to exceed this predefined value.
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "the maximum limit of cart products has been exceeded",
+            "maxProductsInCart": 5
           }
         ]
       }

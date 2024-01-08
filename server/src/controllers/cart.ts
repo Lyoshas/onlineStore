@@ -5,6 +5,7 @@ import VerifiedUserInfo from '../interfaces/VerifiedUserInfo.js';
 import * as cartModel from '../models/cart.js';
 import CartEntry from '../interfaces/CartEntry.js';
 import { getProduct } from '../models/product.js';
+import TooManyProductsInCartError from '../errors/TooManyProductsInCartError.js';
 
 // if the user made it to any of these middlewares,
 // it means he/she is authenticated, so req.user is prepopulated
@@ -29,7 +30,8 @@ export const getCartItemCount: RequestHandler<
 > = async (req, res, next) => {
     res.json({
         cartItemCount: await cartModel.countCartItems(
-            (req.user as VerifiedUserInfo).id
+            (req.user as VerifiedUserInfo).id,
+            true
         ),
     });
 };
@@ -39,6 +41,17 @@ export const upsertProductToCart: RequestHandler<
     {},
     { productId: number; quantity: number } // req.body
 > = asyncHandler(async (req, res, next) => {
+    const userId = req.user!.id;
+    const uniqueCartProductIDs = await cartModel.getCartProductIDs(userId);
+
+    // if the user is trying to add a new product to the cart AND the user is trying to exceed the maximum limit of cart products
+    if (
+        !uniqueCartProductIDs.includes(req.body.productId) &&
+        uniqueCartProductIDs.length >= +process.env.MAX_PRODUCTS_IN_CART!
+    ) {
+        throw new TooManyProductsInCartError();
+    }
+
     await cartModel.upsertProductToCart(
         (req.user as VerifiedUserInfo).id,
         req.body.productId,

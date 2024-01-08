@@ -26,17 +26,32 @@ export const getUserCart = async (userId: number): Promise<CartEntry[]> => {
     });
 };
 
-export const countCartItems = async (userId: number): Promise<number> => {
-    const {
-        rows: [{ total_quantity }],
-    } = await dbPool.query<{ total_quantity: number }>(
-        `
+export const countCartItems = async (
+    userId: number,
+    // the 'includeDuplicates' parameter decides whether to count duplicate
+    // products in the cart. If set to true, duplicates are included; if set
+    // to false, only unique products are counted.
+    includeDuplicates: boolean
+): Promise<number> => {
+    let sqlQuery: string;
+
+    if (includeDuplicates) {
+        sqlQuery = `
             SELECT
                 SUM(quantity)::INTEGER as total_quantity
             FROM carts WHERE user_id = $1
-        `,
-        [userId]
-    );
+        `;
+    } else {
+        sqlQuery = `
+            SELECT
+                COUNT(user_id) as total_quantity
+            FROM carts WHERE user_id = $1
+        `;
+    }
+
+    const {
+        rows: [{ total_quantity }],
+    } = await dbPool.query<{ total_quantity: number }>(sqlQuery, [userId]);
 
     return +total_quantity;
 };
@@ -117,4 +132,13 @@ export const isProductInTheCart = async (
     );
 
     return rowCount > 0;
+};
+
+// returns the IDs of unique products in the cart
+export const getCartProductIDs = async (userId: number): Promise<number[]> => {
+    const { rows } = await dbPool.query<{ productId: number }>(
+        'SELECT product_id FROM carts WHERE user_id = $1',
+        [userId]
+    );
+    return rows.map((entry) => entry.productId);
 };

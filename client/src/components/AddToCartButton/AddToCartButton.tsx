@@ -9,17 +9,9 @@ import ButtonLink from '../UI/ButtonLink/ButtonLink';
 import { useUpsertCartProductMutation } from '../../store/apis/cartApi';
 import useApiError from '../hooks/useApiError';
 import { errorActions } from '../../store/slices/error';
-import ServerErrorResponse from '../../interfaces/ServerErrorResponse';
 import Loading from '../UI/Loading/Loading';
 import apolloClient from '../../graphql/client';
 import { cartModalActions } from '../../store/slices/cartModal';
-
-function includesError(
-    errorMessage: string,
-    allErrors: ServerErrorResponse
-): boolean {
-    return allErrors.errors.some((error) => error.message === errorMessage);
-}
 
 interface AddToCartButtonProps {
     productId: number;
@@ -72,19 +64,31 @@ const AddToCartButton: FC<AddToCartButtonProps> = ({
 
         let errorMessage =
             'Something went wrong while adding the product to the cart';
+
         const insufficientStockMessage =
             'insufficient stock available for this product';
+        const cartLimitExceeded =
+            'the maximum limit of cart products has been exceeded';
+        const apiError = serverErrorResponse.errors[0];
 
-        if (includesError(insufficientStockMessage, serverErrorResponse)) {
-            errorMessage =
-                insufficientStockMessage[0].toUpperCase() +
-                insufficientStockMessage.slice(1);
+        switch (apiError.message) {
+            case insufficientStockMessage:
+                errorMessage =
+                    insufficientStockMessage[0].toUpperCase() +
+                    insufficientStockMessage.slice(1);
+                break;
+            case cartLimitExceeded:
+                errorMessage = `You can only add up to ${
+                    (apiError as any).maxProductsInCart
+                } products to the cart`;
+                break;
         }
 
         dispatch(errorActions.showNotificationError(errorMessage));
     }, [upsertErrorResponse]);
 
     const handleAddToCart = () => {
+        dispatch(errorActions.hideNotificationError());
         upsertCartProduct({ productId: props.productId, quantity: 1 });
     };
 

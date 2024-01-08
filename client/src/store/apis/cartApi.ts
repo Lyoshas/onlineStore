@@ -34,7 +34,11 @@ export const cartApi = createApi({
                 };
             },
             // refetch countCartItems whenever this endpoint is executed
-            invalidatesTags: ['CartItemCount', 'GetCart'],
+            invalidatesTags: (result, error, arg) => {
+                // if an error occurred, don't invalidate anything
+                if (error) return [];
+                return ['CartItemCount', 'GetCart'];
+            }
         }),
         getCart: builder.query<
             { products: CartProduct[]; totalPrice: number },
