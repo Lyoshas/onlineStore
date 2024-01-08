@@ -116,3 +116,18 @@ export function cleanCart(userId: unknown): unknown {
 
     return redis.del(...delKeys);
 }
+
+export const isProductInTheCart = async (
+    userId: number,
+    productId: number
+): Promise<boolean> => {
+    const cart = await getUserCart(userId);
+
+    if (cart) {
+        for (let cartEntry of cart) {
+            if (cartEntry.productId === productId) return true;
+        }
+    }
+
+    return false;
+};

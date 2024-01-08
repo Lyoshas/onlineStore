@@ -97,7 +97,7 @@ export const cleanCart = (userId: number, dbClient?: PoolClient) => {
 // for example, if 2 users with id 5 and 15 had a product with id 20 in their carts,
 // getUsersWithProductInCart(20) would return [5, 15]
 export const getUsersWithProductInCart = async (
-    productId: number,
+    productId: number
 ): Promise<number[]> => {
     const { rows } = await dbPool.query<{ user_id: number }>(
         'SELECT DISTINCT(user_id) FROM carts WHERE product_id = $1',
@@ -105,4 +105,16 @@ export const getUsersWithProductInCart = async (
     );
 
     return rows.map((row) => row.user_id);
+};
+
+export const isProductInTheCart = async (
+    userId: number,
+    productId: number
+): Promise<boolean> => {
+    const { rowCount } = await dbPool.query(
+        'SELECT 1 FROM carts WHERE user_id = $1 AND product_id = $2',
+        [userId, productId]
+    );
+
+    return rowCount > 0;
 };

@@ -88,3 +88,20 @@ export const cleanCart = async (
         console.error('Error cleaning the cart in Redis', error);
     }
 };
+
+// this function should only be used if you want to check one product
+// if there is more than 1 product, other strategies should be used
+// otherwise PostgreSQL can potentially be overwhelmed with requests
+export const isProductInTheCart = async (
+    userId: number,
+    productId: number
+): Promise<boolean> => {
+    try {
+        return redisCartModel.isProductInTheCart(userId, productId);
+    } catch (e) {
+        console.error(e);
+    }
+
+    // if the Redis server fails, fall back to Postgres
+    return postgresCartModel.isProductInTheCart(userId, productId);
+};
