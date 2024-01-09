@@ -106,26 +106,22 @@ const CartContentsModal: FC<CartContentsModalProps> = (props) => {
                                             </p>
                                         </Fragment>
                                     )}
-                                    {cartData!.products.map(
-                                        (cartProduct, i) => {
-                                            return (
-                                                <CartProduct
-                                                    title={cartProduct.title}
-                                                    price={cartProduct.price}
-                                                    initialImageUrl={
-                                                        cartProduct.initialImageUrl
-                                                    }
-                                                    quantity={
-                                                        cartProduct.quantity
-                                                    }
-                                                    productId={
-                                                        cartProduct.productId
-                                                    }
-                                                    key={i}
-                                                />
-                                            );
-                                        }
-                                    )}
+                                    {cartData!.products.map((cartProduct) => {
+                                        return (
+                                            <CartProduct
+                                                title={cartProduct.title}
+                                                price={cartProduct.price}
+                                                initialImageUrl={
+                                                    cartProduct.initialImageUrl
+                                                }
+                                                quantity={cartProduct.quantity}
+                                                productId={
+                                                    cartProduct.productId
+                                                }
+                                                key={cartProduct.productId}
+                                            />
+                                        );
+                                    })}
                                 </Fragment>
                             )}
                         </div>
