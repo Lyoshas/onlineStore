@@ -40,6 +40,7 @@
       - [3. Add an item to the cart or change its quantity in the cart](#3-add-an-item-to-the-cart-or-change-its-quantity-in-the-cart)
       - [4. Remove the specified product from the cart](#4-remove-the-specified-product-from-the-cart)
       - [5. Check if it's safe to add a product to the local cart](#5-check-if-its-safe-to-add-a-product-to-the-local-cart)
+      - [6. Synchronize the local cart with the API](#6-synchronize-the-local-cart-with-the-api)
 
 ## Prerequisites
 - Install Docker and Docker Compose
@@ -1947,6 +1948,105 @@ Some API endpoints require authentication using access tokens and refresh tokens
           {
             "message": "quantityToAdd must be an integer and greater than zero",
             "field": "quantityToAdd"
+          }
+        ]
+      }
+      ```
+#### 6. Synchronize the local cart with the API
+- **URL:** /api/user/cart/is-safe-to-add-product
+- **Method:** PUT
+- **Description:** allows users to persist their local cart (stored in localStorage) to the API. Anonymous users cannot add cart products via API requests, so they need to store them in localStorage. If a user authenticates, they can send a request to this endpoint, specifying their local cart data, which will then be saved in the database. However, it's important to note that the API will only add products that do not exceed their quantityInStock and maxOrderQuantity attributes. Any other products will be ignored. Additionally, there is a limitation: each user can only add a predetermined number of products. This limit is determined by the API's environment variable process.env.MAX_PRODUCTS_IN_CART. If a user tries to exceed this environment variable, an error will be returned, and the entire request will have no effect.
+- **Who can access:** only authenticated users with the provided [access token](#access-token)
+- **Rate limiting:** 1 request per 5 seconds per IP address
+- **Request body (the whole body must be an array):**
+  ```TypeScript
+  {
+    productId: number;
+    quantity: number;
+  }[]
+  ```
+  - _productId_ - must be an integer that is greater than zero
+  - _quantity_ - must be an integer that is greater than zero
+- **Request params:** none
+- **Query string parameters:** none
+- **Required cookies:** none
+- **Success response:**
+  - **Status code:** 204 No Content
+  - **Description**: the server understood the request and took action, either adding the specified products or not. This endpoint intentionally avoids providing clear responses to prevent users from attempting to discern inventory levels and potential limitations by sending large batches of products. The primary use of this endpoint is intended for the React app to operate seamlessly in the background, synchronizing local cart data with the API after user authentication. End-users will remain unaware of this endpoint.
+  - **Content**: empty
+- **Error responses**:
+  - The access token is not specified or is invalid
+    - **Status code**: 401 Unauthorized
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "The access token is either invalid or is not provided",
+          }
+        ]
+      }
+      ```
+  - The access token has expired
+    - **Status code**: 401 Unauthorized
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "The access token has expired",
+          }
+        ]
+      }
+      ```
+  - The request body is not an array
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "request body must be an array",
+            "field": ""
+          }
+        ]
+      }
+      ```
+  - At least one "productId" parameter wasn't provided or it's not a number that is greater than zero
+    - **Status code**: 422 Unprocessable Entity
+    - **Content (example)**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "each productId must be an integer that is greater than zero",
+            "field": "[0].productId"
+          }
+        ]
+      }
+      ```
+  - At least one "quantity" parameter wasn't provided or it's not a number that is greater than zero
+    - **Status code**: 422 Unprocessable Entity
+    - **Content (example)**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "each quantity must be an integer that is greater than zero",
+            "field": "[0].quantity"
+          }
+        ]
+      }
+      ```
+  - The user is trying to add multiple products with the same productId
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "request body must not contain duplicate product IDs",
+            "field": ""
           }
         ]
       }

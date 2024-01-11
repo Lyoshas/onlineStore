@@ -11,7 +11,7 @@ import knex from '../../services/knex.service.js';
 import mapRequestedFieldsToProductInfo from '../helpers/mapRequestedFieldsToProductInfo.js';
 import { IsInTheCartError } from '../errors/IsInTheCartError.js';
 import ProductNotFoundError from '../errors/ProductNotFoundError.js';
-import formatSqlQuery from '../helpers/formatSqlQuery.js';
+import formatSqlQuery from '../../util/formatSqlQuery.js';
 
 type GetProductOutput = Partial<DisplayProduct>;
 

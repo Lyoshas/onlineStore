@@ -1,7 +1,8 @@
 import CartEntry from '../interfaces/CartEntry.js';
+import CartProductSummary from '../interfaces/CartProductSummary.js';
 import redis from '../services/redis.service.js';
 import camelCaseObject from '../util/camelCaseObject.js';
-import { getProduct } from './product.js';
+import * as productModel from './product.js';
 
 // user carts are stored in Redis using this format:
 // cart.userId.ID where ID is the user id
@@ -71,7 +72,7 @@ export const upsertProductToCart = async (
         cart.push({
             productId,
             ...camelCaseObject(
-                await getProduct(productId, [
+                await productModel.getProduct(productId, [
                     'title',
                     'price',
                     'initial_image_url',
@@ -80,6 +81,36 @@ export const upsertProductToCart = async (
             quantity,
         });
     }
+
+    await cacheUserCart(userId, cart);
+};
+
+// inserts lots of products into the cart of the provided user
+// this function assumes that it needs to perform an insert, NOT an update
+export const bulkInsert = async (
+    userId: number,
+    cartProductsSummary: CartProductSummary[]
+) => {
+    let cart = await getUserCart(userId);
+
+    // if the cart isn't cached, do nothing
+    if (cart === null) return;
+
+    // we need to fetch 'title', 'price' and 'initialImageUrl' for the provided products
+    const productIDs: number[] = cartProductsSummary.map(
+        (cartProduct) => cartProduct.productId
+    );
+    const missingProductData = await productModel.getMissingCartProductInfo(
+        productIDs
+    );
+
+    cartProductsSummary.forEach((cartProduct) => {
+        cart!.push({
+            productId: cartProduct.productId,
+            quantity: cartProduct.quantityInCart,
+            ...missingProductData[cartProduct.productId]!,
+        });
+    });
 
     await cacheUserCart(userId, cart);
 };

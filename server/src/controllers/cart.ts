@@ -3,9 +3,12 @@ import asyncHandler from 'express-async-handler';
 
 import VerifiedUserInfo from '../interfaces/VerifiedUserInfo.js';
 import * as cartModel from '../models/cart.js';
+import * as cartPostgres from '../models/cartPostgres.js';
+import * as productModel from '../models/product.js';
 import CartEntry from '../interfaces/CartEntry.js';
 import { getProduct } from '../models/product.js';
 import TooManyProductsInCartError from '../errors/TooManyProductsInCartError.js';
+import arrayDifference from '../util/arrayDifference.js';
 
 // if the user made it to any of these middlewares,
 // it means he/she is authenticated, so req.user is prepopulated
@@ -110,4 +113,86 @@ export const isSafeToAddProductToCart: RequestHandler<
     } else {
         res.json({ safeToAdd: true, reason: null });
     }
+});
+
+// this controller method allows users to send their local cart (localStorage) and persist it in the DB
+// if a user already has some cart products in the DB, only new products will be added there
+export const synchronizeLocalCartWithAPI: RequestHandler<
+    unknown,
+    void,
+    // req.body: [{ productId1: quantityInStock1 }, { productId2: quantityInStock2 }]
+    { productId: number; quantity: number }[]
+> = asyncHandler(async (req, res, next) => {
+    function sendSuccessfulResponse() {
+        res.sendStatus(204);
+    }
+    // creating a lookup table that looks like this:
+    // { productId1: quantity1, productId2: quantity2 }
+    // this will allow us to quickly get a quantity for a specified product ID
+    const lookupReqBody: { [productId: number]: number | undefined } =
+        req.body.reduce(
+            (acc, elem) => ({ ...acc, [elem.productId]: elem.quantity }),
+            {}
+        );
+
+    // this controller method assumes that the user is authenticated
+    const userId = req.user!.id;
+    const cartProductIDs = await cartModel.getCartProductIDs(userId);
+
+    // find out which product IDs aren't in the user's cart
+    const productsToCheck: number[] = arrayDifference(
+        // provided product IDs:
+        Object.keys(lookupReqBody).map((productId) =>
+            Number(productId)
+        ) as number[],
+        // product IDs in the user's cart
+        cartProductIDs
+    );
+
+    if (productsToCheck.length === 0) return sendSuccessfulResponse();
+
+    // now we need to check which of the remaining products actually exist AND which of them don't exceed the quantity in stock
+    const productsLimitations = await productModel.getLimitationsForProducts(
+        productsToCheck
+    );
+
+    // stores products that will be added to the cart
+    // products will be added here only if they aren't already in the cart AND if there are enough products in stock
+    const finalCartProducts: { productId: number; quantityInCart: number }[] =
+        [];
+
+    productsLimitations.forEach((productLimitations) => {
+        const { productId, quantityInStock, maxOrderQuantity } =
+            productLimitations;
+
+        const userQuantityInCart: number = lookupReqBody[productId]!;
+        if (
+            // if the provided product quantity doesn't exceed the quantity in stock and the maximum items per order
+            userQuantityInCart <= quantityInStock &&
+            userQuantityInCart <= maxOrderQuantity
+        ) {
+            finalCartProducts.push({
+                productId,
+                quantityInCart: userQuantityInCart,
+            });
+        }
+    });
+
+    // now that we've determined which products will be added to the cart,
+    // we need to check whether the user is trying to add more products to the cart than the specified limit
+    // if that's the case, throw an error
+    if (
+        // how many products are already in the cart + how many products can be added potentially
+        cartProductIDs.length + finalCartProducts.length >
+        +process.env.MAX_PRODUCTS_IN_CART!
+    ) {
+        throw new TooManyProductsInCartError();
+    }
+
+    if (finalCartProducts.length > 0) {
+        // inserts new cart products into both Postgres and Redis
+        await cartModel.bulkInsert(userId, finalCartProducts);
+    }
+
+    sendSuccessfulResponse();
 });

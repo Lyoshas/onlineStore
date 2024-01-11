@@ -96,4 +96,34 @@ router.get(
     cartController.isSafeToAddProductToCart
 );
 
+router.put(
+    '/cart/synchronize',
+    ensureAuthentication,
+    [
+        body().isArray().withMessage('request body must be an array'),
+        // if req.body is not an array, there is no point in further validation
+        validateRequest,
+        body('*.productId')
+            .isInt({ gt: 0 })
+            .withMessage(
+                'each productId must be an integer that is greater than zero'
+            ),
+        body('*.quantity')
+            .isInt({ gt: 0 })
+            .withMessage(
+                'each quantity must be an integer that is greater than zero'
+            ),
+        body()
+            .custom((reqBody: { productId: number; quantity: number }[]) => {
+                const productIDs: number[] = reqBody.map(
+                    (elem) => elem.productId
+                );
+                return new Set(productIDs).size === productIDs.length;
+            })
+            .withMessage('request body must not contain duplicate product IDs'),
+    ],
+    validateRequest,
+    cartController.synchronizeLocalCartWithAPI
+);
+
 export default router;

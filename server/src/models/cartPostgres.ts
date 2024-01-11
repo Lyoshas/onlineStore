@@ -4,6 +4,8 @@ import CartEntry from '../interfaces/CartEntry.js';
 import dbPool from '../services/postgres.service.js';
 import SnakeCaseProperties from '../interfaces/SnakeCaseProperties.js';
 import camelCaseObject from '../util/camelCaseObject.js';
+import CartProductSummary from '../interfaces/CartProductSummary.js';
+import knex from '../services/knex.service.js';
 
 export const getUserCart = async (userId: number): Promise<CartEntry[]> => {
     const { rows } = await dbPool.query<SnakeCaseProperties<CartEntry>>(
@@ -93,6 +95,21 @@ export const upsertProductToCart = async (
         `,
         [quantity, userId, productId]
     );
+};
+
+// inserts lots of products into the cart of the provided user
+export const bulkInsert = (
+    userId: number,
+    cartProductsSummary: CartProductSummary[]
+) => {
+    const sqlQuery = knex('carts').insert(
+        cartProductsSummary.map((cartProduct) => ({
+            user_id: userId,
+            product_id: cartProduct.productId,
+            quantity: cartProduct.quantityInCart,
+        }))
+    ).toString();
+    return dbPool.query(sqlQuery);
 };
 
 export const deleteProductFromCart = (userId: number, productId: number) => {

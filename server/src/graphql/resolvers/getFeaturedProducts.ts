@@ -9,7 +9,7 @@ import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
 import { IsInTheCartError } from '../errors/IsInTheCartError.js';
 import dbPool from '../../services/postgres.service.js';
 import mapRequestedFieldsToProductInfo from '../helpers/mapRequestedFieldsToProductInfo.js';
-import formatSqlQuery from '../helpers/formatSqlQuery.js';
+import formatSqlQuery from '../../util/formatSqlQuery.js';
 
 type GetFeaturedProductsOutput = Partial<DisplayProduct>[];
 

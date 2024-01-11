@@ -3,6 +3,7 @@ import { PoolClient } from 'pg';
 import CartEntry from '../interfaces/CartEntry.js';
 import * as postgresCartModel from './cartPostgres.js';
 import * as redisCartModel from './cartRedis.js';
+import CartProductSummary from '../interfaces/CartProductSummary.js';
 
 // first, we try to get the cart from Redis
 // if it fails, we get it from PostgreSQL
@@ -74,6 +75,19 @@ export const upsertProductToCart = async (
         await redisCartModel.upsertProductToCart(userId, productId, quantity);
     } catch (error) {
         console.error('Error adding a product to the cart in Redis', error);
+    }
+};
+
+export const bulkInsert = async (
+    userId: number,
+    cartProductsSummary: CartProductSummary[]
+): Promise<void> => {
+    await postgresCartModel.bulkInsert(userId, cartProductsSummary);
+
+    try {
+        await redisCartModel.bulkInsert(userId, cartProductsSummary);
+    } catch (error) {
+        console.log('Error with bulkInsert in Redis', error);
     }
 };
 
