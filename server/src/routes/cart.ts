@@ -126,4 +126,6 @@ router.put(
     cartController.synchronizeLocalCartWithAPI
 );
 
+router.get('/cart/maximum-items', cartController.getMaxProductsInCart);
+
 export default router;

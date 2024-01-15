@@ -41,6 +41,7 @@
       - [4. Remove the specified product from the cart](#4-remove-the-specified-product-from-the-cart)
       - [5. Check if it's safe to add a product to the local cart](#5-check-if-its-safe-to-add-a-product-to-the-local-cart)
       - [6. Synchronize the local cart with the API](#6-synchronize-the-local-cart-with-the-api)
+      - [7. Get the maximum number of items that a user is allowed to have in the cart](#7-get-the-maximum-number-of-items-that-a-user-is-allowed-to-have-in-the-cart)
 
 ## Prerequisites
 - Install Docker and Docker Compose
@@ -2051,3 +2052,23 @@ Some API endpoints require authentication using access tokens and refresh tokens
         ]
       }
       ```
+#### 7. Get the maximum number of items that a user is allowed to have in the cart
+- **URL:** /api/user/cart/maximum-items
+- **Method:** GET
+- **Description:** retrieves the maximum allowed number of products per user in the cart. This endpoint is essential for the frontend application to enable a feature for managing the local cart. Anonymous users cannot send API requests to manipulate the cart, so the React app stores cart products in localStorage. It's important to limit the number of products in the local cart to prevent synchronization issues when a user logs in. Exceeding this limit could result in a failed HTTP request during the synchronization process, which is designed to synchronize the local cart with the API.
+- **Who can access:** everyone
+- **Rate limiting:** none
+- **Request body:** none
+- **Request params:** none
+- **Query string parameters:** none
+- **Required cookies:** none
+- **Success response:**
+  - **Status code:** 200 OK
+  - **Description**: the server has returned the result successfully
+  - **Content**:
+      ```TypeScript
+      {
+        "maxProductsInCart": number
+      }
+      ```
+- **Error responses**: none

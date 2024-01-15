@@ -3,12 +3,12 @@ import asyncHandler from 'express-async-handler';
 
 import VerifiedUserInfo from '../interfaces/VerifiedUserInfo.js';
 import * as cartModel from '../models/cart.js';
-import * as cartPostgres from '../models/cartPostgres.js';
 import * as productModel from '../models/product.js';
 import CartEntry from '../interfaces/CartEntry.js';
 import { getProduct } from '../models/product.js';
 import TooManyProductsInCartError from '../errors/TooManyProductsInCartError.js';
 import arrayDifference from '../util/arrayDifference.js';
+import UnexpectedError from '../errors/UnexpectedError.js';
 
 // if the user made it to any of these middlewares,
 // it means he/she is authenticated, so req.user is prepopulated
@@ -196,3 +196,16 @@ export const synchronizeLocalCartWithAPI: RequestHandler<
 
     sendSuccessfulResponse();
 });
+
+// returns the maximum number of items that the user is allowed to have in the cart
+// this endpoint is necessary for the frontend application to implement a feature that makes it possible to work with the local cart
+export const getMaxProductsInCart: RequestHandler = (req, res) => {
+    const maxProductsInCart = +process.env.MAX_PRODUCTS_IN_CART!;
+
+    // this error is very unlikely and is included just in case
+    if (Number.isNaN(maxProductsInCart)) {
+        throw new UnexpectedError();
+    }
+
+    res.json({ maxProductsInCart });
+};
