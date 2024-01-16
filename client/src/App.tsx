@@ -28,6 +28,7 @@ import CartContentsModal from './components/CartContentsModal/CartContentsModal'
 import { cartModalActions } from './store/slices/cartModal';
 import ProductCategoryList from './pages/ProductCategoryList/ProductCategoryList';
 import ProductListPage from './pages/ProductListPage/ProductListPage';
+import useSynchronizeLocalCartProducts from './components/hooks/useSynchronizeLocalCartProducts';
 
 const App: FC = () => {
     const { errorMessage, isErrorNotificationShown } = useSelector(
@@ -40,6 +41,8 @@ const App: FC = () => {
     const { data, isSuccess, isFetching, isError, error } =
         useRequestAccessTokenQuery();
     const serverErrorResponse = useApiError(isError, error, [422]);
+    // when a user logs in, their local cart will be seamlessly synchronized with the API
+    useSynchronizeLocalCartProducts();
 
     useEffect(() => {
         if (isFetching) return;

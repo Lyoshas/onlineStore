@@ -1,22 +1,31 @@
-import { FC, useEffect, Fragment } from 'react';
-import { useDispatch } from 'react-redux';
+import { FC, useEffect, Fragment, useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import classNames from 'classnames';
+import { useStore } from 'react-redux';
 
 import Button from '../UI/Button/Button';
 import classes from './AddToCartButton.module.css';
 import getStaticAssetUrl from '../../util/getStaticAssetUrl';
-import ButtonLink from '../UI/ButtonLink/ButtonLink';
-import { useUpsertCartProductMutation } from '../../store/apis/cartApi';
+import {
+    useLazyGetMaximumProductsInCartQuery,
+    useUpsertCartProductMutation,
+} from '../../store/apis/cartApi';
 import useApiError from '../hooks/useApiError';
 import { errorActions } from '../../store/slices/error';
 import Loading from '../UI/Loading/Loading';
 import apolloClient from '../../graphql/client';
 import { cartModalActions } from '../../store/slices/cartModal';
+import { RootState } from '../../store';
+import { localCartActions } from '../../store/slices/localCart';
+import { highlightCartActions } from '../../store/slices/highlightCart';
 
 interface AddToCartButtonProps {
     productId: number;
+    title: string;
+    price: number;
+    initialImageUrl: string;
     // "isInTheCart" indicates whether an item is already in the cart
-    isInTheCart?: boolean;
+    isInTheCart: boolean;
     addLabels?: boolean;
     className?: string;
 }
@@ -25,26 +34,40 @@ const AddToCartButton: FC<AddToCartButtonProps> = ({
     addLabels = false,
     ...props
 }) => {
+    const store = useStore<RootState>();
+    const isAuthenticated = useSelector(
+        (state: RootState) => state.auth.isAuthenticated
+    );
     const [
-        upsertCartProduct,
+        upsertCartProductToAPI,
         {
-            isSuccess: isUpsertSuccessful,
-            isError: isUpsertError,
-            error: productUpsertError,
-            isLoading: isUpserting,
+            isSuccess: isUpsertSuccessfulToAPI,
+            isError: isUpsertErrorToAPI,
+            error: productUpsertErrorToAPI,
+            isLoading: isUpsertingToAPI,
         },
     ] = useUpsertCartProductMutation();
     const upsertErrorResponse = useApiError(
-        isUpsertError,
-        productUpsertError,
+        isUpsertErrorToAPI,
+        productUpsertErrorToAPI,
         [422, 409]
     );
+    const [
+        getMaximumProductsInCart,
+        {
+            isSuccess: isGetMaxCartProductsSuccess,
+            isError: isGetMaxCartProductsError,
+            error: getMaxCartProductsError,
+            isFetching: isGetMaxCartProductsFetching,
+            data: maxCartProductsData,
+        },
+    ] = useLazyGetMaximumProductsInCartQuery();
+    useApiError(isGetMaxCartProductsError, getMaxCartProductsError, []);
     const dispatch = useDispatch();
 
-    useEffect(() => {
-        if (!isUpsertSuccessful) return;
-
-        // since we've added this product to the cart, we need to modify the local cache so that the user sees that the product was indeed added to the cart
+    // this function will be called if a product should be added to the cart
+    const modifyCache = useCallback(() => {
+        // since we are trying to add this product to the cart, we need to modify the local cache so that the user sees that the product was indeed added to the cart
         // this doesn't cause any new API requests to the server
         apolloClient.cache.modify({
             id: `Product:${props.productId}`,
@@ -55,7 +78,63 @@ const AddToCartButton: FC<AddToCartButtonProps> = ({
                 },
             },
         });
-    }, [isUpsertSuccessful, apolloClient, props.productId]);
+        // updating the local cart in Redux
+        dispatch(
+            localCartActions.upsertCartProduct({
+                productId: props.productId,
+                title: props.title,
+                price: props.price,
+                initialImageUrl: props.initialImageUrl,
+                quantity: 1,
+            })
+        );
+        dispatch(highlightCartActions.changeHighlightState(true));
+    }, [
+        dispatch,
+        props.productId,
+        props.title,
+        props.price,
+        props.initialImageUrl,
+    ]);
+
+    useEffect(() => {
+        // if a product was successfully added to the cart via API,
+        // reflect the change in the cache
+        if (isUpsertSuccessfulToAPI) modifyCache();
+    }, [isUpsertSuccessfulToAPI, modifyCache]);
+
+    useEffect(() => {
+        // if a product was successfully added to the cart locally
+        // reflect the change in the cache
+        if (
+            isGetMaxCartProductsFetching ||
+            !isGetMaxCartProductsSuccess ||
+            !maxCartProductsData
+        )
+            return;
+
+        const maxProductsInCart = maxCartProductsData.maxProductsInCart;
+        // if the user is trying to add more products to the cart than allowed,
+        // show an error
+        if (
+            maxProductsInCart ===
+            Object.keys(store.getState().localCart.products).length
+        ) {
+            dispatch(
+                errorActions.showNotificationError(
+                    `You can only add up to ${maxProductsInCart} products to the cart`
+                )
+            );
+        } else {
+            modifyCache();
+        }
+    }, [
+        isGetMaxCartProductsFetching,
+        isGetMaxCartProductsSuccess,
+        maxCartProductsData?.maxProductsInCart,
+        store,
+        modifyCache,
+    ]);
 
     useEffect(() => {
         if (!upsertErrorResponse) return;
@@ -87,9 +166,14 @@ const AddToCartButton: FC<AddToCartButtonProps> = ({
         dispatch(errorActions.showNotificationError(errorMessage));
     }, [upsertErrorResponse]);
 
-    const handleAddToCart = () => {
+    const handleAddToCart = async () => {
         dispatch(errorActions.hideNotificationError());
-        upsertCartProduct({ productId: props.productId, quantity: 1 });
+
+        if (isAuthenticated) {
+            upsertCartProductToAPI({ productId: props.productId, quantity: 1 });
+        } else {
+            getMaximumProductsInCart({ productId: props.productId });
+        }
     };
 
     const showCartItems = () => {
@@ -112,22 +196,12 @@ const AddToCartButton: FC<AddToCartButtonProps> = ({
         props.className
     );
 
-    // if the "isInTheCart" property wasn't provided, then the user isn't authenticated
-    if (props.isInTheCart == null) {
-        return (
-            <ButtonLink to="/auth/sign-in" className={className}>
-                {cartImg}
-                {addLabels && 'Add to cart'}
-            </ButtonLink>
-        );
-    }
-
     return (
         <Button
             className={className}
             onClick={
                 // if an item is being added to the cart, the user can't do anything
-                isUpserting
+                isUpsertingToAPI || isGetMaxCartProductsFetching
                     ? function () {}
                     : // if the addition to the cart was successful OR the item was already in the cart, the user can only view existing cart items
                     props.isInTheCart
@@ -136,7 +210,7 @@ const AddToCartButton: FC<AddToCartButtonProps> = ({
                       handleAddToCart
             }
         >
-            {isUpserting ? (
+            {isUpsertingToAPI || isGetMaxCartProductsFetching ? (
                 <Loading width="30px" height="30px" />
             ) : (
                 <Fragment>

@@ -6,50 +6,70 @@ import Modal from '../UI/Modal/Modal';
 import ButtonLink from '../UI/ButtonLink/ButtonLink';
 import Loading from '../UI/Loading/Loading';
 import classes from './CartContentsModal.module.css';
-import { useGetCartQuery } from '../../store/apis/cartApi';
+import { useLazyGetCartQuery } from '../../store/apis/cartApi';
 import CartProduct from '../CartProduct/CartProduct';
 import CartLoadingOverlay from './CartLoadingOverlay/CartLoadingOverlay';
 import Image from '../TopHeader/Image/Image';
 import ErrorIcon from '../UI/Icons/ErrorIcon';
 import { RootState } from '../../store';
+import ICartProduct from '../../interfaces/CartProduct';
 
 interface CartContentsModalProps {
     onClose: () => void;
 }
 
 const CartContentsModal: FC<CartContentsModalProps> = (props) => {
-    const {
-        isFetching: isFetchingCart,
-        isLoading: isFetchingCartFirstTime, // isLoading returns true when you're fetching data for the first time
-        isSuccess: isGetCartSuccess,
-        error: getCartError,
-        data: cartData,
-        requestId: currentGetCartRequestId,
-    } = useGetCartQuery();
-    // stores the initial request ID of the "get cart" operation
-    const [initialGetCartRequestId, setInitialGetCartRequestId] = useState<
-        string | null
-    >(null);
+    const [
+        getCartViaAPI,
+        {
+            isFetching: isFetchingCartViaAPI,
+            isLoading: isFetchingCartFirstTimeViaAPI, // isLoading returns true when you're fetching data for the first time
+            error: getCartErrorViaAPI,
+            data: cartDataViaAPI,
+        },
+    ] = useLazyGetCartQuery();
+    const isAuthenticated = useSelector(
+        (state: RootState) => state.auth.isAuthenticated
+    );
     const isCartBeingChangedByAPI = useSelector(
         (state: RootState) => state.cartModal.isCartBeingChangedByAPI
     );
+    const localCartData = useSelector((state: RootState) => state.localCart);
 
     useEffect(() => {
-        // if no requests have been made, don't do anything
-        if (!currentGetCartRequestId) return;
+        if (isAuthenticated) getCartViaAPI();
+    }, [isAuthenticated]);
 
-        setInitialGetCartRequestId((previousGetCartRequestId) => {
-            return previousGetCartRequestId === null
-                ? currentGetCartRequestId
-                : previousGetCartRequestId;
-        });
-    }, [currentGetCartRequestId]);
+    let cartData: { products: ICartProduct[]; totalPrice: number } | undefined;
+    switch (isAuthenticated) {
+        // if the auth status of the user hasn't been determined yet, the value will be "undefined"
+        case null:
+            cartData = undefined;
+            break;
+        // if the user is authenticated, use cart products fetched from the API
+        case true:
+            cartData = cartDataViaAPI;
+            break;
+        // if the user is NOT authenticated, use cart products stored locally
+        default:
+            const productList = Object.values(
+                localCartData.products
+            ) as ICartProduct[];
+            cartData = {
+                products: productList,
+                totalPrice: productList.reduce(
+                    (acc, product) => acc + product.quantity * product.price,
+                    0
+                ),
+            };
+            break;
+    }
 
     return (
         <Modal
             title="Your Cart"
             message={
-                getCartError ? (
+                getCartErrorViaAPI ? (
                     <div
                         className={
                             classes['cart-products__error-message-block']
@@ -68,45 +88,42 @@ const CartContentsModal: FC<CartContentsModalProps> = (props) => {
                             )}
                         >
                             {/* if the user is trying to add a product to the cart OR delete a product from the cart OR if the user is trying to fetch the cart and this is NOT the first time fetching the cart, then display <CartLoadingOverlay />*/}
-                            {(isCartBeingChangedByAPI ||
-                                (isFetchingCart &&
-                                    initialGetCartRequestId &&
-                                    currentGetCartRequestId !==
-                                        initialGetCartRequestId)) && (
+                            {isCartBeingChangedByAPI ||
+                            (isFetchingCartViaAPI &&
+                                !isFetchingCartFirstTimeViaAPI) ? (
                                 <CartLoadingOverlay />
-                            )}
-                            {/* if the cart is being fetched AND this is the first time fetching the cart, then display the <Loading /> component (NOT <CartLoadingOverlay />) */}
-                            {isFetchingCartFirstTime && (
+                            ) : null}
+                            {/* if the cart is being fetched for the first time, display the <Loading /> component (NOT <CartLoadingOverlay />) */}
+                            {isFetchingCartFirstTimeViaAPI && (
                                 <Loading
                                     color="#273c99"
                                     className={classes['loader-margin']}
                                 />
                             )}
-                            {isGetCartSuccess && (
-                                <Fragment>
-                                    {cartData!.products.length === 0 && (
-                                        <Fragment>
-                                            <Image
-                                                src="https://onlinestore-react-assets.s3.eu-north-1.amazonaws.com/empty-cart-icon.svg"
-                                                alt="Empty cart"
-                                                invertColor={false}
-                                                className={
-                                                    classes['empty-cart-icon']
-                                                }
-                                            />
-                                            <p
-                                                className={
-                                                    classes[
-                                                        'cart-products__no-items-paragraph'
-                                                    ]
-                                                }
-                                            >
-                                                You don't have any items in the
-                                                cart
-                                            </p>
-                                        </Fragment>
-                                    )}
-                                    {cartData!.products.map((cartProduct) => {
+                            <Fragment>
+                                {cartData && cartData.products.length === 0 && (
+                                    <Fragment>
+                                        <Image
+                                            src="https://onlinestore-react-assets.s3.eu-north-1.amazonaws.com/empty-cart-icon.svg"
+                                            alt="Empty cart"
+                                            invertColor={false}
+                                            className={
+                                                classes['empty-cart-icon']
+                                            }
+                                        />
+                                        <p
+                                            className={
+                                                classes[
+                                                    'cart-products__no-items-paragraph'
+                                                ]
+                                            }
+                                        >
+                                            You don't have any items in the cart
+                                        </p>
+                                    </Fragment>
+                                )}
+                                {cartData &&
+                                    cartData.products.map((cartProduct) => {
                                         return (
                                             <CartProduct
                                                 title={cartProduct.title}
@@ -122,32 +139,30 @@ const CartContentsModal: FC<CartContentsModalProps> = (props) => {
                                             />
                                         );
                                     })}
-                                </Fragment>
-                            )}
+                            </Fragment>
                         </div>
-                        {isGetCartSuccess &&
-                            cartData!.products.length !== 0 && (
-                                <div className={classes['cart-summary']}>
-                                    <h3
-                                        className={
-                                            classes[
-                                                'cart-summary__total-price-header'
-                                            ]
-                                        }
-                                    >
-                                        Total Price
-                                    </h3>
-                                    <b
-                                        className={
-                                            classes[
-                                                'cart-summary__total-price-value'
-                                            ]
-                                        }
-                                    >
-                                        {cartData!.totalPrice} ₴
-                                    </b>
-                                </div>
-                            )}
+                        {cartData && cartData.products.length !== 0 && (
+                            <div className={classes['cart-summary']}>
+                                <h3
+                                    className={
+                                        classes[
+                                            'cart-summary__total-price-header'
+                                        ]
+                                    }
+                                >
+                                    Total Price
+                                </h3>
+                                <b
+                                    className={
+                                        classes[
+                                            'cart-summary__total-price-value'
+                                        ]
+                                    }
+                                >
+                                    {cartData!.totalPrice} ₴
+                                </b>
+                            </div>
+                        )}
                     </Fragment>
                 )
             }

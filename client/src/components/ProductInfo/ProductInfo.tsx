@@ -7,7 +7,6 @@ import { useSelector } from 'react-redux';
 import classes from './ProductInfo.module.css';
 import ButtonLink from '../UI/ButtonLink/ButtonLink';
 import ErrorIcon from '../UI/Icons/ErrorIcon';
-import Loading from '../UI/Loading/Loading';
 import Layout from '../Layout/Layout';
 import ProductImages from './ProductImages/ProductImages';
 import SelectedImage from './SelectedImage/SelectedImage';
@@ -38,6 +37,9 @@ const ProductInfo = () => {
     const [selectedImage, setSelectedImage] = useState<0 | 1>(0);
     const isAuthenticated = useSelector(
         (state: RootState) => state.auth.isAuthenticated
+    );
+    const localCart = useSelector(
+        (state: RootState) => state.localCart.products
     );
 
     const productId: number = +stringProductId!;
@@ -96,11 +98,17 @@ const ProductInfo = () => {
     }
 
     // by this point the data has been loaded
-    const productData: (
+    let tempProductData: (
         | GetProductByIdNoAuthQuery['product']
         | GetProductByIdWithAuthQuery['product']
     ) & { isInTheCart?: boolean } =
         getProductNoAuthData?.product! || getProductWithAuthData?.product!;
+
+    const productData: typeof tempProductData & { isInTheCart: boolean } = {
+        ...tempProductData,
+        // if the user is authenticated, keep the previous 'isInTheCart' value, otherwise check the local cart stored in localStorage
+        isInTheCart: tempProductData.isInTheCart ?? productId in localCart,
+    };
 
     const {
         title,
@@ -147,6 +155,7 @@ const ProductInfo = () => {
                     productId={productId}
                     title={title}
                     price={price}
+                    initialImageUrl={initialImageUrl}
                     shortDescription={shortDescription}
                     isProductAvailable={isAvailable}
                     isProductRunningOut={isRunningOut}

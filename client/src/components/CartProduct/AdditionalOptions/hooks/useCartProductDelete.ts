@@ -6,7 +6,9 @@ import useApiError from '../../../hooks/useApiError';
 import { cartModalActions } from '../../../../store/slices/cartModal';
 import { errorActions } from '../../../../store/slices/error';
 import apolloClient from '../../../../graphql/client';
+import { localCartActions } from '../../../../store/slices/localCart';
 
+// this hook must only be used by authenticated users
 const useCartProductDelete = (productId: number) => {
     const dispatch = useDispatch();
     const [
@@ -16,7 +18,7 @@ const useCartProductDelete = (productId: number) => {
             error: deleteCartProductError,
             isLoading: isDeleteCartProductLoading,
             isSuccess: isDeleteCartProductSuccess,
-            isUninitialized: isDeleteCartProductUninitialized,
+            reset: resetRequestState,
         },
     ] = useDeleteCartProductMutation({
         // setting "fixedCacheKey" prevents a bug where multiple cached products get affected when only one should be affected
@@ -56,6 +58,9 @@ const useCartProductDelete = (productId: number) => {
                 },
             },
         });
+        dispatch(localCartActions.deleteCartProduct({ productId }));
+        // there was a bug where a user authenticates, adds a product to the cart from the main page, then deletes it from the cart, then logs out, and then adds this product to the cart again. This would cause the product to be deleted
+        resetRequestState();
     }, [isDeleteCartProductSuccess, productId]);
 
     const deleteCartProduct = () => {

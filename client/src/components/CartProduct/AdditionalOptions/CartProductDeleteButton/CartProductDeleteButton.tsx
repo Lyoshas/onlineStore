@@ -1,13 +1,30 @@
 import { FC } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Button from '../../../UI/Button/Button';
 import classes from './CartProductDeleteButton.module.css';
+import { localCartActions } from '../../../../store/slices/localCart';
+import { RootState } from '../../../../store';
 
-const CartProductDeleteButton: FC<{ onCartProductDelete: () => void }> = (
-    props
-) => {
+const CartProductDeleteButton: FC<{
+    productId: number;
+    onCartProductDeleteWithAuth: () => void;
+}> = (props) => {
+    const dispatch = useDispatch();
+    const isAuthenticated = useSelector(
+        (state: RootState) => state.auth.isAuthenticated
+    );
+
     const handleCartProductDelete = () => {
-        props.onCartProductDelete();
+        if (isAuthenticated) {
+            props.onCartProductDeleteWithAuth();
+        } else {
+            dispatch(
+                localCartActions.deleteCartProduct({
+                    productId: props.productId,
+                })
+            );
+        }
     };
 
     return (

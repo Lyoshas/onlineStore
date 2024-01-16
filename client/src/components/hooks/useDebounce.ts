@@ -16,11 +16,13 @@ function useDebounce<T extends unknown[], V>(
 } {
     const [isActionExecuting, setIsActionExecuting] = useState<boolean>(false);
     const isFirstCallRef = useRef(true);
-
-    let timer: ReturnType<typeof setTimeout> | null = null;
+    const [timer, setTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
 
     const cancelDebouncedExecution = useCallback(() => {
-        if (timer !== null) clearTimeout(timer);
+        if (timer !== null) {
+            clearTimeout(timer);
+            setTimer(null);
+        }
     }, [timer]);
 
     const debouncedFunction: (...args: T) => Promise<Awaited<V>> = useCallback(
@@ -43,7 +45,7 @@ function useDebounce<T extends unknown[], V>(
                 if (isFirstCallRef.current && leadingEdge) {
                     runAction();
                 } else {
-                    timer = setTimeout(runAction, ms);
+                    setTimer(setTimeout(runAction, ms));
                 }
 
                 if (isFirstCallRef.current) {
@@ -52,7 +54,7 @@ function useDebounce<T extends unknown[], V>(
                 }
             });
         },
-        [fn]
+        [fn, cancelDebouncedExecution]
     );
 
     return { isActionExecuting, debouncedFunction, cancelDebouncedExecution };

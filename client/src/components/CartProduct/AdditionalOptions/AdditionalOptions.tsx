@@ -42,7 +42,8 @@ const AdditionalOptions: FC<AdditionalOptionsProps> = (props) => {
             />
             {showAdditionalOptions && (
                 <CartProductDeleteButton
-                    onCartProductDelete={() => deleteCartProduct()}
+                    productId={props.productId}
+                    onCartProductDeleteWithAuth={() => deleteCartProduct()}
                 />
             )}
         </div>

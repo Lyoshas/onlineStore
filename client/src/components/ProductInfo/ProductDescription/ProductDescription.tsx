@@ -8,10 +8,11 @@ interface ProductDescriptionProps {
     productId: number;
     title: string;
     price: number;
+    initialImageUrl: string;
     shortDescription: string;
     isProductAvailable: boolean;
     isProductRunningOut: boolean;
-    isInTheCart?: boolean;
+    isInTheCart: boolean;
 }
 
 const ProductDescription: FC<ProductDescriptionProps> = ({
@@ -22,6 +23,7 @@ const ProductDescription: FC<ProductDescriptionProps> = ({
     isProductAvailable,
     isProductRunningOut,
     isInTheCart,
+    initialImageUrl,
 }) => {
     return (
         <section className={classes['product-info__description']}>
@@ -51,6 +53,9 @@ const ProductDescription: FC<ProductDescriptionProps> = ({
             {isProductAvailable && (
                 <AddToCartButton
                     productId={productId}
+                    title={title}
+                    price={price}
+                    initialImageUrl={initialImageUrl}
                     isInTheCart={isInTheCart}
                     addLabels={true}
                     className={classes['product-description__add-to-cart-btn']}
