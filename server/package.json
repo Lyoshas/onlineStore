@@ -12,6 +12,7 @@
     "db:migrate:up": "node --loader ts-node/esm ./node_modules/.bin/knex migrate:latest --knexfile ./knexfile.ts",
     "db:migrate:rollback": "node --loader ts-node/esm ./node_modules/.bin/knex migrate:rollback --all --knexfile ./knexfile.ts",
     "db:seed:run": "node --loader ts-node/esm ./node_modules/.bin/knex seed:run --knexfile ./knexfile.ts",
+    "knex": "node --loader ts-node/esm ./node_modules/.bin/knex",
     "type-check": "tsc --noEmit"
   },
   "repository": {
