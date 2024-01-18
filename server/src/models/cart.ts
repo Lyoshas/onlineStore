@@ -1,8 +1,8 @@
 import { PoolClient } from 'pg';
 
 import CartEntry from '../interfaces/CartEntry.js';
-import * as postgresCartModel from './cartPostgres.js';
-import * as redisCartModel from './cartRedis.js';
+import * as postgresCartModel from './cart-postgres.js';
+import * as redisCartModel from './cart-redis.js';
 import CartProductSummary from '../interfaces/CartProductSummary.js';
 
 // first, we try to get the cart from Redis

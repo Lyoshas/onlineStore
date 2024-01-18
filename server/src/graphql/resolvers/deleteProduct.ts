@@ -4,8 +4,8 @@ import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
 import { performProductUpsertCleanup as performProductDeleteCleanup } from '../helpers/performProductUpsertCleanup.js';
 import { getObjectKeyByImageUrl } from '../../models/amazon-s3.js';
 import ProductNotFoundError from '../errors/ProductNotFoundError.js';
-import { getUsersWithProductInCart } from '../../models/cartPostgres.js';
-import { cleanCart } from '../../models/cartRedis.js';
+import { getUsersWithProductInCart } from '../../models/cart-postgres.js';
+import { cleanCart } from '../../models/cart-redis.js';
 
 interface DeleteProductArguments {
     id: number;

@@ -16,8 +16,8 @@ import checkImageNames from '../validators/checkImageNames.js';
 import GraphqlUpdateProductArgs from '../../interfaces/GraphqlUpdateProductArgs.js';
 import checkMaxOrderQuantity from '../validators/checkMaxOrderQuantity.js';
 import ProductUpsertReturnValue from '../../interfaces/ProductUpsertReturnValue.js';
-import { getUsersWithProductInCart } from '../../models/cartPostgres.js';
-import { cleanCart } from '../../models/cartRedis.js';
+import { getUsersWithProductInCart } from '../../models/cart-postgres.js';
+import { cleanCart } from '../../models/cart-redis.js';
 
 export default async (
     _: any,
