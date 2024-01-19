@@ -5,6 +5,7 @@ import updateProduct from './resolvers/updateProduct.js';
 import deleteProduct from './resolvers/deleteProduct.js';
 import getFeaturedProducts from './resolvers/getFeaturedProducts.js';
 import getAdminProduct from './resolvers/getAdminProduct.js';
+import addProductReview from './resolvers/addProductReview.js';
 
 export const typeDefs = `#graphql
     type Query {
@@ -43,6 +44,12 @@ export const typeDefs = `#graphql
         ): ProductUpsertReturnValue!
 
         deleteProduct(id: Int!): DeleteProductReturnValue
+
+        addProductReview(
+            productId: Int!,
+            reviewMessage: String!,
+            starRating: Float!
+        ): AddProductReviewReturnValue!
     }
 
     type DeleteProductReturnValue {
@@ -93,6 +100,12 @@ export const typeDefs = `#graphql
         shortDescription: String!
         maxOrderQuantity: Int!
     }
+
+    type AddProductReviewReturnValue {
+        "returning a composite primary key of the recently added product review"
+        productId: Int!
+        userId: Int!
+    }
 `;
 
 export const resolvers = {
@@ -106,5 +119,6 @@ export const resolvers = {
         addProduct,
         updateProduct,
         deleteProduct,
+        addProductReview,
     },
 };

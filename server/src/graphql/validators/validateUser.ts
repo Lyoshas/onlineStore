@@ -4,16 +4,24 @@ import UserNotAuthenticatedError from '../errors/UserNotAuthenticatedError.js';
 import UserNotActivatedError from '../errors/UserNotActivatedError.js';
 import UserNotAdminError from '../errors/UserNotAdminError.js';
 
-export default async (user: VerifiedUserInfo | null) => {
+interface UserCheckOptions {
+    checkIsActivated: boolean;
+    checkIsAdmin: boolean;
+}
+
+export default async (
+    user: VerifiedUserInfo | null,
+    options: UserCheckOptions
+) => {
     if (!user) {
         throw new UserNotAuthenticatedError();
     }
 
-    if (!(await isAccountActivated(user.id))) {
+    if (options.checkIsActivated && !(await isAccountActivated(user.id))) {
         throw new UserNotActivatedError();
     }
 
-    if (!user.isAdmin) {
+    if (options.checkIsAdmin && !user.isAdmin) {
         throw new UserNotAdminError();
     }
 };

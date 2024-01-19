@@ -29,11 +29,12 @@ const getAdminProduct = async (
     context: ApolloServerContext,
     resolveInfo: GraphQLResolveInfo
 ): Promise<GetAdminProductOutput> => {
-    await validateUser(context.user);
+    await validateUser(context.user, {
+        checkIsActivated: true,
+        checkIsAdmin: true,
+    });
 
-    const requestedFields = graphqlFields(
-        resolveInfo
-    ) as PossibleGraphQLFields;
+    const requestedFields = graphqlFields(resolveInfo) as PossibleGraphQLFields;
     const requestedFieldsList = Object.keys(
         requestedFields
     ) as (keyof PossibleGraphQLFields)[];

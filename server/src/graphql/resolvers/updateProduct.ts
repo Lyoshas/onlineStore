@@ -25,7 +25,10 @@ export default async (
     context: ApolloServerContext
 ): Promise<ProductUpsertReturnValue> => {
     // if any of these checks fail, an error will be thrown and the product will not be updated
-    await validateUser(context.user);
+    await validateUser(context.user, {
+        checkIsActivated: true,
+        checkIsAdmin: true,
+    });
 
     const {
         id: productId,

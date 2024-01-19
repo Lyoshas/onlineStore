@@ -37,7 +37,10 @@ export default async (
     } = args;
 
     // if a user doesn't have enough privileges, throw an error immediately
-    await validateUser(context.user);
+    await validateUser(context.user, {
+        checkIsActivated: true,
+        checkIsAdmin: true,
+    });
 
     try {
         // if any of these checks fail, an error will be thrown, the product will not be added, and initialImageName and additionalImageName objects will be removed from the S3 bucket

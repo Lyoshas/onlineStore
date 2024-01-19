@@ -116,3 +116,12 @@ export const getMissingCartProductInfo = async (
 
     return lookupObj;
 };
+
+export const productExists = async (productId: number): Promise<boolean> => {
+    const { rowCount } = await dbPool.query(
+        'SELECT 1 FROM products WHERE id = $1',
+        [productId]
+    );
+
+    return rowCount > 0;
+};

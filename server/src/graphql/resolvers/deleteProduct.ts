@@ -16,7 +16,10 @@ export default async (
     args: DeleteProductArguments,
     context: ApolloServerContext
 ): Promise<{ id: number }> => {
-    await validateUser(context.user);
+    await validateUser(context.user, {
+        checkIsActivated: true,
+        checkIsAdmin: true,
+    });
 
     const { id: productId } = args;
 

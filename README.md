@@ -1594,6 +1594,118 @@ Some API endpoints require authentication using access tokens and refresh tokens
   - When the product is deleted, the associated images that are stored in S3 will be deleted only if these images are not tied to any other product in the database.
   
     For example, if you try to delete a product and the images that are tied to this product don't point to any other product, these images will be deleted from the S3 bucket. However, if another product uses these images, they will stay in the S3 bucket and won't be deleted.
+#### 8. Add a product review
+- **Who can access:** only authenticated users with the provided [access token](#access-token)
+- **Required parameters:**
+  - _productId_ - must be a valid product ID for an existing product to which the user is adding a review
+  - _reviewMessage_ - the text of the review message. Must be between 1 and 2000 characters
+  - _starRating_ - specifies how many stars the user is giving to the product. Must be between 1 and 5, inclusive, in increments of 0.5
+- **Example**:
+  ```graphql
+  mutation Mutation(
+    $productId: Int!
+    $reviewMessage: String!
+    $starRating: Float!
+  ) {
+    addProductReview(
+      productId: $productId
+      reviewMessage: $reviewMessage
+      starRating: $starRating
+    ) {
+      productId
+      userId
+    }
+  }
+  ```
+  **Example Variables**:
+  ```JSON
+  {
+    "productId": 643,
+    "reviewMessage": "A very cool product!",
+    "starRating": 5
+  }
+  ```
+  **Result**:
+  ```JSON
+  {
+    "data": {
+      "addProductReview": {
+        "productId": 643,
+        "userId": 627
+      }
+    }
+  }
+  ```
+- **Error responses**:
+  - The user is not authenticated (the 'Authorization' header is empty or the provided access token is invalid)
+    ```JSON
+    {
+      "data": {
+        "addProductReview": null
+      },
+      "errors": [
+        {
+          "message": "User must be authenticated to perform this action"
+        }
+      ]
+    }
+    ```
+  - The user is trying to add a review to a product that doesn't exist
+    ```JSON
+    {
+      "data": {
+        "addProductReview": null
+      },
+      "errors": [
+        {
+          "message": "A product with the specified id does not exist"
+        }
+      ]
+    }
+    ```
+  - The user is trying to add a review twice
+    ```JSON
+    {
+      "data": {
+        "addProductReview": null
+      },
+      "errors": [
+        {
+          "message": "Only one review per user is allowed for each product"
+        }
+      ]
+    }
+    ```
+  - The length of the product review is wrong
+    ```JSON
+    {
+      "data": {
+        "addProductReview": null
+      },
+      "errors": [
+        {
+          "message": "reviewMessage length must be between 1 and 2000 characters"
+        }
+      ]
+    }
+    ```
+  - The star rating has a value other than (1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5)
+    ```JSON
+    {
+      "data": {
+        "addProductReview": null
+      },
+      "errors": [
+        {
+          "message": "starRating must be between 1 and 5, inclusive, in increments of 0.5"
+        }
+      ]
+    }
+    ```
+- **Additional Notes**:
+  - When the product is deleted, the associated images that are stored in S3 will be deleted only if these images are not tied to any other product in the database.
+  
+    For example, if you try to delete a product and the images that are tied to this product don't point to any other product, these images will be deleted from the S3 bucket. However, if another product uses these images, they will stay in the S3 bucket and won't be deleted.
 
 ### Cart Endpoints
 #### 1. Get the contents of your shopping cart
