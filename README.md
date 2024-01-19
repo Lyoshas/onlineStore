@@ -1079,7 +1079,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
   }
   ```
 - **Error responses**:
-  - The user is not authenticated (the 'Authorization' header is empty):
+  - The user is not authenticated (the 'Authorization' header is empty or the provided access token is invalid)
     ```JSON
     {
       "data": {},
@@ -1214,7 +1214,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
       ]
     }
     ```
-  - The user is not authenticated (the 'Authorization' header is empty):
+  - The user is not authenticated (the 'Authorization' header is empty or the provided access token is invalid)
     ```JSON
     {
       "data": {},
@@ -1414,7 +1414,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
       ]
     } 
     ```
-  - The user is not authenticated (the 'Authorization' header is empty):
+  - The user is not authenticated (the 'Authorization' header is empty or the provided access token is invalid)
     ```JSON
     {
       "data": {},
@@ -1551,7 +1551,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
       ]
     } 
     ```
-  - The user is not authenticated (the 'Authorization' header is empty):
+  - The user is not authenticated (the 'Authorization' header is empty or the provided access token is invalid)
     ```JSON
     {
       "data": {
