@@ -827,7 +827,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
     ```
 
 ### GraphQL Queries and Mutations
-#### 1. Get basic information about an individual product
+#### 1. Get basic information about an individual product (optinally with reviews to this product as well)
 - **Who can access:** everyone (but if you request the 'isInTheCart' field, you have to provide a valid access token)
 - **Required parameters:**
   - _id_ - the id of the product that you are trying to get information about. Must be a number.
@@ -842,27 +842,50 @@ Some API endpoints require authentication using access tokens and refresh tokens
       initialImageUrl
       additionalImageUrl
       shortDescription
+      isInTheCart
       isAvailable
       isRunningOut
-      isInTheCart // indicates whether the product is the cart of the user who requested this query
+      reviews {
+        userId
+        fullName
+        reviewMessage
+        starRating
+        createdAt
+      }
     }
   }
   ```
-  **Result**:
+  **Result (example)**:
   ```JSON
   {
     "data": {
       "product": {
-        "id": 5,
-        "title": "Intel Core i5-10400F 2.9GHz/12MB",
-        "price": 5375,
-        "category": "Laptops",
-        "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/ff042894-a2d5-457d-b9b2-82f7cde46255.png",
-        "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/1aab2da7-775e-4759-9d99-57f1d669b2e2.png",
-        "shortDescription": "A small description of the product",
+        "id": 635,
+        "title": "SSD диск Kingston KC3000 1TB M.2 2280 NVMe PCIe Gen 4.0 x4 3D TLC NAND (SKC3000S/1024G)",
+        "price": 3199,
+        "category": "SSD",
+        "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/564a7f3b-c26c-4516-ae64-ff1874edd404.png",
+        "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/65950bef-58c4-4248-8b83-5f9161711889.png",
+        "shortDescription": "Kingston KC3000 SKC3000D/1024G - це SSD-накопичувач PCIe 4.0 NVMe M.2, який забезпечує швидкість зчитування і запису даних до 7000 МБ/с. Цей накопичувач ідеально підходить для систем, які вимагають високої продуктивності для таких завдань, як ігри, редагування відео та створення контенту.",
+        "isInTheCart": false,
         "isAvailable": true,
         "isRunningOut": false,
-        "isInTheCart": true
+        "reviews": [
+          {
+            "userId": 615,
+            "fullName": "Сергій Дмитрук",
+            "reviewMessage": "SSD на високому рівні. Але здається, що ціна за бренд.",
+            "starRating": 4,
+            "createdAt": "14.06.2024"
+          },
+          {
+            "userId": 660,
+            "fullName": "Вадим Щербаков",
+            "reviewMessage": "Непогана швидкість, але вартість занадто висока.",
+            "starRating": 4,
+            "createdAt": "23.03.2023"
+          }
+        ]
       }
     }
   }

@@ -12,9 +12,9 @@ export const typeDefs = `#graphql
         "Get products by category and page"
         products(category: String!, page: Int!): GetProductsByCategoryAndPageReturnValue
         "Get a single product by its id"
-        product(id: Int!): Product
+        product(id: Int!): ProductInfoWithReviews!
         "Get featured products"
-        featuredProducts: [Product]!
+        featuredProducts: [ProductInfoWithoutReviews]!
         "Get product info including 'quantity_in_stock' (only for admins)"
         adminProduct(productId: Int!): AdminProduct!
     }
@@ -57,11 +57,34 @@ export const typeDefs = `#graphql
     }
 
     type GetProductsByCategoryAndPageReturnValue {
-        productList: [Product!]!
+        productList: [ProductInfoWithoutReviews!]!
         totalPages: Int!
     }
 
-    type Product {
+    type ProductReview {
+        userId: Int!
+        fullName: String!
+        reviewMessage: String!
+        starRating: Float!
+        "createdAt specifies the review creation date (DD.MM.YYYY)"
+        createdAt: String!
+    }
+
+    type ProductInfoWithReviews {
+        id: Int!
+        title: String!
+        price: Float!
+        category: String!
+        initialImageUrl: String!
+        additionalImageUrl: String!
+        shortDescription: String!
+        isInTheCart: Boolean!
+        isAvailable: Boolean!
+        isRunningOut: Boolean!
+        reviews: [ProductReview!]!
+    }
+
+    type ProductInfoWithoutReviews {
         id: Int!
         title: String!
         price: Float!

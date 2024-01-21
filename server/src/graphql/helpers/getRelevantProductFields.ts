@@ -52,6 +52,7 @@ const getRelevantProductFields = (
                 'isInTheCart',
                 'initialImageName',
                 'additionalImageName',
+                'reviews',
                 '__typename',
             ].includes(requestedField)
         ) {
