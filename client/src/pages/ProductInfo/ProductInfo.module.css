@@ -15,7 +15,15 @@
 }
 
 .product-info > section:not(:last-child) {
-    margin-right: 3%; 
+    margin-right: 3%;
+}
+
+.product-info__reviews {
+    padding-bottom: 15px;
+}
+
+.product-reviews__heading {
+    font-size: 1.4rem;
 }
 
 @media screen and (max-width: 1200px) {
@@ -32,12 +40,12 @@
     }
 
     .product-info > section:not(:last-child) {
-        margin-right: 0; 
-    }    
+        margin-right: 0;
+    }
 }
 
 @media screen and (max-width: 450px) {
     .product-info-layout {
-        width: 100%;
+        width: 95%;
     }
 }

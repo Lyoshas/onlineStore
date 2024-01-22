@@ -21,6 +21,7 @@ import {
     GetProductByIdWithAuthQuery,
 } from '../../__generated__/graphql';
 import LoadingScreen from '../../components/UI/LoadingScreen/LoadingScreen';
+import ProductReview from '../../components/ProductReview/ProductReview';
 
 const createErrorBlock = (errorMessage: string) => {
     return (
@@ -119,6 +120,7 @@ const ProductInfo = () => {
         isRunningOut,
         shortDescription,
         isInTheCart,
+        reviews,
     } = productData!;
 
     const productImages = [initialImageUrl, additionalImageUrl];
@@ -162,6 +164,18 @@ const ProductInfo = () => {
                     isInTheCart={isInTheCart}
                 />
             </article>
+            <div className={classes['product-info__reviews']}>
+                <h3 className={classes['product-reviews__heading']}>Reviews</h3>
+                {reviews.map((review) => (
+                    <ProductReview
+                        userId={review.userId}
+                        fullName={review.fullName}
+                        starRating={review.starRating}
+                        reviewMessage={review.reviewMessage}
+                        createdAt={review.createdAt}
+                    />
+                ))}
+            </div>
         </Layout>
     );
 };

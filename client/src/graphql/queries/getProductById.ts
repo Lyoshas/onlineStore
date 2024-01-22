@@ -11,6 +11,13 @@ export const GET_PRODUCT_BY_ID_NO_AUTH = gql(`
             shortDescription
             isAvailable
             isRunningOut
+            reviews {
+                userId
+                fullName
+                reviewMessage
+                starRating
+                createdAt
+            }
         }
     } 
 `);
@@ -27,6 +34,13 @@ export const GET_PRODUCT_BY_ID_WITH_AUTH = gql(`
             isAvailable
             isRunningOut
             isInTheCart
+            reviews {
+                userId
+                fullName
+                reviewMessage
+                starRating
+                createdAt
+            }
         }
     }
 `);
