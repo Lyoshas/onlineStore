@@ -2,7 +2,7 @@ import { FC } from 'react';
 import classNames from 'classnames';
 
 import classes from './ProductDescription.module.css';
-import AddToCartButton from '../../AddToCartButton/AddToCartButton';
+import AddToCartButton from '../../../components/AddToCartButton/AddToCartButton';
 
 interface ProductDescriptionProps {
     productId: number;

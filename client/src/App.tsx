@@ -21,7 +21,7 @@ import OAuthCallback from './pages/OAuthCallback/OAuthCallback';
 import Logout from './pages/Logout/Logout';
 import useApiError from './components/hooks/useApiError';
 import LandingPage from './pages/LandingPage/LandingPage';
-import ProductInfo from './components/ProductInfo/ProductInfo';
+import ProductInfo from './pages/ProductInfo/ProductInfo';
 import EditProduct from './pages/EditProduct/EditProduct';
 import AddProduct from './pages/AddProduct/AddProduct';
 import CartContentsModal from './components/CartContentsModal/CartContentsModal';

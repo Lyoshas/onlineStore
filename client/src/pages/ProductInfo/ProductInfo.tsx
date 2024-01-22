@@ -5,9 +5,9 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import classes from './ProductInfo.module.css';
-import ButtonLink from '../UI/ButtonLink/ButtonLink';
-import ErrorIcon from '../UI/Icons/ErrorIcon';
-import Layout from '../Layout/Layout';
+import ButtonLink from '../../components/UI/ButtonLink/ButtonLink';
+import ErrorIcon from '../../components/UI/Icons/ErrorIcon';
+import Layout from '../../components/Layout/Layout';
 import ProductImages from './ProductImages/ProductImages';
 import SelectedImage from './SelectedImage/SelectedImage';
 import ProductDescription from './ProductDescription/ProductDescription';
@@ -20,7 +20,7 @@ import {
     GetProductByIdNoAuthQuery,
     GetProductByIdWithAuthQuery,
 } from '../../__generated__/graphql';
-import LoadingScreen from '../UI/LoadingScreen/LoadingScreen';
+import LoadingScreen from '../../components/UI/LoadingScreen/LoadingScreen';
 
 const createErrorBlock = (errorMessage: string) => {
     return (
