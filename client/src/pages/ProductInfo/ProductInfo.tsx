@@ -173,6 +173,8 @@ const ProductInfo = () => {
                         starRating={review.starRating}
                         reviewMessage={review.reviewMessage}
                         createdAt={review.createdAt}
+                        // one user can add one review to a single product
+                        key={`${productId}.${review.userId}`}
                     />
                 ))}
             </div>
