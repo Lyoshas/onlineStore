@@ -1726,10 +1726,6 @@ Some API endpoints require authentication using access tokens and refresh tokens
       ]
     }
     ```
-- **Additional Notes**:
-  - When the product is deleted, the associated images that are stored in S3 will be deleted only if these images are not tied to any other product in the database.
-  
-    For example, if you try to delete a product and the images that are tied to this product don't point to any other product, these images will be deleted from the S3 bucket. However, if another product uses these images, they will stay in the S3 bucket and won't be deleted.
 
 ### Cart Endpoints
 #### 1. Get the contents of your shopping cart
