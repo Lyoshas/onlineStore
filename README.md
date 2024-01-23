@@ -34,6 +34,7 @@
       - [5. Add a new product](#5-add-a-new-product)
       - [6. Update a product](#6-update-a-product)
       - [7. Delete a product](#7-delete-a-product)
+      - [8. Add a product review](#8-add-a-product-review)
     - [Cart Endpoints](#cart-endpoints)
       - [1. Get the contents of your shopping cart](#1-get-the-contents-of-your-shopping-cart)
       - [2. Get the total number of items in the cart](#2-get-the-total-number-of-items-in-the-cart)
