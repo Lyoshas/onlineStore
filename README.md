@@ -828,7 +828,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
     ```
 
 ### GraphQL Queries and Mutations
-#### 1. Get basic information about an individual product (optinally with reviews to this product as well)
+#### 1. Get basic information about an individual product (optionally with reviews to this product as well)
 - **Who can access:** everyone (but if you request the 'isInTheCart' field, you have to provide a valid access token)
 - **Required parameters:**
   - _id_ - the id of the product that you are trying to get information about. Must be a number.
