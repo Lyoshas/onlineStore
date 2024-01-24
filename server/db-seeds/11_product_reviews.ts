@@ -44,14 +44,28 @@ class ProductReviewsHelper {
             .where({ name: chosenStatus });
     }
 
+    // generates a random date
+    // important: this date will be at some point in the past; it cannot be in the future
     getRandomDate() {
+        const currentDate = new Date();
+
+        const randomYear: number = this.randomInteger(2023, 2024);
+        const isCurrentYear: boolean = randomYear === currentDate.getFullYear();
+
+        const randomMonth: number = isCurrentYear
+            ? this.randomInteger(0, currentDate.getMonth())
+            : this.randomInteger(0, 11);
+        const isCurrentMonth: boolean = randomMonth === currentDate.getMonth();
+
         return new Date(
             // year
-            this.randomInteger(2023, 2024),
+            randomYear,
             // month
-            this.randomInteger(0, 11),
+            randomMonth,
             // days
-            this.randomInteger(1, 31)
+            isCurrentYear && isCurrentMonth
+                ? this.randomInteger(1, currentDate.getDate() - 1)
+                : this.randomInteger(1, 31)
         );
     }
 }
