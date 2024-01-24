@@ -1,17 +1,18 @@
 import { FC } from 'react';
 
-import Modal from '../../../UI/Modal/Modal';
-import Button from '../../../UI/Button/Button';
+import Modal from '../UI/Modal/Modal';
+import Button from '../UI/Button/Button';
 
 interface SuccessModalProps {
     onClose: () => void;
+    message: string;
 }
 
 const SuccessModal: FC<SuccessModalProps> = (props) => {
     return (
         <Modal
             title="Success"
-            message={<p>The product has been successfully deleted.</p>}
+            message={<p>{props.message}</p>}
             onClose={props.onClose}
             includeCancelButton={false}
             actions={<Button onClick={props.onClose}>OK</Button>}

@@ -7,8 +7,8 @@ import Button from '../../UI/Button/Button';
 import classes from './DeleteButton.module.css';
 import DELETE_PRODUCT from '../../../graphql/mutations/deleteProduct';
 import ConfirmationModal from './ConfirmationModal/ConfirmationModal';
-import SuccessModal from './SuccessModal/SuccessModal';
-import ErrorModal from './ErrorModal/ErrorModal';
+import SuccessModal from '../../SuccessModal/SuccessModal';
+import ErrorModal from '../../ErrorModal/ErrorModal';
 import Loading from '../../UI/Loading/Loading';
 import apolloClient from '../../../graphql/client';
 import { deleteProductsByPageCache } from '../../../store/util/deleteProductsByPageCache';
@@ -96,7 +96,10 @@ const DeleteButton: FC<DeleteButtonProps> = ({
             )}
             {/* if there is data, it means the delete request was successful */}
             {showSuccessModal && responseData && (
-                <SuccessModal onClose={handleSuccessModalClose} />
+                <SuccessModal
+                    message="The product has been successfully deleted"
+                    onClose={handleSuccessModalClose}
+                />
             )}
             {showErrorModal && responseError && (
                 <ErrorModal
