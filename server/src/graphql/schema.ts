@@ -14,7 +14,7 @@ export const typeDefs = `#graphql
         "Get a single product by its id"
         product(id: Int!): ProductInfoWithReviews!
         "Get featured products"
-        featuredProducts: [ProductInfoWithoutReviews]!
+        featuredProducts: [ProductInfoWithoutReviews!]!
         "Get product info including 'quantity_in_stock' (only for admins)"
         adminProduct(productId: Int!): AdminProduct!
     }
