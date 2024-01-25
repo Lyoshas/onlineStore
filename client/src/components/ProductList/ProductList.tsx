@@ -4,15 +4,22 @@ import { useSelector } from 'react-redux';
 
 import ProductItem from '../ProductItem/ProductItem';
 import classes from './ProductList.module.css';
-import { Product } from '../../__generated__/graphql';
 import { RootState } from '../../store';
 
-// copying everything from the Product type, but the 'isInTheCart' property is optional
-type ProductModified = Omit<Product, 'isInTheCart'> &
-    Partial<Pick<Product, 'isInTheCart'>>;
+interface Product {
+    id: number;
+    title: string;
+    initialImageUrl: string;
+    additionalImageUrl: string;
+    price: number;
+    shortDescription: string;
+    isAvailable: boolean;
+    isRunningOut: boolean;
+    isInTheCart?: boolean;
+}
 
 const ProductList: FC<{
-    products: (Omit<ProductModified, 'category'> | null)[];
+    products: (Product | null)[];
 }> = (props) => {
     const localCartProducts = useSelector(
         (state: RootState) => state.localCart.products
