@@ -88,10 +88,10 @@ const ProductListPage = () => {
 
     return (
         <Layout className={classes['product-layout']}>
-            <ProductList products={products!.productList} />
+            <ProductList products={products.productList} />
             <Pagination
                 currentPage={currentPage}
-                totalPages={products!.totalPages}
+                totalPages={products.totalPages}
             />
         </Layout>
     );

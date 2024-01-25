@@ -19,13 +19,12 @@ interface Product {
 }
 
 const ProductList: FC<{
-    products: (Product | null)[];
+    products: Product[];
 }> = (props) => {
     const localCartProducts = useSelector(
         (state: RootState) => state.localCart.products
     );
     const productsToDisplay = props.products.map((fetchedProduct) => {
-        if (fetchedProduct === null) return null;
         return {
             ...fetchedProduct,
             isInTheCart: localCartProducts[fetchedProduct.id] ? true : false,
@@ -40,8 +39,6 @@ const ProductList: FC<{
             )}
         >
             {productsToDisplay.map((product) => {
-                if (product === null) return false;
-
                 return (
                     <ProductItem
                         key={product.id}
