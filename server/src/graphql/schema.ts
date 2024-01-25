@@ -10,7 +10,7 @@ import addProductReview from './resolvers/addProductReview.js';
 export const typeDefs = `#graphql
     type Query {
         "Get products by category and page"
-        products(category: String!, page: Int!): GetProductsByCategoryAndPageReturnValue
+        products(category: String!, page: Int!): GetProductsByCategoryAndPageReturnValue!
         "Get a single product by its id"
         product(id: Int!): ProductInfoWithReviews!
         "Get featured products"
