@@ -1,10 +1,7 @@
 import { FC } from 'react';
-import { Rating } from '@mui/material';
-import StarIcon from '@mui/icons-material/Star';
 
 import classes from './ProductReview.module.css';
-
-const CustomIcon = <StarIcon style={{ color: 'white' }} />;
+import StarRating from '../UI/StarRating/StarRating';
 
 const ProductReview: FC<{
     userId: number;
@@ -21,10 +18,8 @@ const ProductReview: FC<{
                 </h4>
                 <span>{props.createdAt}</span>
             </div>
-            <Rating
+            <StarRating
                 value={props.starRating}
-                precision={0.5}
-                emptyIcon={CustomIcon}
                 className={classes['product-review__star-rating']}
                 readOnly
             />

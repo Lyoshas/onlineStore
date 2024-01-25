@@ -1,0 +1,29 @@
+.product-review {
+    width: 100%;
+    text-align: center;
+}
+
+.product-review > * {
+    margin-bottom: 10px;
+}
+
+.product-review > *:first-child {
+    margin-top: 10px;
+}
+
+.product-review__review-message {
+    box-sizing: border-box;
+    width: 100%;
+    font-size: 1rem;
+    font-family: inherit;
+    border: 1px solid black;
+    margin-bottom: 5px;
+    min-height: 100px;
+    max-height: 400px;
+    resize: vertical;
+}
+
+.product-review__error-message {
+    margin-top: 0;
+    line-height: 1;
+}

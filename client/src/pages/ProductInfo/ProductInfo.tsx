@@ -22,6 +22,7 @@ import {
 } from '../../__generated__/graphql';
 import LoadingScreen from '../../components/UI/LoadingScreen/LoadingScreen';
 import ProductReview from '../../components/ProductReview/ProductReview';
+import AddReviewButton from './AddReviewButton/AddReviewButton';
 
 const createErrorBlock = (errorMessage: string) => {
     return (
@@ -102,13 +103,17 @@ const ProductInfo = () => {
     let tempProductData: (
         | GetProductByIdNoAuthQuery['product']
         | GetProductByIdWithAuthQuery['product']
-    ) & { isInTheCart?: boolean } =
+    ) & { isInTheCart?: boolean; userCanAddReview?: boolean } =
         getProductNoAuthData?.product! || getProductWithAuthData?.product!;
 
-    const productData: typeof tempProductData & { isInTheCart: boolean } = {
+    const productData: typeof tempProductData & {
+        isInTheCart: boolean;
+        userCanAddReview: boolean;
+    } = {
         ...tempProductData,
         // if the user is authenticated, keep the previous 'isInTheCart' value, otherwise check the local cart stored in localStorage
         isInTheCart: tempProductData.isInTheCart ?? productId in localCart,
+        userCanAddReview: tempProductData.userCanAddReview ?? false,
     };
 
     const {
@@ -119,6 +124,7 @@ const ProductInfo = () => {
         isAvailable,
         isRunningOut,
         shortDescription,
+        userCanAddReview,
         isInTheCart,
         reviews,
     } = productData!;
@@ -137,6 +143,10 @@ const ProductInfo = () => {
         });
     };
     const onSelectImage = (imageIndex: 0 | 1) => setSelectedImage(imageIndex);
+
+    const reviewsHeading = (
+        <h3 className={classes['product-reviews__heading']}>Reviews</h3>
+    );
 
     // <article> - a self-contained piece of content that can be independently distributed or reused
     return (
@@ -165,7 +175,17 @@ const ProductInfo = () => {
                 />
             </article>
             <div className={classes['product-info__reviews']}>
-                <h3 className={classes['product-reviews__heading']}>Reviews</h3>
+                {isAuthenticated ? (
+                    <div className={classes['product-reviews__flex-container']}>
+                        {reviewsHeading}
+                        <AddReviewButton
+                            productId={productId}
+                            userCanAddReview={userCanAddReview}
+                        />
+                    </div>
+                ) : (
+                    reviewsHeading
+                )}
                 {reviews.map((review) => (
                     <ProductReview
                         userId={review.userId}

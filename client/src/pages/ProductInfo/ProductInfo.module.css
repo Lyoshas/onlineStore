@@ -8,7 +8,6 @@
 }
 
 .product-info {
-    /* background: red; */
     display: flex;
     justify-content: space-between;
     padding: 50px 0;
@@ -24,6 +23,13 @@
 
 .product-reviews__heading {
     font-size: 1.4rem;
+    display: inline-block;
+    margin-right: 20px
+}
+
+.product-reviews__flex-container {
+    display: flex;
+    align-items: center;
 }
 
 @media screen and (max-width: 1200px) {

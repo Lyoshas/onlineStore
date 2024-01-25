@@ -34,6 +34,7 @@ export const GET_PRODUCT_BY_ID_WITH_AUTH = gql(`
             isAvailable
             isRunningOut
             isInTheCart
+            userCanAddReview
             reviews {
                 userId
                 fullName
