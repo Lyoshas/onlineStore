@@ -50,6 +50,7 @@ const getRelevantProductFields = (
         if (
             [
                 'isInTheCart',
+                'userCanAddReview',
                 'initialImageName',
                 'additionalImageName',
                 'reviews',

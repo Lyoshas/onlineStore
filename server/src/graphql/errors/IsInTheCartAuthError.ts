@@ -1,6 +1,6 @@
 import { GraphQLError } from 'graphql';
 
-export class IsInTheCartError extends GraphQLError {
+export class IsInTheCartAuthError extends GraphQLError {
     constructor() {
         super('User must be authenticated to request the "isInTheCart" field');
     }

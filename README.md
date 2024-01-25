@@ -829,7 +829,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
 
 ### GraphQL Queries and Mutations
 #### 1. Get basic information about an individual product (optionally with reviews to this product as well)
-- **Who can access:** everyone (but if you request the 'isInTheCart' field, you have to provide a valid access token)
+- **Who can access:** everyone (but if you request the 'isInTheCart' or 'userCanAddReview' fields, you have to provide a valid access token)
 - **Required parameters:**
   - _id_ - the id of the product that you are trying to get information about. Must be a number.
 - **Example**:
@@ -846,6 +846,8 @@ Some API endpoints require authentication using access tokens and refresh tokens
       isInTheCart
       isAvailable
       isRunningOut
+      # only one review is allowed per user for each product, so 'userCanAddReview' specifies whether the user can post a review or not
+      userCanAddReview
       reviews {
         userId
         fullName
@@ -869,6 +871,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
         "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/65950bef-58c4-4248-8b83-5f9161711889.png",
         "shortDescription": "Kingston KC3000 SKC3000D/1024G - це SSD-накопичувач PCIe 4.0 NVMe M.2, який забезпечує швидкість зчитування і запису даних до 7000 МБ/с. Цей накопичувач ідеально підходить для систем, які вимагають високої продуктивності для таких завдань, як ігри, редагування відео та створення контенту.",
         "isInTheCart": false,
+        "userCanAddReview": false,
         "isAvailable": true,
         "isRunningOut": false,
         "reviews": [
@@ -910,6 +913,17 @@ Some API endpoints require authentication using access tokens and refresh tokens
       "errors": [
         {
           "message": "User must be authenticated to request the \"isInTheCart\" field"
+        }
+      ]
+    }
+    ```
+  - The user is trying to access the 'userCanAddReview' field while being unauthenticated
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "User must be authenticated to request the \"userCanAddReview\" field"
         }
       ]
     }

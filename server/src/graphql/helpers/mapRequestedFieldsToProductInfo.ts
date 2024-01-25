@@ -18,7 +18,8 @@ export type PossibleResolverField =
     | 'maxOrderQuantity'
     | 'isAvailable'
     | 'isRunningOut'
-    | 'isInTheCart';
+    | 'isInTheCart'
+    | 'userCanAddReview';
 
 type ResolverOutput = Partial<{
     [prop in PossibleResolverField]: unknown;
@@ -30,7 +31,11 @@ type ResolverOutput = Partial<{
 // productInfo - actual data from the DB
 const mapRequestedFieldsToProductInfo = <T extends PossibleResolverField[]>(
     productInfo: Partial<
-        DBProduct & { is_in_the_cart: boolean; category: string }
+        DBProduct & {
+            is_in_the_cart: boolean;
+            user_can_add_review: boolean;
+            category: string;
+        }
     >,
     requestedFields: T
 ): ResolverOutput => {

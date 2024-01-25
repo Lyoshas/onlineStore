@@ -6,7 +6,7 @@ import DisplayProduct from '../../interfaces/DisplayProduct.js';
 import getRelevantProductFields from '../helpers/getRelevantProductFields.js';
 import knex from '../../services/knex.service.js';
 import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
-import { IsInTheCartError } from '../errors/IsInTheCartError.js';
+import { IsInTheCartAuthError } from '../errors/IsInTheCartAuthError.js';
 import dbPool from '../../services/postgres.service.js';
 import mapRequestedFieldsToProductInfo from '../helpers/mapRequestedFieldsToProductInfo.js';
 import formatSqlQuery from '../../util/formatSqlQuery.js';
@@ -30,7 +30,7 @@ async function getFeaturedProducts(
     const shouldGetIsInTheCart: boolean = 'isInTheCart' in requestedFields;
 
     if (shouldGetIsInTheCart && context.user === null) {
-        throw new IsInTheCartError();
+        throw new IsInTheCartAuthError();
     }
 
     const requestedFieldsList = Object.keys(

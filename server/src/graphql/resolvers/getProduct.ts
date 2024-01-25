@@ -9,12 +9,11 @@ import getRelevantProductFields, {
 } from '../helpers/getRelevantProductFields.js';
 import knex from '../../services/knex.service.js';
 import mapRequestedFieldsToProductInfo from '../helpers/mapRequestedFieldsToProductInfo.js';
-import { IsInTheCartError } from '../errors/IsInTheCartError.js';
+import { IsInTheCartAuthError } from '../errors/IsInTheCartAuthError.js';
+import { UserCanAddReviewAuthError } from '../errors/UserCanAddReviewAuthError.js';
 import ProductNotFoundError from '../errors/ProductNotFoundError.js';
 import camelCaseToSnakeCase from '../helpers/camelCaseToSnakeCase.js';
 import camelCaseObject from '../../util/camelCaseObject.js';
-
-// type GetProductOutput = Partial<DisplayProduct>;
 
 interface ProductReview {
     userId: number;
@@ -36,6 +35,7 @@ interface GetProductOutput {
     isAvailable?: boolean;
     isRunningOut?: boolean;
     reviews?: Partial<ProductReview>[];
+    userCanAddReview?: boolean;
 }
 
 type PossibleGraphQLFields = {
@@ -60,9 +60,15 @@ async function getProduct(
     const productId: number = args.id;
 
     const shouldGetIsInTheCart: boolean = 'isInTheCart' in requestedFields;
+    const shouldGetUserCanAddReview: boolean =
+        'userCanAddReview' in requestedFields;
 
     if (shouldGetIsInTheCart && context.user === null) {
-        throw new IsInTheCartError();
+        throw new IsInTheCartAuthError();
+    }
+
+    if (shouldGetUserCanAddReview && context.user === null) {
+        throw new UserCanAddReviewAuthError();
     }
 
     const userId: number | null = context.user && context.user.id;
@@ -77,7 +83,13 @@ async function getProduct(
             (
                 SELECT COUNT(*)::int::boolean
                 FROM carts WHERE user_id = 601 AND product_id = 635
-            ) AS is_in_the_cart
+            ) AS is_in_the_cart,
+            (
+                SELECT NOT EXISTS(
+                    SELECT 1 FROM product_reviews
+                    WHERE product_id = 635 AND user_id = 601
+                )
+            ) AS user_can_add_review
         FROM products
         INNER JOIN product_categories ON product_categories.id = products.category_id
         WHERE products.id = 635;
@@ -102,6 +114,19 @@ async function getProduct(
         );
     }
 
+    if (shouldGetUserCanAddReview) {
+        const subquery = knex.select(1).from('product_reviews').where({
+            product_id: productId,
+            user_id: userId,
+        });
+
+        columnsToSelect.push(
+            knex
+                .select(knex.raw('NOT EXISTS(?)', [subquery]))
+                .as('user_can_add_review')
+        );
+    }
+
     let queryBuilder = knex.select(columnsToSelect).from('products');
 
     if ('category' in requestedFields) {
@@ -114,6 +139,9 @@ async function getProduct(
     }
 
     queryBuilder = queryBuilder.where({ 'products.id': productId });
+
+    console.log('!!!!!!!!!!!!!!!!')
+    console.log(queryBuilder.toQuery())
 
     const {
         rows: [dbProductInfo],

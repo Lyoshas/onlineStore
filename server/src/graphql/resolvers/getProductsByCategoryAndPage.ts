@@ -6,7 +6,7 @@ import ApolloServerContext from '../../interfaces/ApolloServerContext.js';
 import RequireAtLeastOneProperty from '../../interfaces/RequireAtLeastOneProperty.js';
 import DisplayProduct from '../../interfaces/DisplayProduct.js';
 import dbPool from '../../services/postgres.service.js';
-import { IsInTheCartError } from '../errors/IsInTheCartError.js';
+import { IsInTheCartAuthError } from '../errors/IsInTheCartAuthError.js';
 import { PageOutOfRangeError } from '../errors/PageOutOfRangeError.js';
 import getRelevantProductFields from '../helpers/getRelevantProductFields.js';
 import knex from '../../services/knex.service.js';
@@ -59,7 +59,7 @@ async function getProductsByCategoryAndPage(
         'isInTheCart' in requestedFields.productList;
 
     if (shouldGetIsInTheCart && context.user === null) {
-        throw new IsInTheCartError();
+        throw new IsInTheCartAuthError();
     } else if (shouldGetIsInTheCart) {
         // we need to request the id of each product if the user requested the "isInTheCart" field
         requestedFields.productList!.id = {};
