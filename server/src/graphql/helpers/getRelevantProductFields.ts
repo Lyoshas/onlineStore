@@ -18,6 +18,7 @@ export type GetRelevantProductFieldsInput = (
     | 'isInTheCart'
     | 'initialImageName'
     | 'additionalImageName'
+    | 'userRating'
     | '__typename'
 )[];
 
@@ -51,6 +52,7 @@ const getRelevantProductFields = (
             [
                 'isInTheCart',
                 'userCanAddReview',
+                'userRating',
                 'initialImageName',
                 'additionalImageName',
                 'reviews',

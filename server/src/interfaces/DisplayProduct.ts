@@ -10,6 +10,7 @@ type DisplayProduct = Omit<
     isAvailable: boolean;
     isRunningOut: boolean;
     isInTheCart: boolean;
+    userRating: number;
 }
 
 export default DisplayProduct;

@@ -13,9 +13,12 @@ import formatSqlQuery from '../../util/formatSqlQuery.js';
 
 type GetFeaturedProductsOutput = Partial<DisplayProduct>[];
 
-type PossibleGraphQLFields = {
-    [productField in keyof DisplayProduct]?: {};
-};
+type PossibleGraphQLFields = Omit<
+    {
+        [productField in keyof DisplayProduct]?: {};
+    },
+    'userRating'
+>;
 
 // this function should get featured (or most popular) products,
 // but for now we're going to only get 12 random products
@@ -28,6 +31,7 @@ async function getFeaturedProducts(
     const requestedFields = graphqlFields(resolveInfo) as PossibleGraphQLFields;
 
     const shouldGetIsInTheCart: boolean = 'isInTheCart' in requestedFields;
+    const shouldGetUserRating: boolean = 'userRating' in requestedFields;
 
     if (shouldGetIsInTheCart && context.user === null) {
         throw new IsInTheCartAuthError();
@@ -37,17 +41,76 @@ async function getFeaturedProducts(
         requestedFields
     ) as (keyof PossibleGraphQLFields)[];
 
-    const fieldsToFetch: (string | Knex.Raw)[] =
+    // full query that this resolver makes
+    // (it can be smaller if the user provided less fields; this is why this query is constructed dynamically)
+    /*
+        SELECT
+            "products"."id",
+            "products"."title",
+            "products"."price",
+            "product_categories"."category",
+            "products"."initial_image_url",
+            "products"."additional_image_url",
+            "products"."short_description",
+            "products"."quantity_in_stock",
+            CASE
+                WHEN relevant_cart_entries.product_id IS NOT NULL
+                THEN true
+                ELSE false
+            END AS is_in_the_cart,
+            (
+                SELECT (ROUND(AVG(star_rating) * 2) / 2)::DECIMAL(3, 2)
+                FROM "product_reviews"
+                INNER JOIN "moderation_statuses"
+                    ON "moderation_statuses"."id" = "product_reviews"."moderation_status_id"
+                WHERE "product_id" = products.id AND "moderation_statuses"."name" = 'approved'
+            ) AS "user_rating"
+        FROM "products"
+        INNER JOIN "product_categories"
+            ON "product_categories"."id" = "products"."category_id"
+        LEFT JOIN (
+            SELECT "product_id"
+            FROM "carts"
+            WHERE "user_id" = 750
+        ) AS "relevant_cart_entries"
+            ON "products"."id" = "relevant_cart_entries"."product_id"
+        WHERE "quantity_in_stock" > 0
+        ORDER BY RANDOM()
+        LIMIT 12;
+    */
+
+    const fieldsToFetch: (string | Knex.Raw | Knex.QueryBuilder)[] =
         getRelevantProductFields(requestedFieldsList);
 
     if (shouldGetIsInTheCart) {
         fieldsToFetch.push(
-            knex.raw(`
-                CASE
-                    WHEN relevant_cart_entries.product_id IS NOT NULL THEN true
-                    ELSE false
-                END AS is_in_the_cart
-            `)
+            knex.raw(
+                formatSqlQuery(`
+                    CASE
+                        WHEN relevant_cart_entries.product_id IS NOT NULL THEN true
+                        ELSE false
+                    END AS is_in_the_cart
+                `)
+            )
+        );
+    }
+
+    if (shouldGetUserRating) {
+        // calculating the user rating of each selected product with a correlated subquery
+        fieldsToFetch.push(
+            knex
+                // rounding to the nearest 0.5
+                .select(knex.raw('(ROUND(AVG(star_rating) * 2) / 2)::DECIMAL(3, 2)'))
+                .from('product_reviews')
+                .innerJoin(
+                    'moderation_statuses',
+                    'moderation_statuses.id',
+                    '=',
+                    'product_reviews.moderation_status_id'
+                )
+                .where('product_id', '=', knex.raw('products.id'))
+                .andWhere('moderation_statuses.name', '=', 'approved')
+                .as('user_rating')
         );
     }
 

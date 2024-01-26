@@ -8,6 +8,7 @@ type GraphqlAddProductArgs = Omit<
     | 'initialImageUrl'
     | 'additionalImageUrl'
     | 'isInTheCart'
+    | 'userRating'
 > & {
     quantityInStock: number;
     initialImageName: string;

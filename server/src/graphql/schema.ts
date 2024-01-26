@@ -96,6 +96,7 @@ export const typeDefs = `#graphql
         isInTheCart: Boolean!
         isAvailable: Boolean!
         isRunningOut: Boolean!
+        userRating: Float!
     }
 
     type ProductUpsertReturnValue {

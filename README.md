@@ -1048,7 +1048,8 @@ Some API endpoints require authentication using access tokens and refresh tokens
       shortDescription
       isAvailable
       isRunningOut
-      isInTheCart // indicates whether the product is the cart of the user who requested this query
+      isInTheCart # indicates whether the product is the cart of the user who requested this query
+      userRating # returns the rating of the product in increments of 0.5
     }
   }
   ```

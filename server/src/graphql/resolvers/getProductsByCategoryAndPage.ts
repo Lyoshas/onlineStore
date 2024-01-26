@@ -19,9 +19,9 @@ type GetProductsByCategoryAndPageOutput = RequireAtLeastOneProperty<{
     totalPages: number;
 }>;
 
-type ProductInfo = {
+type ProductInfo = Omit<{
     [productField in keyof DisplayProduct]: {};
-};
+}, 'userRating'>;
 
 interface PossibleGraphQLFields {
     productList?: Partial<ProductInfo>;
