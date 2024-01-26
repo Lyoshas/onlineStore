@@ -3,6 +3,7 @@ import classNames from 'classnames';
 
 import classes from './ProductDescription.module.css';
 import AddToCartButton from '../../../components/AddToCartButton/AddToCartButton';
+import StarRating from '../../../components/UI/StarRating/StarRating';
 
 interface ProductDescriptionProps {
     productId: number;
@@ -13,6 +14,7 @@ interface ProductDescriptionProps {
     isProductAvailable: boolean;
     isProductRunningOut: boolean;
     isInTheCart: boolean;
+    userRating: number;
 }
 
 const ProductDescription: FC<ProductDescriptionProps> = ({
@@ -24,10 +26,14 @@ const ProductDescription: FC<ProductDescriptionProps> = ({
     isProductRunningOut,
     isInTheCart,
     initialImageUrl,
+    userRating,
 }) => {
     return (
         <section className={classes['product-info__description']}>
             <h2 className={classes['product-description__title']}>{title}</h2>
+            <div className={classes['product-description__user-rating']}>
+                <StarRating value={userRating} readOnly />
+            </div>
             <span
                 className={classNames(
                     classes['product-description__price'],

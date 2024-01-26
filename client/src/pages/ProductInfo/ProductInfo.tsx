@@ -127,6 +127,7 @@ const ProductInfo = () => {
         userCanAddReview,
         isInTheCart,
         reviews,
+        userRating,
     } = productData!;
 
     const productImages = [initialImageUrl, additionalImageUrl];
@@ -172,6 +173,7 @@ const ProductInfo = () => {
                     isProductAvailable={isAvailable}
                     isProductRunningOut={isRunningOut}
                     isInTheCart={isInTheCart}
+                    userRating={userRating}
                 />
             </article>
             <div className={classes['product-info__reviews']}>

@@ -11,6 +11,7 @@ export const GET_PRODUCT_BY_ID_NO_AUTH = gql(`
             shortDescription
             isAvailable
             isRunningOut
+            userRating
             reviews {
                 userId
                 fullName
@@ -35,6 +36,7 @@ export const GET_PRODUCT_BY_ID_WITH_AUTH = gql(`
             isRunningOut
             isInTheCart
             userCanAddReview
+            userRating
             reviews {
                 userId
                 fullName
