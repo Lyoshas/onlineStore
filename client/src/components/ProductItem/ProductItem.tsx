@@ -2,12 +2,14 @@ import { FC, Fragment, useState } from 'react';
 import { useSelector } from 'react-redux';
 import classNames from 'classnames';
 import { Link } from 'react-router-dom';
+import { useMediaQuery } from 'react-responsive';
 
 import classes from './ProductItem.module.css';
 import { RootState } from '../../store';
 import ButtonLink from '../UI/ButtonLink/ButtonLink';
 import DeleteButton from './DeleteButton/DeleteButton';
 import AddToCartButton from '../AddToCartButton/AddToCartButton';
+import StarRating from '../UI/StarRating/StarRating';
 
 interface ProductItemProps {
     id: number;
@@ -21,11 +23,13 @@ interface ProductItemProps {
     isAvailable: boolean;
     isRunningOut: boolean;
     isInTheCart: boolean;
+    userRating?: number;
 }
 
 const ProductItem: FC<ProductItemProps> = (props) => {
     const [showMainImage, setShowMainImage] = useState<boolean>(true);
     const isAdmin = useSelector((state: RootState) => state.auth.isAdmin);
+    const isLessThan250px = useMediaQuery({ query: '(max-width: 250px)' });
 
     const handleMouseEnter = () => setShowMainImage(false);
     const handleMouseLeave = () => setShowMainImage(true);
@@ -34,6 +38,7 @@ const ProductItem: FC<ProductItemProps> = (props) => {
         <article
             className={classNames(
                 classes['product-list__item'],
+                props.userRating !== undefined && classes['extended-height'],
                 isAdmin && classes.admin,
                 !props.isAvailable && classes['not-available'],
                 props.isAvailable &&
@@ -72,6 +77,15 @@ const ProductItem: FC<ProductItemProps> = (props) => {
                 >
                     {props.title}
                 </Link>
+                {props.userRating !== undefined && (
+                    <div className={classes['product-item__user-rating']}>
+                        <StarRating
+                            value={props.userRating}
+                            readOnly
+                            starSize={isLessThan250px ? '1.2rem' : ''}
+                        />
+                    </div>
+                )}
                 <p className={classes['product-item__price']}>
                     {props.price} ₴
                 </p>

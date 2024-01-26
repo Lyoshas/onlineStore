@@ -12,6 +12,10 @@
     background: #273c99;
 }
 
+.product-list__item.extended-height {
+    height: 450px;
+}
+
 .product-list__item,
 .product-item__description {
     transition: 0.2s box-shadow ease;
@@ -79,6 +83,10 @@
     position: absolute;
     bottom: 0;
     left: 20px;
+}
+
+.product-item__user-rating {
+    margin-top: 20px;
 }
 
 .product-item__img-block {

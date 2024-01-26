@@ -11,6 +11,7 @@ export const GET_FEATURED_PRODUCTS_NO_AUTH = gql(`
             shortDescription
             isAvailable
             isRunningOut
+            userRating
         }
     }
 `);
@@ -27,6 +28,7 @@ export const GET_FEATURED_PRODUCTS_WITH_AUTH = gql(`
             isAvailable
             isRunningOut
             isInTheCart
+            userRating
         }
     }
 `);

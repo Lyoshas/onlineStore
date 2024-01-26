@@ -16,6 +16,7 @@ interface Product {
     isAvailable: boolean;
     isRunningOut: boolean;
     isInTheCart?: boolean;
+    userRating?: number;
 }
 
 const ProductList: FC<{
@@ -51,6 +52,7 @@ const ProductList: FC<{
                         isAvailable={product.isAvailable}
                         isRunningOut={product.isRunningOut}
                         isInTheCart={product.isInTheCart}
+                        userRating={product.userRating}
                     />
                 );
             })}
