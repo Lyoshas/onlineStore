@@ -82,6 +82,7 @@ export const typeDefs = `#graphql
         userCanAddReview: Boolean!
         isAvailable: Boolean!
         isRunningOut: Boolean!
+        userRating: Float!
         reviews: [ProductReview!]!
     }
 

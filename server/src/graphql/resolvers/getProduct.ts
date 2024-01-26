@@ -14,6 +14,7 @@ import { UserCanAddReviewAuthError } from '../errors/UserCanAddReviewAuthError.j
 import ProductNotFoundError from '../errors/ProductNotFoundError.js';
 import camelCaseToSnakeCase from '../helpers/camelCaseToSnakeCase.js';
 import camelCaseObject from '../../util/camelCaseObject.js';
+import DisplayProduct from '../../interfaces/DisplayProduct.js';
 
 interface ProductReview {
     userId: number;
@@ -23,21 +24,13 @@ interface ProductReview {
     createdAt: string;
 }
 
-interface GetProductOutput {
-    id?: number;
-    title?: string;
-    price?: number;
-    category?: string;
-    initialImageUrl?: string;
-    additionalImageUrl?: string;
-    shortDescription?: string;
-    isInTheCart?: boolean;
-    isAvailable?: boolean;
-    isRunningOut?: boolean;
-    reviews?: Partial<ProductReview>[];
+type GetProductOutput = Partial<DisplayProduct> & {
+    // specifying additional fields that this GraphQL resolver might return
     userCanAddReview?: boolean;
-}
+    reviews: Partial<ProductReview>[];
+};
 
+// creating a type that specifies which fields this resolver accepts
 type PossibleGraphQLFields = {
     [prop in keyof GetProductOutput]: {};
 } & {
@@ -62,6 +55,7 @@ async function getProduct(
     const shouldGetIsInTheCart: boolean = 'isInTheCart' in requestedFields;
     const shouldGetUserCanAddReview: boolean =
         'userCanAddReview' in requestedFields;
+    const shouldGetUserRating: boolean = 'userRating' in requestedFields;
 
     if (shouldGetIsInTheCart && context.user === null) {
         throw new IsInTheCartAuthError();
@@ -89,7 +83,13 @@ async function getProduct(
                     SELECT 1 FROM product_reviews
                     WHERE product_id = 635 AND user_id = 601
                 )
-            ) AS user_can_add_review
+            ) AS user_can_add_review,
+            (
+                SELECT (ROUND(AVG(star_rating) * 2) / 2)::DECIMAL(3, 2)
+                FROM product_reviews AS p_r
+                INNER JOIN moderation_statuses AS m_s ON m_s.id = p_r.moderation_status_id
+                WHERE product_id = 754 AND m_s.name = 'approved'
+            ) AS user_rating
         FROM products
         INNER JOIN product_categories ON product_categories.id = products.category_id
         WHERE products.id = 635;
@@ -127,6 +127,26 @@ async function getProduct(
         );
     }
 
+    if (shouldGetUserRating) {
+        columnsToSelect.push(
+            knex
+                // rounding to the nearest 0.5
+                .select(
+                    knex.raw('(ROUND(AVG(star_rating) * 2) / 2)::DECIMAL(3, 2)')
+                )
+                .from('product_reviews')
+                .innerJoin(
+                    'moderation_statuses',
+                    'moderation_statuses.id',
+                    '=',
+                    'product_reviews.moderation_status_id'
+                )
+                .where('product_id', '=', productId)
+                .andWhere('moderation_statuses.name', '=', 'approved')
+                .as('user_rating')
+        );
+    }
+
     let queryBuilder = knex.select(columnsToSelect).from('products');
 
     if ('category' in requestedFields) {
@@ -139,9 +159,6 @@ async function getProduct(
     }
 
     queryBuilder = queryBuilder.where({ 'products.id': productId });
-
-    console.log('!!!!!!!!!!!!!!!!')
-    console.log(queryBuilder.toQuery())
 
     const {
         rows: [dbProductInfo],

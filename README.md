@@ -848,6 +848,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
       isRunningOut
       # only one review is allowed per user for each product, so 'userCanAddReview' specifies whether the user can post a review or not
       userCanAddReview
+      userRating # ranges from 1 to 5 in increments of 0.5
       reviews {
         userId
         fullName
@@ -874,6 +875,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
         "userCanAddReview": false,
         "isAvailable": true,
         "isRunningOut": false,
+        "userRating": 4.5,
         "reviews": [
           {
             "userId": 615,
