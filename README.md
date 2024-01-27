@@ -28,7 +28,7 @@
       - [Get a presigned URL](#get-a-presigned-url)
     - [GraphQL Queries and Mutations](#graphql-queries-and-mutations)
       - [1. Get basic information about an individual product (optionally with reviews to this product as well)](#1-get-basic-information-about-an-individual-product-optionally-with-reviews-to-this-product-as-well)
-      - [2. Get a list of products by specifying a page](#2-get-a-list-of-products-by-specifying-a-page)
+      - [2. Get a list of products by specifying a category and a page](#2-get-a-list-of-products-by-specifying-a-category-and-a-page)
       - [3. Get featured products](#3-get-featured-products)
       - [4. Get product info including 'quantity\_in\_stock' and/or 'max\_order\_quantity'](#4-get-product-info-including-quantity_in_stock-andor-max_order_quantity)
       - [5. Add a new product](#5-add-a-new-product)
