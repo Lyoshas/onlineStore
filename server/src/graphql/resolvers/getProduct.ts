@@ -15,6 +15,7 @@ import ProductNotFoundError from '../errors/ProductNotFoundError.js';
 import camelCaseToSnakeCase from '../helpers/camelCaseToSnakeCase.js';
 import camelCaseObject from '../../util/camelCaseObject.js';
 import DisplayProduct from '../../interfaces/DisplayProduct.js';
+import getUserRatingSubquery from '../helpers/getUserRatingSubquery.js';
 
 interface ProductReview {
     userId: number;
@@ -128,23 +129,7 @@ async function getProduct(
     }
 
     if (shouldGetUserRating) {
-        columnsToSelect.push(
-            knex
-                // rounding to the nearest 0.5
-                .select(
-                    knex.raw('(ROUND(AVG(star_rating) * 2) / 2)::DECIMAL(3, 2)')
-                )
-                .from('product_reviews')
-                .innerJoin(
-                    'moderation_statuses',
-                    'moderation_statuses.id',
-                    '=',
-                    'product_reviews.moderation_status_id'
-                )
-                .where('product_id', '=', productId)
-                .andWhere('moderation_statuses.name', '=', 'approved')
-                .as('user_rating')
-        );
+        columnsToSelect.push(getUserRatingSubquery(productId));
     }
 
     let queryBuilder = knex.select(columnsToSelect).from('products');

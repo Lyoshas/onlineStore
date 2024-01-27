@@ -13,15 +13,19 @@ import knex from '../../services/knex.service.js';
 import formatSqlQuery from '../../util/formatSqlQuery.js';
 import mapRequestedFieldsToProductInfo from '../helpers/mapRequestedFieldsToProductInfo.js';
 import checkProductCategory from '../validators/checkProductCategory.js';
+import getUserRatingSubquery from '../helpers/getUserRatingSubquery.js';
 
 type GetProductsByCategoryAndPageOutput = RequireAtLeastOneProperty<{
     productList: Partial<DisplayProduct>[];
     totalPages: number;
 }>;
 
-type ProductInfo = Omit<{
-    [productField in keyof DisplayProduct]: {};
-}, 'userRating'>;
+type ProductInfo = Omit<
+    {
+        [productField in keyof DisplayProduct]: {};
+    },
+    'userRating'
+>;
 
 interface PossibleGraphQLFields {
     productList?: Partial<ProductInfo>;
@@ -57,6 +61,9 @@ async function getProductsByCategoryAndPage(
     const shouldGetIsInTheCart: boolean =
         !!requestedFields.productList &&
         'isInTheCart' in requestedFields.productList;
+    const shouldGetUserRating: boolean =
+        !!requestedFields.productList &&
+        'userRating' in requestedFields.productList;
 
     if (shouldGetIsInTheCart && context.user === null) {
         throw new IsInTheCartAuthError();
@@ -82,7 +89,7 @@ async function getProductsByCategoryAndPage(
         const requestedFieldsList = Object.keys(
             requestedFields.productList
         ) as (keyof Exclude<PossibleGraphQLFields['productList'], undefined>)[];
-        const fieldsToFetch: (string | Knex.Raw)[] = [
+        const fieldsToFetch: (string | Knex.Raw | Knex.QueryBuilder)[] = [
             ...getRelevantProductFields(requestedFieldsList),
         ];
 
@@ -95,6 +102,11 @@ async function getProductsByCategoryAndPage(
                     END AS is_in_the_cart
                 `)
             );
+        }
+
+        if (shouldGetUserRating) {
+            // calculating the user rating of each selected product with a correlated subquery
+            fieldsToFetch.push(getUserRatingSubquery(knex.raw('products.id')));
         }
 
         let queryBuilder = knex.select(fieldsToFetch).from('products');

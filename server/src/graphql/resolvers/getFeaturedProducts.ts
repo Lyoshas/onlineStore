@@ -10,6 +10,7 @@ import { IsInTheCartAuthError } from '../errors/IsInTheCartAuthError.js';
 import dbPool from '../../services/postgres.service.js';
 import mapRequestedFieldsToProductInfo from '../helpers/mapRequestedFieldsToProductInfo.js';
 import formatSqlQuery from '../../util/formatSqlQuery.js';
+import getUserRatingSubquery from '../helpers/getUserRatingSubquery.js';
 
 type GetFeaturedProductsOutput = Partial<DisplayProduct>[];
 
@@ -97,21 +98,7 @@ async function getFeaturedProducts(
 
     if (shouldGetUserRating) {
         // calculating the user rating of each selected product with a correlated subquery
-        fieldsToFetch.push(
-            knex
-                // rounding to the nearest 0.5
-                .select(knex.raw('(ROUND(AVG(star_rating) * 2) / 2)::DECIMAL(3, 2)'))
-                .from('product_reviews')
-                .innerJoin(
-                    'moderation_statuses',
-                    'moderation_statuses.id',
-                    '=',
-                    'product_reviews.moderation_status_id'
-                )
-                .where('product_id', '=', knex.raw('products.id'))
-                .andWhere('moderation_statuses.name', '=', 'approved')
-                .as('user_rating')
-        );
+        fieldsToFetch.push(getUserRatingSubquery(knex.raw('products.id')));
     }
 
     let queryBuilder = knex.select(fieldsToFetch).from('products');

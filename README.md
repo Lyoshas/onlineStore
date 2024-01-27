@@ -949,13 +949,14 @@ Some API endpoints require authentication using access tokens and refresh tokens
         shortDescription
         isAvailable
         isRunningOut
-        isInTheCart // indicates whether the product is the cart of the user who requested this query
+        isInTheCart # indicates whether the product is the cart of the user who requested this query
+        userRating # indicates the rating of the product (from 1 to 5, in increments of 0.5)
       }
-      totalPages // indicates how many pages there are, used for pagination purposes
+      totalPages # indicates how many pages there are, used for pagination purposes
     }
   }
   ```
-  **Result**:
+  **Result (example)**:
   ```JSON
   {
     "data": {
@@ -970,7 +971,8 @@ Some API endpoints require authentication using access tokens and refresh tokens
             "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/14f5c601-96a6-41f2-a22e-9922bb207376.png",
             "shortDescription": "Екран 16.2\" Liquid Retina XDR (3456x2234) 120 Гц, глянсовий / Apple M1 Pro / RAM 16 ГБ / SSD 512 ГБ / Apple M1 Pro Graphics (16 ядер) / без ОД / Wi-Fi / Bluetooth / веб-камера / macOS Monterey / 2.1 кг / сірий",
             "isAvailable": true,
-            "isRunningOut": false
+            "isRunningOut": false,
+            "userRating": 4.5
           },
           {
             "id": 160,
@@ -981,7 +983,8 @@ Some API endpoints require authentication using access tokens and refresh tokens
             "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/0d51e340-f487-4f58-a25e-35f977eb6098.png",
             "shortDescription": "Екран 15.6\" IPS (1920x1080) Full HD 144 Гц, матовий / AMD Ryzen 5 5500U (2.1 - 4.0 ГГц) / RAM 8 ГБ / SSD 512 ГБ / nVidia GeForce RTX 3050, 4 ГБ / без ОД / LAN / Wi-Fi / Bluetooth / веб-камера / без ОС / 2.15 кг / чорний",
             "isAvailable": true,
-            "isRunningOut": true
+            "isRunningOut": true,
+            "userRating": 4
           },
           {
             "id": 161,
@@ -992,7 +995,8 @@ Some API endpoints require authentication using access tokens and refresh tokens
             "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/67c8dc18-3347-498c-a61a-028131b2cf69.png",
             "shortDescription": "Екран 15.6\" (1366x768) WXGA HD, матовий / Intel Celeron N4020 (1.1 - 2.8 ГГц) / RAM 4 ГБ / SSD 256 ГБ / Intel UHD Graphics 600 / без ОД / Wi-Fi / Bluetooth / веб-камера / Windows 11 / 1.8 кг / сріблястий",
             "isAvailable": true,
-            "isRunningOut": false
+            "isRunningOut": false,
+            "userRating": 5
           }
         ],
         "totalPages": 2
