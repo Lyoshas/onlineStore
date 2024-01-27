@@ -13,6 +13,7 @@ export const GET_PRODUCTS_BY_PAGE_NO_AUTH = gql(`
                 shortDescription
                 isAvailable
                 isRunningOut
+                userRating
             }
             totalPages
         }
@@ -33,6 +34,7 @@ export const GET_PRODUCTS_BY_PAGE_WITH_AUTH = gql(`
                 isAvailable
                 isRunningOut
                 isInTheCart
+                userRating
             }
             totalPages
         }
