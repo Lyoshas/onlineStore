@@ -2,6 +2,7 @@
     width: 100%;
     height: 100%;
     position: fixed;
+    top: 0;
     background: rgba(0, 0, 0, .7);
     /* z-index: 999 will be used for a modal window or something similar that will be on top of the backdrop */
     z-index: 998;
