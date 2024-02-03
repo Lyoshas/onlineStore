@@ -43,6 +43,8 @@
       - [5. Check if it's safe to add a product to the local cart](#5-check-if-its-safe-to-add-a-product-to-the-local-cart)
       - [6. Synchronize the local cart with the API](#6-synchronize-the-local-cart-with-the-api)
       - [7. Get the maximum number of items that a user is allowed to have in the cart](#7-get-the-maximum-number-of-items-that-a-user-is-allowed-to-have-in-the-cart)
+    - [Postal Services Endpoints](#postal-services-endpoints)
+      - [1. Get all Nova Poshta branches (відділення) and pickup points (пункти)](#1-get-all-nova-poshta-branches-відділення-and-pickup-points-пункти)
 
 ## Prerequisites
 - Install Docker and Docker Compose
@@ -2225,3 +2227,65 @@ Some API endpoints require authentication using access tokens and refresh tokens
       }
       ```
 - **Error responses**: none
+
+### Postal Services Endpoints
+#### 1. Get all Nova Poshta branches (відділення) and pickup points (пункти)
+- **URL:** /api/shipping/nova-poshta/warehouses
+- **Method:** GET
+- **Description:** returns all available Nova Poshta branches and pickup points. This endpoint is used by the React application to display all places where the order can be shipped to.
+- **Who can access:** everyone
+- **Rate limiting:** none
+- **Request body:** none
+- **Request params:** none
+- **Query string parameters:**
+  - _city_ - specifies the city for which you want to retrieve Nova Poshta branches and pickup points. It must be specified as a string and be supported by the API.
+- **Required cookies:** none
+- **Success response:**
+  - **Status code:** 200
+  - **Description:** the Nova Poshta branches and pickup points were returned successfully
+  - **Content:**
+    ```TypeScript
+    {
+      "warehouses": [
+        "Відділення №1: вул. Пирогівський шлях, 135",
+        "Відділення №2: вул. Богатирська, 11",
+        "Відділення №3 (до 30 кг на одне місце): вул. Слобожанська,13",
+        "Відділення №4: (до 200 кг) вул. Верховинна, 69",
+        "Відділення №5: вул. Федорова, 32 (м. Олімпійська)",
+        "Відділення №6: вул. Миколи Василенка, 2",
+        "Відділення №7 (до 10 кг): вул. Гната Хоткевича, 8 (м.Чернігівська)",
+        "Відділення №8 (до 30 кг на одне місце): вул. Набережно-Хрещатицька, 33",
+        "Відділення №9: пров. В'ячеслава Чорновола, 54а (р-н Жулянського мосту)",
+        "Відділення №10 (до 30 кг на одне місце): вул. Василя Жуковського, 22А",
+        "Відділення №12: вул. Якутська, 8",
+        // ...
+      ]
+    }
+    ```
+- **Error responses**:
+  - The 'city' parameter doesn't exist
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "the field 'city' must be specified",
+            "field": "city"
+          }
+        ]
+      }
+      ```
+  - The specified 'city' parameter isn't supported
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "the provided city is not supported",
+            "field": "city"
+          }
+        ]
+      }
+      ```

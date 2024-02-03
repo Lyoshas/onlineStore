@@ -29,6 +29,7 @@ import errorHandler from './middlewares/error-handler.js';
 import notFoundHandler from './middlewares/not-found-handler.js';
 import productCategoriesRoutes from './routes/product-category.js';
 import s3Routes from './routes/file-upload.js';
+import shippingRoutes from './routes/shipping.js';
 
 const app = express();
 
@@ -56,6 +57,8 @@ app.use('/user', orderRoutes);
 app.use('/product', productCategoriesRoutes);
 
 app.use('/s3', s3Routes);
+
+app.use('/shipping', shippingRoutes);
 
 const startGraphQLServer = async () => {
     const server = new ApolloServer<ApolloServerContext>({
