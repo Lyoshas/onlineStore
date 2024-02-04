@@ -50,3 +50,9 @@ export const getWarehousesByCity: RequestHandler<
         dbClient.release();
     });
 });
+
+export const getSupportedCities: RequestHandler = asyncHandler(
+    async (req, res, next) => {
+        res.json({ supportedCities: await shippingModel.getSupportedCities() });
+    }
+);

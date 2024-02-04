@@ -43,8 +43,9 @@
       - [5. Check if it's safe to add a product to the local cart](#5-check-if-its-safe-to-add-a-product-to-the-local-cart)
       - [6. Synchronize the local cart with the API](#6-synchronize-the-local-cart-with-the-api)
       - [7. Get the maximum number of items that a user is allowed to have in the cart](#7-get-the-maximum-number-of-items-that-a-user-is-allowed-to-have-in-the-cart)
-    - [Postal Services Endpoints](#postal-services-endpoints)
-      - [1. Get all Nova Poshta branches (відділення) and pickup points (пункти)](#1-get-all-nova-poshta-branches-відділення-and-pickup-points-пункти)
+    - [Shipping Endpoints](#shipping-endpoints)
+      - [1. Get a list of supported cities for shipping](#1-get-a-list-of-supported-cities-for-shipping)
+      - [2. Get all Nova Poshta branches (відділення) and pickup points (пункти)](#2-get-all-nova-poshta-branches-відділення-and-pickup-points-пункти)
 
 ## Prerequisites
 - Install Docker and Docker Compose
@@ -2228,8 +2229,28 @@ Some API endpoints require authentication using access tokens and refresh tokens
       ```
 - **Error responses**: none
 
-### Postal Services Endpoints
-#### 1. Get all Nova Poshta branches (відділення) and pickup points (пункти)
+### Shipping Endpoints
+#### 1. Get a list of supported cities for shipping
+- **URL:** /api/shipping/supported-cities
+- **Method:** GET
+- **Description:** returns a list of cities that are supported for delivery within the application
+- **Who can access:** everyone
+- **Rate limiting:** none
+- **Request body:** none
+- **Request params:** none
+- **Query string parameters:** none
+- **Required cookies:** none
+- **Success response:**
+  - **Status code:** 200
+  - **Description:** the list of cities has been returned successfully
+  - **Content (example):**
+    ```JSON
+    {
+      "supportedCities": ["Київ"]
+    }
+    ```
+- **Error responses**: none
+#### 2. Get all Nova Poshta branches (відділення) and pickup points (пункти)
 - **URL:** /api/shipping/nova-poshta/warehouses
 - **Method:** GET
 - **Description:** returns all available Nova Poshta branches and pickup points. This endpoint is used by the React application to display all places where the order can be shipped to.

@@ -86,3 +86,10 @@ export const doesCityExist = async (city: string): Promise<boolean> => {
     );
     return rows[0].exists;
 };
+
+export const getSupportedCities = async (): Promise<string[]> => {
+    const { rows } = await dbPool.query<{ city_name: string }>(
+        'SELECT name AS city_name FROM cities'
+    );
+    return rows.map((row) => row.city_name);
+};

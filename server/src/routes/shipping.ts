@@ -27,4 +27,6 @@ router.get(
     shippingController.getWarehousesByCity
 );
 
+router.get('/supported-cities', shippingController.getSupportedCities);
+
 export default router;
