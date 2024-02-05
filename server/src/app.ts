@@ -30,6 +30,7 @@ import notFoundHandler from './middlewares/not-found-handler.js';
 import productCategoriesRoutes from './routes/product-category.js';
 import s3Routes from './routes/file-upload.js';
 import shippingRoutes from './routes/shipping.js';
+import userRoutes from './routes/user.js';
 
 const app = express();
 
@@ -50,9 +51,11 @@ app.use('/auth', [
     logoutRoutes,
 ]);
 
-app.use('/user', cartRoutes);
-
-app.use('/user', orderRoutes);
+app.use('/user', [
+    cartRoutes,
+    orderRoutes,
+    userRoutes
+])
 
 app.use('/product', productCategoriesRoutes);
 

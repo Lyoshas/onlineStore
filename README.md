@@ -46,6 +46,8 @@
     - [Shipping Endpoints](#shipping-endpoints)
       - [1. Get a list of supported cities for shipping](#1-get-a-list-of-supported-cities-for-shipping)
       - [2. Get all Nova Poshta branches (відділення) and pickup points (пункти)](#2-get-all-nova-poshta-branches-відділення-and-pickup-points-пункти)
+    - [User Endpoints](#user-endpoints)
+      - [1. Get the first name and last name of the user who makes the request](#1-get-the-first-name-and-last-name-of-the-user-who-makes-the-request)
 
 ## Prerequisites
 - Install Docker and Docker Compose
@@ -2310,3 +2312,36 @@ Some API endpoints require authentication using access tokens and refresh tokens
         ]
       }
       ```
+
+### User Endpoints
+#### 1. Get the profile of the user who makes the request
+- **URL:** /api/user/profile
+- **Method:** GET
+- **Description:** retrieves the first name, last name, and phone number of the requester. The phone number can be 'null'.
+- **Who can access:** only authenticated users with the provided [access token](#access-token)
+- **Rate limiting:** none
+- **Request body:** none
+- **Request params:** none
+- **Query string parameters:** none
+- **Required cookies:** none
+- **Success response:**
+  - **Status code:** 200
+  - **Description:** the first name and last name were returned successfully
+  - **Content**
+    - **Example 1 (phone number is specified):**
+    ```JSON
+    {
+      "firstName": "Oleksii",
+      "lastName": "Potapchuk",
+      "phoneNumber": "+380-12-345-67-89"
+    }
+    ```
+    - **Example 2 (phone number is not specified):**
+    ```JSON
+    {
+      "firstName": "Oleksii",
+      "lastName": "Potapchuk",
+      "phoneNumber": null
+    }
+    ```
+- **Error responses**: none

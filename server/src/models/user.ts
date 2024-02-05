@@ -2,6 +2,7 @@ import bcryptjs from 'bcryptjs';
 
 import dbPool from '../services/postgres.service.js';
 import UserCredentials from '../interfaces/UserCredentials.js';
+import formatSqlQuery from '../util/formatSqlQuery.js';
 
 export const getUserIdByEmail = (email: string): Promise<number | null> => {
     return dbPool
@@ -53,4 +54,38 @@ export const getUserIdByCredentials = (
 
             return Promise.resolve(userData.id);
         });
+};
+
+export const getProfileByUserId = async (
+    userId: number
+): Promise<{
+    firstName: string;
+    lastName: string;
+    phoneNumber: string | null;
+}> => {
+    const {
+        rows: [
+            {
+                first_name: firstName,
+                last_name: lastName,
+                phone_number: phoneNumber,
+            },
+        ],
+    } = await dbPool.query<{
+        first_name: string;
+        last_name: string;
+        phone_number: string | null;
+    }>(
+        formatSqlQuery(`
+            SELECT
+                first_name,
+                last_name,
+                phone_number
+            FROM users
+            WHERE id = $1
+        `),
+        [userId]
+    );
+
+    return { firstName, lastName, phoneNumber };
 };
