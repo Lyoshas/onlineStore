@@ -4,6 +4,20 @@ export async function seed(knex: Knex): Promise<void> {
     // Deletes ALL existing entries
     await knex('cities').del();
 
+    const cities = [
+        'Київ',
+        'Львів',
+        'Тернопіль',
+        'Запоріжжя',
+        'Харків',
+        'Херсон',
+        'Миколаїв',
+        'Чернівці',
+        'Житомир',
+        'Луцьк',
+        'Дніпро',
+    ];
+
     // Inserts seed entries
-    await knex('cities').insert([{ id: 1, name: 'Київ' }]);
+    await knex('cities').insert(cities.map((city) => ({ name: city })));
 }
