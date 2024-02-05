@@ -27,6 +27,13 @@
     box-sizing: border-box;
     padding: 8px;
     font-size: 1rem;
+    border: 2px solid #aaaaaa;
+    border-radius: 5px;
+}
+
+.form-input:focus {
+    border-color: #000;
+    outline: none;
 }
 
 .form__error-message {
