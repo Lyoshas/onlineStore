@@ -1,7 +1,6 @@
 .button {
     border: none;
     padding: 8px 15px;
-    background: #5262a7;
     color: white;
     border-radius: 5px;
     font-size: 1rem;
@@ -9,11 +8,24 @@
     transition: 0.2s background-color ease;
 }
 
-.button:hover {
+.button.default-color-theme {
+    background: #5262a7;
+}
+
+.button.default-color-theme:hover {
     background: #707db4;
 }
 
-.button:disabled {
+.button.second-color-theme {
+    background: #405ee1;
+}
+
+.button.second-color-theme:hover {
+    background: #617ae8;
+}
+
+.button.default-color-theme:disabled,
+.button.second-color-theme:disabled {
     background: #ccc;
     cursor: not-allowed;
 }

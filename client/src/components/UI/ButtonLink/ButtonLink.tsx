@@ -17,6 +17,7 @@ const ButtonLink: FC<ButtonLinkProps> = (props) => {
     const className = classNames(
         buttonClasses.button,
         classes['button-link'],
+        buttonClasses['default-color-theme'],
         props.className
     );
 
