@@ -15,7 +15,11 @@ export const getUserCart = async (userId: number): Promise<CartEntry[]> => {
                 p.title,
                 p.price,
                 p.initial_image_url,
-                c.quantity
+                c.quantity,
+                (
+                    c.quantity <= p.quantity_in_stock AND
+                    c.quantity <= p.max_order_quantity
+                ) AS can_be_ordered
             FROM carts AS c
             INNER JOIN products AS p ON c.product_id = p.id
             WHERE c.user_id = $1

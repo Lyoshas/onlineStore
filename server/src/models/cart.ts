@@ -55,11 +55,12 @@ export const countCartItems = async (
 // if it fails, the function will fall back to using PostgreSQL
 
 export const getCartTotalPrice = (cartContent: CartEntry[]): number => {
-    return cartContent.reduce(
-        (acc, cartProduct) =>
-            acc + Number(cartProduct.price) * Number(cartProduct.quantity),
-        0
-    );
+    return cartContent.reduce((acc, cartProduct) => {
+        // don't include cart products that are "unavailable"
+        if (!cartProduct.canBeOrdered) return acc;
+
+        return acc + Number(cartProduct.price) * Number(cartProduct.quantity);
+    }, 0);
 };
 
 export const upsertProductToCart = async (

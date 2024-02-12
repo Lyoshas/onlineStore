@@ -64,20 +64,25 @@ export const upsertProductToCart = async (
     for (let cartItem of cart) {
         if (cartItem.productId === productId) {
             cartItem.quantity = quantity;
+            // if this function is used, it's assumed that it was checked
+            // whether this upsert operation does not conflict with the
+            // existing product inventory and the 'maxOrderQuantity' limit
+            // hasn't been exceeded
+            cartItem.canBeOrdered = true;
             entryExists = true;
         }
     }
 
     if (!entryExists) {
+        const missingProductData = (
+            await productModel.getMissingCartProductInfo([
+                { productId, quantityInCart: quantity },
+            ])
+        )[productId];
+
         cart.push({
             productId,
-            ...camelCaseObject(
-                await productModel.getProduct(productId, [
-                    'title',
-                    'price',
-                    'initial_image_url',
-                ])
-            ),
+            ...missingProductData,
             quantity,
         });
     }
@@ -96,19 +101,16 @@ export const bulkInsert = async (
     // if the cart isn't cached, do nothing
     if (cart === null) return;
 
-    // we need to fetch 'title', 'price' and 'initialImageUrl' for the provided products
-    const productIDs: number[] = cartProductsSummary.map(
-        (cartProduct) => cartProduct.productId
-    );
+    // we need to fetch 'title', 'price', 'initialImageUrl', 'cartQuantityExceedsStock', 'isMaxOrderLimitExceeded' for the provided products
     const missingProductData = await productModel.getMissingCartProductInfo(
-        productIDs
+        cartProductsSummary
     );
 
     cartProductsSummary.forEach((cartProduct) => {
         cart!.push({
             productId: cartProduct.productId,
             quantity: cartProduct.quantityInCart,
-            ...missingProductData[cartProduct.productId]!,
+            ...missingProductData[cartProduct.productId],
         });
     });
 

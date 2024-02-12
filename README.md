@@ -1768,7 +1768,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
   - **Status code:** 200
   - **Description:** The cart has been fetched successfully
   - **Content (if there are items in the cart):**
-    ```JSON
+    ```TypeScript
     {
       "products": [
         {
@@ -1776,17 +1776,21 @@ Some API endpoints require authentication using access tokens and refresh tokens
           "title": "Монітор 24\" Samsung LF24T450 Black",
           "price": 4000,
           "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/7f5e2915-66f7-45e0-9802-775db86b86dd.png",
-          "quantity": 50
+          "quantity": 50,
+          // a cart product can be ordered if the specified quantity doesn't exceed the stock balance and if the "maxOrderQuantity" limit hashn't been exceeded
+          "canBeOrdered": false
         },
         {
           "productId": 2,
           "title": "Sony PlayStation 5 Digital Edition 825GB White",
           "price": 28999,
           "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/64d22b21-b6be-4038-b37c-7e5696b7bd14.png",
-          "quantity": 2
+          "quantity": 2,
+          "canBeOrdered": true
         }
       ],
-      "totalPrice": 257998
+      // cart products that can't be ordered aren't included in the total price
+      "totalPrice": 57998
     }
     ```
   - **Content (if there are no items in the cart):**

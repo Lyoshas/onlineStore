@@ -6,6 +6,7 @@ import dbPool from '../services/postgres.service.js';
 import ProductNotFoundError from '../errors/ProductNotFoundError.js';
 import CartEntry from '../interfaces/CartEntry.js';
 import formatSqlQuery from '../util/formatSqlQuery.js';
+import CartProductSummary from '../interfaces/CartProductSummary.js';
 
 export type PossibleProductFields = (keyof DBProduct)[];
 
@@ -78,30 +79,65 @@ export const getLimitationsForProducts = async (
 
 // accepts product IDs, fetches info from the DB, and makes it adhere to the format of cart products
 // this function returns an object:
-// { productId: { title, price, initialImageUrl } }
+// {
+//     productId: {
+//         title,
+//         price,
+//         initialImageUrl,
+//         canBeOrdered
+//     }
+// }
 // this output allows to quickly perform lookups
 export const getMissingCartProductInfo = async (
-    productIds: number[]
+    productQuantities: CartProductSummary[]
 ): Promise<{
-    [productId: number]: Omit<CartEntry, 'productId' | 'quantity'> | undefined;
+    [productId: number]: Omit<CartEntry, 'productId' | 'quantity'>;
 }> => {
+    // creates parameters to prevent SQL injection
+    const serializeParameters = (productEntriesNum: number): string => {
+        let i: number = 0;
+        let parameterizedQuery: string = '';
+
+        for (let j = 0; j < productEntriesNum; j++) {
+            parameterizedQuery += `($${++i}, $${++i}),`;
+        }
+
+        return parameterizedQuery.slice(0, -1);
+    };
+
     const { rows } = await dbPool.query<{
         product_id: number;
         title: string;
         // price will look like this: '25499.00'
         price: string;
         initial_image_url: string;
+        can_be_ordered: boolean;
     }>(
         formatSqlQuery(`
             SELECT
-                id AS product_id,
-                title,
-                price,
-                initial_image_url
-            FROM products
-            WHERE id = ANY($1)
+                p.id AS product_id,
+                p.title,
+                p.price,
+                p.initial_image_url,
+                (
+                    c.quantity_in_cart <= p.quantity_in_stock AND
+                    c.quantity_in_cart <= p.max_order_quantity
+                ) AS can_be_ordered
+            FROM products AS p
+            INNER JOIN (
+                VALUES ${
+                    // it's NOT prone to SQL injections because this function doesn't include any user-provided data
+                    serializeParameters(productQuantities.length)
+                }
+            ) AS c(product_id, quantity_in_cart)
+                ON c.product_id::INTEGER = p.id;
         `),
-        [productIds]
+        productQuantities
+            .map((productQuantity) => [
+                productQuantity.productId,
+                productQuantity.quantityInCart,
+            ])
+            .flat()
     );
 
     const lookupObj: Awaited<ReturnType<typeof getMissingCartProductInfo>> = {};
@@ -111,6 +147,7 @@ export const getMissingCartProductInfo = async (
             title: row.title,
             price: +row.price,
             initialImageUrl: row.initial_image_url,
+            canBeOrdered: row.can_be_ordered,
         };
     });
 
