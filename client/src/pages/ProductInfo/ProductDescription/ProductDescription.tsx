@@ -14,7 +14,7 @@ interface ProductDescriptionProps {
     isProductAvailable: boolean;
     isProductRunningOut: boolean;
     isInTheCart: boolean;
-    userRating: number;
+    userRating: number | null;
 }
 
 const ProductDescription: FC<ProductDescriptionProps> = ({
@@ -31,9 +31,11 @@ const ProductDescription: FC<ProductDescriptionProps> = ({
     return (
         <section className={classes['product-info__description']}>
             <h2 className={classes['product-description__title']}>{title}</h2>
-            <div className={classes['product-description__user-rating']}>
-                <StarRating value={userRating} readOnly />
-            </div>
+            {userRating !== null && (
+                <div className={classes['product-description__user-rating']}>
+                    <StarRating value={userRating} readOnly />
+                </div>
+            )}
             <span
                 className={classNames(
                     classes['product-description__price'],

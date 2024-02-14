@@ -32,6 +32,16 @@
     align-items: center;
 }
 
+.product-reviews__no-reviews-warning,
+.product-reviews__sign-in-warning {
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.sign-in-warning__link {
+    color: white;
+}
+
 @media screen and (max-width: 1200px) {
     .product-info {
         flex-wrap: wrap;

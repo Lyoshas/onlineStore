@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { useLazyQuery } from '@apollo/client';
 import classNames from 'classnames';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import classes from './ProductInfo.module.css';
@@ -23,6 +23,7 @@ import {
 import LoadingScreen from '../../components/UI/LoadingScreen/LoadingScreen';
 import ProductReview from '../../components/ProductReview/ProductReview';
 import AddReviewButton from './AddReviewButton/AddReviewButton';
+import { Link } from 'react-router-dom';
 
 const createErrorBlock = (errorMessage: string) => {
     return (
@@ -173,7 +174,7 @@ const ProductInfo = () => {
                     isProductAvailable={isAvailable}
                     isProductRunningOut={isRunningOut}
                     isInTheCart={isInTheCart}
-                    userRating={userRating}
+                    userRating={userRating || null}
                 />
             </article>
             <div className={classes['product-info__reviews']}>
@@ -187,6 +188,37 @@ const ProductInfo = () => {
                     </div>
                 ) : (
                     reviewsHeading
+                )}
+                {reviews.length === 0 && (
+                    <Fragment>
+                        <p
+                            className={
+                                classes['product-reviews__no-reviews-warning']
+                            }
+                        >
+                            Currently, there are no reviews. You can be the
+                            first to share your thoughts!
+                        </p>
+                        {!isAuthenticated && (
+                            <p
+                                className={
+                                    classes['product-reviews__sign-in-warning']
+                                }
+                            >
+                                Please{' '}
+                                <Link
+                                    to="/auth/sign-in"
+                                    className={classNames(
+                                        'link',
+                                        classes['sign-in-warning__link']
+                                    )}
+                                >
+                                    log in
+                                </Link>{' '}
+                                to create a review
+                            </p>
+                        )}
+                    </Fragment>
                 )}
                 {reviews.map((review) => (
                     <ProductReview

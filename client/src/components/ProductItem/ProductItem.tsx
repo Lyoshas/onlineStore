@@ -23,7 +23,7 @@ interface ProductItemProps {
     isAvailable: boolean;
     isRunningOut: boolean;
     isInTheCart: boolean;
-    userRating?: number;
+    userRating: number | null;
 }
 
 const ProductItem: FC<ProductItemProps> = (props) => {
@@ -77,7 +77,7 @@ const ProductItem: FC<ProductItemProps> = (props) => {
                 >
                     {props.title}
                 </Link>
-                {props.userRating !== undefined && (
+                {props.userRating !== null && (
                     <div className={classes['product-item__user-rating']}>
                         <StarRating
                             value={props.userRating}
