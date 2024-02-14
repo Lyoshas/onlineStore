@@ -82,7 +82,7 @@ export const typeDefs = `#graphql
         userCanAddReview: Boolean!
         isAvailable: Boolean!
         isRunningOut: Boolean!
-        userRating: Float!
+        userRating: Float
         reviews: [ProductReview!]!
     }
 
@@ -97,7 +97,7 @@ export const typeDefs = `#graphql
         isInTheCart: Boolean!
         isAvailable: Boolean!
         isRunningOut: Boolean!
-        userRating: Float!
+        userRating: Float
     }
 
     type ProductUpsertReturnValue {

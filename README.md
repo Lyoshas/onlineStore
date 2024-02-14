@@ -853,7 +853,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
       isRunningOut
       # only one review is allowed per user for each product, so 'userCanAddReview' specifies whether the user can post a review or not
       userCanAddReview
-      userRating # ranges from 1 to 5 in increments of 0.5
+      userRating # ranges from 1 to 5 in increments of 0.5, can be null if there are no reviews
       reviews {
         userId
         fullName
@@ -955,7 +955,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
         isAvailable
         isRunningOut
         isInTheCart # indicates whether the product is the cart of the user who requested this query
-        userRating # indicates the rating of the product (from 1 to 5, in increments of 0.5)
+        userRating # indicates the rating of the product (from 1 to 5, in increments of 0.5), can be null if there are no reviews
       }
       totalPages # indicates how many pages there are, used for pagination purposes
     }
@@ -1060,7 +1060,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
       isAvailable
       isRunningOut
       isInTheCart # indicates whether the product is the cart of the user who requested this query
-      userRating # returns the rating of the product in increments of 0.5
+      userRating # returns the rating of the product in increments of 0.5, can be null if there are no reviews
     }
   }
   ```
