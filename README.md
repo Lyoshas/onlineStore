@@ -48,6 +48,8 @@
       - [2. Get all Nova Poshta branches (відділення) and pickup points (пункти)](#2-get-all-nova-poshta-branches-відділення-and-pickup-points-пункти)
     - [User Endpoints](#user-endpoints)
       - [1. Get the first name and last name of the user who makes the request](#1-get-the-first-name-and-last-name-of-the-user-who-makes-the-request)
+    - [Order Endpoints](#order-endpoints)
+      - [1. Get the first name and last name of the user who makes the request](#1-get-the-first-name-and-last-name-of-the-user-who-makes-the-request)
 
 ## Prerequisites
 - Install Docker and Docker Compose
@@ -2349,3 +2351,119 @@ Some API endpoints require authentication using access tokens and refresh tokens
     }
     ```
 - **Error responses**: none
+
+### Order Endpoints
+#### 1. Check order feasibility
+- **URL:** /api/user/order/check-feasibility
+- **Method:** POST
+- **Description:** checks if it's possible to order the provided products. The user gives a list of product IDs along with the quantities they want to order, and the server returns whether the provided products can be ordered in the provided quantities or not.
+- **Who can access:** everyone
+- **Rate limiting:** none
+- **Request body (the whole body must be an array):**
+  ```TypeScript
+  {
+    productId: number;
+    quantity: number;
+  }[]
+  ```
+  - _productId_ - must be an integer that is greater than zero
+  - _quantity_ - must be an integer that is greater than zero
+- **Request params:** none
+- **Required cookies:** none
+- **Success response:**
+  - **Status code:** 200
+  - **Description:** the check has been performed successfully
+  - **Content:**
+    ```TypeScript
+    {
+      // productId: { canBeOrdered: boolean }
+      "1261": {
+        "canBeOrdered": true
+      },
+      "1262": {
+        "canBeOrdered": false
+      },
+      "1263": {
+        "canBeOrdered": false
+      },
+      "1264": {
+        "canBeOrdered": false
+      },
+      "1265": {
+        "canBeOrdered": true
+      }
+    }
+    ```
+- **Error responses**:
+  - The request body isn't provided or it's not a non-empty array
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "request body must be a non-empty array",
+            "field": ""
+          }
+        ]
+      }
+      ```
+  - The specified 'productId' parameter is not a number
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "each productId must be an integer that is greater than zero",
+            "field": "[0].productId"
+          }
+        ]
+      }
+  - The specified 'quantity' parameter is not a number
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "each quantity must be an integer that is greater than zero",
+            "field": "[0].quantity"
+          }
+        ]
+      }
+  - The user is trying to check more products at a time than allowed (determined by the process.env.MAX_PRODUCTS_IN_CART variable)
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "only a limited number of products can be checked at once",
+            "maxAllowedProducts": 5
+          }
+        ]
+      }
+  - Some of the provided product identifiers are duplicated
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "request body must not contain duplicate product IDs",
+            "field": "req.body"
+          }
+        ]
+      }
+  - At least one of the provided products doesn't exist
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+              "message": "some of the provided product IDs don't exist"
+          }
+        ]
+      }

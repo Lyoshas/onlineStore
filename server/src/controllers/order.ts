@@ -5,9 +5,19 @@ import VerifiedUserInfo from '../interfaces/VerifiedUserInfo.js';
 import * as orderModel from '../models/order.js';
 import * as cartModel from '../models/cart.js';
 import * as transactionModel from '../models/pg-transaction.js';
+import * as productModel from '../models/product.js';
 import EmptyCartError from '../errors/EmptyCartError.js';
 import UnexpectedError from '../errors/UnexpectedError.js';
 import dbPool from '../services/postgres.service.js';
+import CheckOrderFeasabilityReqBody from '../interfaces/CheckOrderFeasabilityReqBody.js';
+
+export const checkOrderFeasability: RequestHandler<
+    unknown,
+    unknown,
+    CheckOrderFeasabilityReqBody
+> = asyncHandler(async (req, res, next) => {
+    res.json(await productModel.canProductsBeOrdered(req.body));
+});
 
 export const createOrder: RequestHandler = asyncHandler(
     async (req, res, next) => {

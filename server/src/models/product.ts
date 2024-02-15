@@ -7,6 +7,7 @@ import ProductNotFoundError from '../errors/ProductNotFoundError.js';
 import CartEntry from '../interfaces/CartEntry.js';
 import formatSqlQuery from '../util/formatSqlQuery.js';
 import CartProductSummary from '../interfaces/CartProductSummary.js';
+import CheckOrderFeasabilityReqBody from '../interfaces/CheckOrderFeasabilityReqBody.js';
 
 export type PossibleProductFields = (keyof DBProduct)[];
 
@@ -77,6 +78,18 @@ export const getLimitationsForProducts = async (
     }));
 };
 
+// creates parameters to prevent SQL injection
+const serializeParameters = (productEntriesNum: number): string => {
+    let i: number = 0;
+    let parameterizedQuery: string = '';
+
+    for (let j = 0; j < productEntriesNum; j++) {
+        parameterizedQuery += `($${++i}, $${++i}),`;
+    }
+
+    return parameterizedQuery.slice(0, -1);
+};
+
 // accepts product IDs, fetches info from the DB, and makes it adhere to the format of cart products
 // this function returns an object:
 // {
@@ -93,18 +106,6 @@ export const getMissingCartProductInfo = async (
 ): Promise<{
     [productId: number]: Omit<CartEntry, 'productId' | 'quantity'>;
 }> => {
-    // creates parameters to prevent SQL injection
-    const serializeParameters = (productEntriesNum: number): string => {
-        let i: number = 0;
-        let parameterizedQuery: string = '';
-
-        for (let j = 0; j < productEntriesNum; j++) {
-            parameterizedQuery += `($${++i}, $${++i}),`;
-        }
-
-        return parameterizedQuery.slice(0, -1);
-    };
-
     const { rows } = await dbPool.query<{
         product_id: number;
         title: string;
@@ -161,4 +162,68 @@ export const productExists = async (productId: number): Promise<boolean> => {
     );
 
     return rowCount > 0;
+};
+
+// returns 'true' if all the provided products exist
+// if at least one product doesn't exist, returns 'false'
+export const productsExist = async (productIDs: number[]): Promise<boolean> => {
+    const { rowCount } = await dbPool.query(
+        `
+            SELECT 1
+            FROM products
+            WHERE id = ANY($1)
+        `,
+        [productIDs]
+    );
+
+    return rowCount === productIDs.length;
+};
+
+export const canProductsBeOrdered = async (
+    productEntries: CheckOrderFeasabilityReqBody
+): Promise<{
+    [productId: number]: { canBeOrdered: boolean };
+}> => {
+    const rows = await dbPool
+        .query<{
+            product_id: number;
+            can_be_ordered: boolean;
+        }>(
+            formatSqlQuery(`
+                SELECT
+                    c.product_id,
+                    (
+                        c.quantity_in_cart::INTEGER <= p.quantity_in_stock
+                        AND c.quantity_in_cart::INTEGER <= p.max_order_quantity
+                    ) AS can_be_ordered
+                FROM (
+                    VALUES ${
+                        // it's NOT prone to SQL injections because this function doesn't include any user-provided data
+                        serializeParameters(productEntries.length)
+                    }
+                ) AS c(product_id, quantity_in_cart)
+                INNER JOIN products AS p
+                    ON p.id = c.product_id::INTEGER;
+            `),
+            productEntries
+                .map((productQuantity) => [
+                    productQuantity.productId,
+                    productQuantity.quantity,
+                ])
+                .flat()
+        )
+        .then(({ rows }) =>
+            rows.map((row) => ({
+                productId: row.product_id,
+                canBeOrdered: row.can_be_ordered,
+            }))
+        );
+
+    const result: Awaited<ReturnType<typeof canProductsBeOrdered>> = {};
+
+    rows.forEach((row) => {
+        result[row.productId] = { canBeOrdered: row.canBeOrdered };
+    });
+
+    return result;
 };
