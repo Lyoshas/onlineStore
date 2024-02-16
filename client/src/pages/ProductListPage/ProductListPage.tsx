@@ -59,7 +59,7 @@ const ProductListPage = () => {
     }, [isAuthenticated]);
 
     const productsLoading = productsNoAuthLoading || productsWithAuthLoading;
-    const products =
+    let products =
         productsNoAuthData?.products || productsWithAuthData?.products || null;
     const productsFetchError = productsNoAuthError || productsWithAuthError;
 
@@ -88,7 +88,12 @@ const ProductListPage = () => {
 
     return (
         <Layout className={classes['product-layout']}>
-            <ProductList products={products.productList} />
+            <ProductList
+                products={products.productList.map((product) => ({
+                    ...product,
+                    userRating: product.userRating || null,
+                }))}
+            />
             <Pagination
                 currentPage={currentPage}
                 totalPages={products.totalPages}

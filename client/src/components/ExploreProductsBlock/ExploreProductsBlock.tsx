@@ -78,7 +78,12 @@ const ExploreProductsBlock = () => {
                 )}
             </div>
             {featuredProducts ? (
-                <ProductList products={featuredProducts} />
+                <ProductList
+                    products={featuredProducts.map((product) => ({
+                        ...product,
+                        userRating: product.userRating || null,
+                    }))}
+                />
             ) : (
                 ''
             )}
