@@ -86,6 +86,7 @@ const AddToCartButton: FC<AddToCartButtonProps> = ({
                 price: props.price,
                 initialImageUrl: props.initialImageUrl,
                 quantity: 1,
+                canBeOrdered: true,
             })
         );
         dispatch(highlightCartActions.changeHighlightState(true));

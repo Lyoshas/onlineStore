@@ -9,6 +9,23 @@
     padding: 5px;
 }
 
+.cart-products__unavailable-items {
+    opacity: 0.5;
+}
+
+.unavailable-products__heading {
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid #000;
+    line-height: 0.1rem;
+    margin: 10px 0 20px;
+}
+
+.cart-products__heading-text-wrapper {
+    background: #fff;
+    padding: 0 20px;
+}
+
 .no-cart-products {
     margin: 10px 0;
     text-align: center;

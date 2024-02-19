@@ -65,6 +65,21 @@ const localCartSlice = createSlice({
         emptyCart(state) {
             state.products = {};
         },
+        updateCartProductsAvailability(
+            state,
+            action: PayloadAction<{
+                [productId: number]: { canBeOrdered: boolean };
+            }>
+        ) {
+            for (let [productId, productData] of Object.entries(
+                action.payload
+            )) {
+                if (productId in state.products) {
+                    state.products[productId]!.canBeOrdered =
+                        productData.canBeOrdered;
+                }
+            }
+        },
     },
 });
 

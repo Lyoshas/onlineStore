@@ -4,6 +4,7 @@ interface CartProduct {
     price: number;
     initialImageUrl: string;
     quantity: number;
+    canBeOrdered: boolean;
 }
 
 export default CartProduct;

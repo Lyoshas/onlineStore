@@ -11,6 +11,7 @@ import { cartApi } from './apis/cartApi';
 import cartModalSlice from './slices/cartModal';
 import highlightCartSlice from './slices/highlightCart';
 import localCartSlice, { persistLocalCartMiddleware } from './slices/localCart';
+import { orderCheckApi } from './apis/orderCheckApi';
 
 const store = configureStore({
     reducer: {
@@ -24,6 +25,7 @@ const store = configureStore({
         [s3PresignedUrlApi.reducerPath]: s3PresignedUrlApi.reducer,
         [s3UploadApi.reducerPath]: s3UploadApi.reducer,
         [cartApi.reducerPath]: cartApi.reducer,
+        [orderCheckApi.reducerPath]: orderCheckApi.reducer,
     },
     middleware: (getDefaultMiddleware) => {
         return getDefaultMiddleware()
@@ -32,6 +34,7 @@ const store = configureStore({
             .concat(s3PresignedUrlApi.middleware)
             .concat(s3UploadApi.middleware)
             .concat(cartApi.middleware)
+            .concat(orderCheckApi.middleware)
             .concat(persistLocalCartMiddleware);
     },
 });

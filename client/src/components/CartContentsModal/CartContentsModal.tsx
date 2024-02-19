@@ -1,6 +1,6 @@
-import { FC, Fragment, useEffect, useState } from 'react';
+import { FC, Fragment, useEffect } from 'react';
 import classNames from 'classnames';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Modal from '../UI/Modal/Modal';
 import ButtonLink from '../UI/ButtonLink/ButtonLink';
@@ -13,12 +13,31 @@ import Image from '../TopHeader/Image/Image';
 import ErrorIcon from '../UI/Icons/ErrorIcon';
 import { RootState } from '../../store';
 import ICartProduct from '../../interfaces/CartProduct';
+import { useLazyCheckOrderFeasibilityQuery } from '../../store/apis/orderCheckApi';
+import useApiError from '../hooks/useApiError';
+import calculateCartTotalPrice from '../../store/util/calculateCartTotalPrice';
+import { localCartActions } from '../../store/slices/localCart';
+
+const displayCartProducts = (cartProduct: ICartProduct) => {
+    return (
+        <CartProduct
+            title={cartProduct.title}
+            price={cartProduct.price}
+            initialImageUrl={cartProduct.initialImageUrl}
+            quantity={cartProduct.quantity}
+            productId={cartProduct.productId}
+            canBeOrdered={cartProduct.canBeOrdered}
+            key={cartProduct.productId}
+        />
+    );
+};
 
 interface CartContentsModalProps {
     onClose: () => void;
 }
 
 const CartContentsModal: FC<CartContentsModalProps> = (props) => {
+    const dispatch = useDispatch();
     const [
         getCartViaAPI,
         {
@@ -35,10 +54,45 @@ const CartContentsModal: FC<CartContentsModalProps> = (props) => {
         (state: RootState) => state.cartModal.isCartBeingChangedByAPI
     );
     const localCartData = useSelector((state: RootState) => state.localCart);
+    const [
+        checkOrderFeasibility,
+        {
+            isFetching: isCheckingOrderFeasbility,
+            isError: isOrderFeasibilityCheckError,
+            error: orderFeasibilityCheckError,
+            data: orderFeasibilityCheckData,
+        },
+    ] = useLazyCheckOrderFeasibilityQuery();
+    useApiError(isOrderFeasibilityCheckError, orderFeasibilityCheckError, []);
+
+    useEffect(() => {
+        // 'isAuthenticated' can be null
+        if (
+            isAuthenticated === false &&
+            Object.values(localCartData.products).length > 0
+        ) {
+            checkOrderFeasibility(
+                Object.values(localCartData.products).map((product) => ({
+                    productId: product!.productId,
+                    quantity: product!.quantity,
+                }))
+            );
+        }
+    }, [isAuthenticated, checkOrderFeasibility, localCartData]);
 
     useEffect(() => {
         if (isAuthenticated) getCartViaAPI();
     }, [isAuthenticated]);
+
+    useEffect(() => {
+        if (orderFeasibilityCheckData) {
+            dispatch(
+                localCartActions.updateCartProductsAvailability(
+                    orderFeasibilityCheckData
+                )
+            );
+        }
+    }, [orderFeasibilityCheckData]);
 
     let cartData: { products: ICartProduct[]; totalPrice: number } | undefined;
     switch (isAuthenticated) {
@@ -57,13 +111,28 @@ const CartContentsModal: FC<CartContentsModalProps> = (props) => {
             ) as ICartProduct[];
             cartData = {
                 products: productList,
-                totalPrice: productList.reduce(
-                    (acc, product) => acc + product.quantity * product.price,
-                    0
-                ),
+                totalPrice: calculateCartTotalPrice(localCartData.products),
             };
             break;
     }
+
+    let cart: {
+        basicProducts: ICartProduct[];
+        unavailableProducts: ICartProduct[];
+    } | null = cartData
+        ? {
+              basicProducts: [],
+              unavailableProducts: [],
+          }
+        : null;
+
+    cartData?.products.forEach((cartProduct) => {
+        if (!cartProduct.canBeOrdered) {
+            cart!.unavailableProducts.push(cartProduct);
+        } else {
+            cart!.basicProducts.push(cartProduct);
+        }
+    });
 
     return (
         <Modal
@@ -90,7 +159,8 @@ const CartContentsModal: FC<CartContentsModalProps> = (props) => {
                             {/* if the user is trying to add a product to the cart OR delete a product from the cart OR if the user is trying to fetch the cart and this is NOT the first time fetching the cart, then display <CartLoadingOverlay />*/}
                             {isCartBeingChangedByAPI ||
                             (isFetchingCartViaAPI &&
-                                !isFetchingCartFirstTimeViaAPI) ? (
+                                !isFetchingCartFirstTimeViaAPI) ||
+                            isCheckingOrderFeasbility ? (
                                 <CartLoadingOverlay />
                             ) : null}
                             {/* if the cart is being fetched for the first time, display the <Loading /> component (NOT <CartLoadingOverlay />) */}
@@ -122,23 +192,54 @@ const CartContentsModal: FC<CartContentsModalProps> = (props) => {
                                         </p>
                                     </Fragment>
                                 )}
-                                {cartData &&
-                                    cartData.products.map((cartProduct) => {
-                                        return (
-                                            <CartProduct
-                                                title={cartProduct.title}
-                                                price={cartProduct.price}
-                                                initialImageUrl={
-                                                    cartProduct.initialImageUrl
+                                {cart !== null && (
+                                    <Fragment>
+                                        {cart.basicProducts.length > 0 && (
+                                            <div
+                                                className={
+                                                    classes[
+                                                        'cart-products__basic-items'
+                                                    ]
                                                 }
-                                                quantity={cartProduct.quantity}
-                                                productId={
-                                                    cartProduct.productId
+                                            >
+                                                {cart.basicProducts.map(
+                                                    displayCartProducts
+                                                )}
+                                            </div>
+                                        )}
+                                        {cart.unavailableProducts.length >
+                                            0 && (
+                                            <div
+                                                className={
+                                                    classes[
+                                                        'cart-products__unavailable-items'
+                                                    ]
                                                 }
-                                                key={cartProduct.productId}
-                                            />
-                                        );
-                                    })}
+                                            >
+                                                <h3
+                                                    className={
+                                                        classes[
+                                                            'unavailable-products__heading'
+                                                        ]
+                                                    }
+                                                >
+                                                    <span
+                                                        className={
+                                                            classes[
+                                                                'cart-products__heading-text-wrapper'
+                                                            ]
+                                                        }
+                                                    >
+                                                        Unavailable products
+                                                    </span>
+                                                </h3>
+                                                {cart.unavailableProducts.map(
+                                                    displayCartProducts
+                                                )}
+                                            </div>
+                                        )}
+                                    </Fragment>
+                                )}
                             </Fragment>
                         </div>
                         {cartData && cartData.products.length !== 0 && (
