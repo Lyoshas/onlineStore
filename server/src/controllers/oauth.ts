@@ -91,7 +91,7 @@ export const OAuthCallback: RequestHandler<
         throw new UnexpectedError('Invalid authorization server name');
     }
 
-    const { firstName, lastName, email, avatarURL } = userData;
+    const { firstName, lastName, email } = userData;
 
     // check if the user is signed up with userModel.getUserIdByEmail
     let userId = await userModel.getUserIdByEmail(email);
@@ -108,7 +108,6 @@ export const OAuthCallback: RequestHandler<
                 12
             ),
             phoneNumber: null,
-            avatarURL,
             withOAuth: true,
         }).then(({ rows }) => rows[0].id)) as number;
 

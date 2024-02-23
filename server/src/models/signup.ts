@@ -8,7 +8,6 @@ export const signUpUser = (options: {
     email: string;
     password: string;
     phoneNumber: string | null;
-    avatarURL?: string;
     withOAuth?: boolean;
     dbClient?: PoolClient;
 }) => {
@@ -18,7 +17,6 @@ export const signUpUser = (options: {
         email,
         password,
         phoneNumber,
-        avatarURL = process.env.DEFAULT_AVATAR_URL as string,
         withOAuth = false,
         dbClient,
     } = options;
@@ -33,21 +31,12 @@ export const signUpUser = (options: {
             first_name,
             last_name,
             phone_number,
-            is_activated,
-            avatar_URL
+            is_activated
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING id;
     `,
-        [
-            email,
-            password,
-            firstName,
-            lastName,
-            phoneNumber,
-            withOAuth,
-            avatarURL,
-        ]
+        [email, password, firstName, lastName, phoneNumber, withOAuth]
     );
 };
 
