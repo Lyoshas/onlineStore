@@ -49,7 +49,7 @@
     - [User Endpoints](#user-endpoints)
       - [1. Get the first name and last name of the user who makes the request](#1-get-the-first-name-and-last-name-of-the-user-who-makes-the-request)
     - [Order Endpoints](#order-endpoints)
-      - [1. Get the first name and last name of the user who makes the request](#1-get-the-first-name-and-last-name-of-the-user-who-makes-the-request)
+      - [1. Check order feasibility](#1-check-order-feasibility)
 
 ## Prerequisites
 - Install Docker and Docker Compose
