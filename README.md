@@ -47,7 +47,7 @@
       - [1. Get a list of supported cities for shipping](#1-get-a-list-of-supported-cities-for-shipping)
       - [2. Get all Nova Poshta branches (відділення) and pickup points (пункти)](#2-get-all-nova-poshta-branches-відділення-and-pickup-points-пункти)
     - [User Endpoints](#user-endpoints)
-      - [1. Get the first name and last name of the user who makes the request](#1-get-the-first-name-and-last-name-of-the-user-who-makes-the-request)
+      - [1. Get the profile of the user who makes the request](#1-get-the-profile-of-the-user-who-makes-the-request)
     - [Order Endpoints](#order-endpoints)
       - [1. Check order feasibility](#1-check-order-feasibility)
 
