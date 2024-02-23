@@ -4,7 +4,6 @@ import { body, query } from 'express-validator';
 import recaptchaValidation from './util/recaptchaValidation.js';
 import passwordValidation from './util/passwordValidation.js';
 import { isEmailAvailable } from '../models/signup.js';
-import dbPool from '../services/postgres.service.js';
 import validateRequest from '../middlewares/validate-request.js';
 import * as signupController from '../controllers/signup.js';
 
@@ -36,31 +35,6 @@ router.post(
             return Promise.resolve();
         }),
     passwordValidation,
-    body('phoneNumber')
-        .optional()
-        .isString()
-        .withMessage('the field "phoneNumber" must be a string')
-        .custom((phoneNumber: any) => {
-            if (typeof phoneNumber !== 'string') return false;
-            return /^\+380-\d{2}-\d{3}(-\d{2}){2}$/.test(phoneNumber);
-        })
-        .withMessage(
-            'the field "phoneNumber" must conform to this schema: ' +
-                '+380-XX-XXX-XX-XX'
-        )
-        .custom(async (phoneNumber: string) => {
-            const isPhoneNumberTaken: boolean = await dbPool
-                .query(
-                    'SELECT EXISTS(SELECT 1 FROM users WHERE phone_number = $1)',
-                    [phoneNumber]
-                )
-                .then(({ rows }) => rows[0].exists);
-
-            if (isPhoneNumberTaken) {
-                return Promise.reject('The phone number is already taken');
-            }
-            return Promise.resolve();
-        }),
     validateRequest,
     signupController.postSignUp
 );

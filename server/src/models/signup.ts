@@ -7,7 +7,6 @@ export const signUpUser = (options: {
     lastName: string;
     email: string;
     password: string;
-    phoneNumber: string | null;
     withOAuth?: boolean;
     dbClient?: PoolClient;
 }) => {
@@ -16,7 +15,6 @@ export const signUpUser = (options: {
         lastName,
         email,
         password,
-        phoneNumber,
         withOAuth = false,
         dbClient,
     } = options;
@@ -25,18 +23,17 @@ export const signUpUser = (options: {
 
     return client.query(
         `
-        INSERT INTO users (
-            email,
-            password,
-            first_name,
-            last_name,
-            phone_number,
-            is_activated
-        )
-        VALUES ($1, $2, $3, $4, $5, $6)
-        RETURNING id;
-    `,
-        [email, password, firstName, lastName, phoneNumber, withOAuth]
+            INSERT INTO users (
+                email,
+                password,
+                first_name,
+                last_name,
+                is_activated
+            )
+            VALUES ($1, $2, $3, $4, $5)
+            RETURNING id;
+        `,
+        [email, password, firstName, lastName, withOAuth]
     );
 };
 

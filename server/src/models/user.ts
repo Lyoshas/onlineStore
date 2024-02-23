@@ -34,10 +34,9 @@ export const getUserIdByCredentials = (
                 SELECT
                     id,
                     email,
-                    phone_number,
                     password
                 FROM users
-                WHERE phone_number = $1 OR email = $1
+                WHERE email = $1
             `,
             [login]
         )
@@ -61,31 +60,22 @@ export const getProfileByUserId = async (
 ): Promise<{
     firstName: string;
     lastName: string;
-    phoneNumber: string | null;
 }> => {
     const {
-        rows: [
-            {
-                first_name: firstName,
-                last_name: lastName,
-                phone_number: phoneNumber,
-            },
-        ],
+        rows: [{ first_name: firstName, last_name: lastName }],
     } = await dbPool.query<{
         first_name: string;
         last_name: string;
-        phone_number: string | null;
     }>(
         formatSqlQuery(`
             SELECT
                 first_name,
-                last_name,
-                phone_number
+                last_name
             FROM users
             WHERE id = $1
         `),
         [userId]
     );
 
-    return { firstName, lastName, phoneNumber };
+    return { firstName, lastName };
 };

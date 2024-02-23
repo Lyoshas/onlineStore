@@ -15,7 +15,7 @@ export const postSignIn: RequestHandler<
     { login: string; password: string }
 > = asyncHandler(async (req, res, next) => {
     const userId = await userModel.getUserIdByCredentials(
-        // the login can be either a mobile phone (+380-XX-XXX-XX-XX) or an email
+        // the login must be an email of the user who is trying to log in
         req.body.login,
         req.body.password
     );

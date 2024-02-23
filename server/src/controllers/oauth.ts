@@ -107,7 +107,6 @@ export const OAuthCallback: RequestHandler<
                 oauthModel.generateStrongPassword(),
                 12
             ),
-            phoneNumber: null,
             withOAuth: true,
         }).then(({ rows }) => rows[0].id)) as number;
 

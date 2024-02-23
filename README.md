@@ -226,7 +226,6 @@ Some API endpoints require authentication using access tokens and refresh tokens
   - _lastName_ - must be a string and must be 1 to 50 characters long
   - _email_ - must be a valid email with up to 254 characters. This email must be unique, meaning no two users can have the same email.
   - _password_ - must consist of at least 8 characters, not exceeding 72 characters, including at least 1 uppercase letter, 1 lowercase letter, 1 number and 1 special character
-  - _phoneNumber_ - optional parameter. If specified, it must be a string that conforms to this schema: '+380-XX-XXX-XX-XX' (e.g. +380-12-345-67-89). The phone number must be unique.
   - _recaptchaToken_ - retrieved when the user completes the ReCAPTCHA v2 challenge. Must be specified and must be valid.
 - **Request params:** none
 - **Query string parameters:** none
@@ -362,7 +361,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
 - **Who can access:** everyone
 - **Rate limiting:** 1 request per second per IP address
 - **Request body:**
-  - _login_ - a mobile phone (+380-XX-XXX-XX-XX) or an email. Must not be empty.
+  - _login_ - an email associated with the user who wants to resend the activation link. Must not be empty.
   - _password_ - a password that is associated with the login. Must not be empty.
   - _recaptchaToken_ - retrieved when the user completes the ReCAPTCHA v2 challenge. Must be specified and must be valid.
 - **Request params:** none
@@ -2323,7 +2322,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
 #### 1. Get the profile of the user who makes the request
 - **URL:** /api/user/profile
 - **Method:** GET
-- **Description:** retrieves the first name, last name, and phone number of the requester. The phone number can be 'null'.
+- **Description:** retrieves the first name and last name of the requester.
 - **Who can access:** only authenticated users with the provided [access token](#access-token)
 - **Rate limiting:** none
 - **Request body:** none
@@ -2334,20 +2333,10 @@ Some API endpoints require authentication using access tokens and refresh tokens
   - **Status code:** 200
   - **Description:** the first name and last name were returned successfully
   - **Content**
-    - **Example 1 (phone number is specified):**
     ```JSON
     {
       "firstName": "Oleksii",
-      "lastName": "Potapchuk",
-      "phoneNumber": "+380-12-345-67-89"
-    }
-    ```
-    - **Example 2 (phone number is not specified):**
-    ```JSON
-    {
-      "firstName": "Oleksii",
-      "lastName": "Potapchuk",
-      "phoneNumber": null
+      "lastName": "Potapchuk"
     }
     ```
 - **Error responses**: none

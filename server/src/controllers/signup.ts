@@ -18,7 +18,6 @@ export const postSignUp: RequestHandler = asyncHandler(
             lastName,
             email,
             password: plainPassword,
-            phoneNumber,
         } = req.body;
 
         const activationToken = await generateRandomString(32);
@@ -39,7 +38,6 @@ export const postSignUp: RequestHandler = asyncHandler(
                     lastName,
                     email,
                     password: await bcryptjs.hash(plainPassword, 12),
-                    phoneNumber,
                     // it's necessary to make the request using this client because transactions should be performed within a single client
                     dbClient,
                 })
