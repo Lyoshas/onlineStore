@@ -4,7 +4,7 @@ import bcryptjs from 'bcryptjs';
 
 import * as userModel from '../models/user.js';
 import * as oauthModel from '../models/oauth.js';
-import { signUpUser } from '../models/signup.js';
+import * as signupModel from '../models/signup.js';
 import { generateAccessToken } from '../models/access-token.js';
 import * as refreshTokenModel from '../models/refresh-token.js';
 import CustomValidationError from '../errors/CustomValidationError.js';
@@ -99,16 +99,18 @@ export const OAuthCallback: RequestHandler<
 
     if (userId === null) {
         // the user is new, so perform a signup
-        userId = (await signUpUser({
-            firstName,
-            lastName,
-            email,
-            password: await bcryptjs.hash(
-                oauthModel.generateStrongPassword(),
-                12
-            ),
-            withOAuth: true,
-        }).then(({ rows }) => rows[0].id)) as number;
+        userId = (await signupModel
+            .signUpUser({
+                firstName,
+                lastName,
+                email,
+                password: await bcryptjs.hash(
+                    signupModel.generateStrongPassword(),
+                    12
+                ),
+                withOAuth: true,
+            })
+            .then(({ rows }) => rows[0].id)) as number;
 
         responseStatus = 201;
     }
