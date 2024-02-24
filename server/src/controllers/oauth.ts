@@ -108,7 +108,7 @@ export const OAuthCallback: RequestHandler<
                     signupModel.generateStrongPassword(),
                     12
                 ),
-                withOAuth: true,
+                isActivated: true,
             })
             .then(({ rows }) => rows[0].id)) as number;
 

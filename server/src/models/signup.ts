@@ -7,7 +7,7 @@ export const signUpUser = (options: {
     lastName: string;
     email: string;
     password: string;
-    withOAuth?: boolean;
+    isActivated?: boolean;
     dbClient?: PoolClient;
 }) => {
     const {
@@ -15,7 +15,7 @@ export const signUpUser = (options: {
         lastName,
         email,
         password,
-        withOAuth = false,
+        isActivated = false,
         dbClient,
     } = options;
 
@@ -33,7 +33,7 @@ export const signUpUser = (options: {
             VALUES ($1, $2, $3, $4, $5)
             RETURNING id;
         `,
-        [email, password, firstName, lastName, withOAuth]
+        [email, password, firstName, lastName, isActivated]
     );
 };
 
