@@ -32,16 +32,14 @@ export const postSignUp: RequestHandler = asyncHandler(
         await transactionModel.beginTransaction(dbClient);
 
         try {
-            const insertedId = await signupModel
-                .signUpUser({
-                    firstName,
-                    lastName,
-                    email,
-                    password: await bcryptjs.hash(plainPassword, 12),
-                    // it's necessary to make the request using this client because transactions should be performed within a single client
-                    dbClient,
-                })
-                .then(({ rows }) => rows[0].id);
+            const insertedId = await signupModel.signUpUser({
+                firstName,
+                lastName,
+                email,
+                password: await bcryptjs.hash(plainPassword, 12),
+                // it's necessary to make the request using this client because transactions should be performed within a single client
+                dbClient,
+            });
 
             await addTokenToRedis({
                 tokenType: 'activationToken',

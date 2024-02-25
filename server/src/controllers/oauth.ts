@@ -99,18 +99,16 @@ export const OAuthCallback: RequestHandler<
 
     if (userId === null) {
         // the user is new, so perform a signup
-        userId = (await signupModel
-            .signUpUser({
-                firstName,
-                lastName,
-                email,
-                password: await bcryptjs.hash(
-                    signupModel.generateStrongPassword(),
-                    12
-                ),
-                isActivated: true,
-            })
-            .then(({ rows }) => rows[0].id)) as number;
+        userId = await signupModel.signUpUser({
+            firstName,
+            lastName,
+            email,
+            password: await bcryptjs.hash(
+                signupModel.generateStrongPassword(),
+                12
+            ),
+            isActivated: true,
+        });
 
         responseStatus = 201;
     }

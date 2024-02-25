@@ -2,14 +2,14 @@ import { PoolClient } from 'pg';
 
 import dbPool from '../services/postgres.service.js';
 
-export const signUpUser = (options: {
+export const signUpUser = async (options: {
     firstName: string;
     lastName: string;
     email: string;
     password: string;
     isActivated?: boolean;
     dbClient?: PoolClient;
-}) => {
+}): Promise<number> => {
     const {
         firstName,
         lastName,
@@ -21,7 +21,7 @@ export const signUpUser = (options: {
 
     const client = dbClient || dbPool;
 
-    return client.query(
+    const { rows } = await client.query<{ id: number }>(
         `
             INSERT INTO users (
                 email,
@@ -35,6 +35,8 @@ export const signUpUser = (options: {
         `,
         [email, password, firstName, lastName, isActivated]
     );
+
+    return rows[0].id;
 };
 
 export const isEmailAvailable = async (email: string) => {
