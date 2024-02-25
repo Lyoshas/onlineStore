@@ -1,7 +1,7 @@
 import { Knex } from 'knex';
 import bcryptjs from 'bcryptjs';
 
-import { generateStrongPassword } from '../src/models/signup';
+import { generateStrongPassword } from '../src/models/signup.js';
 
 const hashPassword = (password: string): Promise<string> => {
     return bcryptjs.hash(password, 10);
