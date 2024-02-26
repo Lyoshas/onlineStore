@@ -9,12 +9,12 @@ export async function seed(knex: Knex): Promise<void> {
         'name',
     ]);
 
-    const getDeliveryMethodIdSubquery = (
-        deliveryMethod: 'Нова Пошта' | 'Укрпошта'
+    const getPostalServiceIdSubquery = (
+        postalService: 'Нова Пошта' | 'Укрпошта'
     ) => {
-        return knex('delivery_methods')
+        return knex('postal_services')
             .select('id')
-            .where('name', '=', deliveryMethod);
+            .where('name', '=', postalService);
     };
 
     const getCityIdSubquery = (cityName: string) => {
@@ -28,7 +28,7 @@ export async function seed(knex: Knex): Promise<void> {
 
         await knex('postal_service_warehouses').insert(
             warehousesDescription.map((warehouseDescription) => ({
-                postal_service_id: getDeliveryMethodIdSubquery('Нова Пошта'),
+                postal_service_id: getPostalServiceIdSubquery('Нова Пошта'),
                 city_id: getCityIdSubquery(cityName),
                 warehouse_description: warehouseDescription,
             }))
