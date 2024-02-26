@@ -1,5 +1,6 @@
 import { Knex } from 'knex';
 import { getNovaPoshtaWarehousesByCityViaAPI } from '../src/models/shipping.js';
+import sleep from '../src/util/sleep.js';
 
 export async function seed(knex: Knex): Promise<void> {
     // Deletes ALL existing entries
@@ -22,12 +23,17 @@ export async function seed(knex: Knex): Promise<void> {
     };
 
     for (let { name: cityName } of availableCities) {
-        const warehousesDescription = await getNovaPoshtaWarehousesByCityViaAPI(
-            cityName
+        console.log(
+            `Retrieving Nova Poshta warehouses for ${cityName}: `,
+            new Date().toISOString()
         );
+        // sleeping for 1s so that we don't exceed the rate limit of the Nova Poshta API
+        await sleep(1000);
+        const warehousesDescriptions =
+            await getNovaPoshtaWarehousesByCityViaAPI(cityName);
 
         await knex('postal_service_warehouses').insert(
-            warehousesDescription.map((warehouseDescription) => ({
+            warehousesDescriptions.map((warehouseDescription) => ({
                 postal_service_id: getPostalServiceIdSubquery('Нова Пошта'),
                 city_id: getCityIdSubquery(cityName),
                 warehouse_description: warehouseDescription,
