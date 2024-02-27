@@ -106,6 +106,7 @@ export const getMissingCartProductInfo = async (
 ): Promise<{
     [productId: number]: Omit<CartEntry, 'productId' | 'quantity'>;
 }> => {
+    console.log(productQuantities);
     const { rows } = await dbPool.query<{
         product_id: number;
         title: string;
@@ -121,8 +122,8 @@ export const getMissingCartProductInfo = async (
                 p.price,
                 p.initial_image_url,
                 (
-                    c.quantity_in_cart <= p.quantity_in_stock AND
-                    c.quantity_in_cart <= p.max_order_quantity
+                    c.quantity_in_cart::INTEGER <= p.quantity_in_stock AND
+                    c.quantity_in_cart::INTEGER <= p.max_order_quantity
                 ) AS can_be_ordered
             FROM products AS p
             INNER JOIN (
