@@ -50,6 +50,7 @@
       - [1. Get the profile of the user who makes the request](#1-get-the-profile-of-the-user-who-makes-the-request)
     - [Order Endpoints](#order-endpoints)
       - [1. Check order feasibility](#1-check-order-feasibility)
+      - [2. Get order recipients associated with a single user](#2-get-order-recipients-associated-with-a-single-user)
 
 ## Prerequisites
 - Install Docker and Docker Compose
@@ -2456,3 +2457,57 @@ Some API endpoints require authentication using access tokens and refresh tokens
           }
         ]
       }
+#### 2. Get order recipients associated with a single user
+- **URL:** /api/user/order/recipients
+- **Method:** GET
+- **Description:** This endpoint retrieves a list of recipients associated with a specific user. Recipients are individuals designated by the user to receive goods or services for orders they've placed.
+- **Who can access:** only authenticated users with the provided [access token](#access-token)
+- **Rate limiting:** none
+- **Request body:** none
+- **Request params:** none
+- **Required cookies:** none
+- **Success response:**
+  - **Status code:** 200
+  - **Description:** the order recipients have been fetched successfully
+  - **Content:**
+    ```JSON
+    {
+      "orderRecipients": [
+        {
+          "firstName": "Oleksii",
+          "lastName": "Potapchuk",
+          "phoneNumber": "+380-12-345-67-89"
+        },
+        {
+          "firstName": "Ivan",
+          "lastName": "Sirko",
+          "phoneNumber": "+380-22-345-67-89"
+        }
+      ]
+    }
+    ```
+- **Error responses**:
+  - The access token is not specified or is invalid
+    - **Status code**: 401 Unauthorized
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "The access token is either invalid or is not provided"
+          }
+        ]
+      }
+      ```
+  - The access token has expired
+    - **Status code**: 401 Unauthorized
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "The access token has expired"
+          }
+        ]
+      }
+      ```

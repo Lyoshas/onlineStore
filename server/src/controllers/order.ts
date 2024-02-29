@@ -19,6 +19,14 @@ export const checkOrderFeasability: RequestHandler<
     res.json(await productModel.canProductsBeOrdered(req.body));
 });
 
+export const getOrderRecipients: RequestHandler = asyncHandler(
+    async (req, res, next) => {
+        res.json({
+            orderRecipients: await orderModel.getOrderRecipients(req.user!.id),
+        });
+    }
+);
+
 export const createOrder: RequestHandler = asyncHandler(
     async (req, res, next) => {
         const userId: number = (req.user as VerifiedUserInfo).id;

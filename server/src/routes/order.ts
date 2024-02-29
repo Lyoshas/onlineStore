@@ -76,6 +76,12 @@ router.post(
     orderController.checkOrderFeasability
 );
 
+router.get(
+    '/order/recipients',
+    ensureAuthentication,
+    orderController.getOrderRecipients
+);
+
 // this checks if the specified name exists in the DB
 // it's important to be careful with this function
 // don't let user input get in here!

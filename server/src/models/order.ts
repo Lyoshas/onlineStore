@@ -4,6 +4,7 @@ import { PoolClient } from 'pg';
 
 import dbPool from '../services/postgres.service.js';
 import * as userModel from './user.js';
+import camelCaseObject from '../util/camelCaseObject.js';
 
 const getIdByNameFromDB = (
     tableName: string,
@@ -42,6 +43,31 @@ export const getCityIdByName = (
 //     const result = getDeliveryMethodIdByName(deliveryName);
 //     return result !== null;
 // };
+
+export const getOrderRecipients = async (
+    userId: number
+): Promise<
+    {
+        firstName: string;
+        lastName: string;
+        phoneNumber: string;
+    }[]
+> => {
+    const { rows } = await dbPool.query<{
+        first_name: string;
+        last_name: string;
+        phone_number: string;
+    }>(
+        `
+            SELECT first_name, last_name, phone_number
+            FROM order_recipients
+            WHERE associated_user_id = $1 
+        `,
+        [userId]
+    );
+
+    return rows.map((orderRecipient) => camelCaseObject(orderRecipient));
+};
 
 export const createOrder = async (
     userId: number,
