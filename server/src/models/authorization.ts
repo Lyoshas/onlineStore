@@ -1,17 +1,19 @@
-import UserPrivileges from '../interfaces/UserPrivileges.js';
+import UserDataForAccessToken from '../interfaces/UserDataForAccessToken.js';
 import dbPool from '../services/postgres.service.js';
+import camelCaseObject from '../util/camelCaseObject.js';
 
 // it returns an object with { isAdmin: boolean }
 // or, if the user doesn't exist, it returns null
-export const getUserPrivileges = async (
+export const getUserDataForAccessToken = async (
     userId: number
-): Promise<UserPrivileges | null> => {
-    const { rows } = await dbPool.query(
-        `SELECT is_admin FROM users WHERE id = $1`,
+): Promise<UserDataForAccessToken | null> => {
+    const { rows } = await dbPool.query<{ email: string; is_admin: boolean }>(
+        'SELECT email, is_admin FROM users WHERE id = $1',
         [userId]
     );
+    const userData = camelCaseObject(rows[0]);
 
-    if (rows[0]) return { isAdmin: rows[0].is_admin };
+    if (userData) return { email: userData.email, isAdmin: userData.isAdmin };
 
     return null;
 };

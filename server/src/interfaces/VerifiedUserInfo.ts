@@ -1,6 +1,7 @@
-export default interface VerifiedUserInfo {
+import UserDataForAccessToken from './UserDataForAccessToken';
+
+export default interface VerifiedUserInfo extends UserDataForAccessToken {
     id: number;
-    isAdmin: boolean;
     iat: number; // issued at
     exp: number; // expiration time
-};
+}

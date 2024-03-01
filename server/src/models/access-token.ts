@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 
-import { getUserPrivileges } from './authorization.js';
+import { getUserDataForAccessToken } from './authorization.js';
 import VerifiedUserInfo from '../interfaces/VerifiedUserInfo.js';
 
 // The access token is generated as a JWT.
@@ -10,13 +10,13 @@ export const generateAccessToken = (
     userId: number
 ): Promise<string | never> => {
     return new Promise((resolve, reject) => {
-        getUserPrivileges(userId).then((userPrivileges) => {
-            if (userPrivileges === null) {
+        getUserDataForAccessToken(userId).then((userData) => {
+            if (userData === null) {
                 reject(`user with userId ${userId} does not exist`);
             }
 
             jwt.sign(
-                { id: userId, ...userPrivileges },
+                { id: userId, ...userData },
                 process.env.ACCESS_TOKEN_SECRET as string,
                 {
                     algorithm: 'HS256',
