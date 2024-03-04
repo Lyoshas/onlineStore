@@ -88,7 +88,7 @@ async function getProduct(
             (
                 SELECT (ROUND(AVG(star_rating) * 2) / 2)::DECIMAL(3, 2)
                 FROM product_reviews AS p_r
-                INNER JOIN moderation_statuses AS m_s ON m_s.id = p_r.moderation_status_id
+                INNER JOIN review_moderation_statuses AS m_s ON m_s.id = p_r.moderation_status_id
                 WHERE product_id = 754 AND m_s.name = 'approved'
             ) AS user_rating
         FROM products
@@ -174,13 +174,13 @@ async function getProduct(
                 star_rating,
                 product_reviews.created_at
             FROM product_reviews
-            INNER JOIN moderation_statuses
-                ON moderation_statuses.id = product_reviews.moderation_status_id
+            INNER JOIN review_moderation_statuses
+                ON review_moderation_statuses.id = product_reviews.moderation_status_id
             INNER JOIN users
                 ON users.id = product_reviews.user_id
             WHERE
                 product_reviews.product_id = 635
-                AND moderation_statuses.name = 'approved'
+                AND review_moderation_statuses.name = 'approved'
             ORDER BY created_at DESC
         */
 
@@ -206,8 +206,8 @@ async function getProduct(
             .select(dbFields)
             .from('product_reviews')
             .innerJoin(
-                'moderation_statuses',
-                'moderation_statuses.id',
+                'review_moderation_statuses',
+                'review_moderation_statuses.id',
                 '=',
                 'product_reviews.moderation_status_id'
             );
@@ -223,7 +223,7 @@ async function getProduct(
 
         queryBuilder = queryBuilder
             .where('product_reviews.product_id', '=', productId)
-            .andWhere('moderation_statuses.name', '=', 'approved')
+            .andWhere('review_moderation_statuses.name', '=', 'approved')
             .orderBy('product_reviews.created_at', 'desc');
 
         // technically, it's possible to combine 2 queries into one,

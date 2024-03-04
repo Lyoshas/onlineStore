@@ -21,7 +21,7 @@ export const addProductReview = (
                 $3,
                 $4,
                 (SELECT id
-                    FROM moderation_statuses
+                    FROM review_moderation_statuses
                     WHERE name = 'pending')
             )
         `),

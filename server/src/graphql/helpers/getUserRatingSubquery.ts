@@ -11,13 +11,13 @@ const getUserRatingSubquery = (productId: number | Knex.Raw) => {
             )
             .from('product_reviews')
             .innerJoin(
-                'moderation_statuses',
-                'moderation_statuses.id',
+                'review_moderation_statuses',
+                'review_moderation_statuses.id',
                 '=',
                 'product_reviews.moderation_status_id'
             )
             .where('product_id', '=', productId)
-            .andWhere('moderation_statuses.name', '=', 'approved')
+            .andWhere('review_moderation_statuses.name', '=', 'approved')
             .as('user_rating')
     );
 };

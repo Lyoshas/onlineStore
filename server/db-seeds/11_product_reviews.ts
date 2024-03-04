@@ -39,7 +39,7 @@ class ProductReviewsHelper {
         // 70% chance that 'approved' will be chosen
         else chosenStatus = 'approved';
 
-        return this.knex('moderation_statuses')
+        return this.knex('review_moderation_statuses')
             .select('id')
             .where({ name: chosenStatus });
     }

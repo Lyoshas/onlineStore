@@ -62,9 +62,9 @@ async function getFeaturedProducts(
             (
                 SELECT (ROUND(AVG(star_rating) * 2) / 2)::DECIMAL(3, 2)
                 FROM "product_reviews"
-                INNER JOIN "moderation_statuses"
-                    ON "moderation_statuses"."id" = "product_reviews"."moderation_status_id"
-                WHERE "product_id" = products.id AND "moderation_statuses"."name" = 'approved'
+                INNER JOIN "review_moderation_statuses"
+                    ON "review_moderation_statuses"."id" = "product_reviews"."moderation_status_id"
+                WHERE "product_id" = products.id AND "review_moderation_statuses"."name" = 'approved'
             ) AS "user_rating"
         FROM "products"
         INNER JOIN "product_categories"
