@@ -1,4 +1,5 @@
 import { PoolClient } from 'pg';
+import bcryptjs from 'bcryptjs';
 
 import dbPool from '../services/postgres.service.js';
 
@@ -105,4 +106,8 @@ export const generateStrongPassword = () => {
 
     strongPassword = shuffle(strongPassword.split('')).join('');
     return strongPassword;
+};
+
+export const hashPassword = (plaintextPassword: string): Promise<string> => {
+    return bcryptjs.hash(plaintextPassword, 12);
 };

@@ -103,9 +103,8 @@ export const OAuthCallback: RequestHandler<
             firstName,
             lastName,
             email,
-            hashedPassword: await bcryptjs.hash(
-                signupModel.generateStrongPassword(),
-                12
+            hashedPassword: await signupModel.hashPassword(
+                signupModel.generateStrongPassword()
             ),
             isActivated: true,
         });

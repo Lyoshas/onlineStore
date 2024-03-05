@@ -11,6 +11,7 @@ import dbPool from '../services/postgres.service.js';
 import UnexpectedError from '../errors/UnexpectedError.js';
 import { generateRandomString } from '../util/generateRandomString.js';
 import { sendEmail } from '../services/email.service.js';
+import { hashPassword } from '../models/signup.js';
 
 // this route sends a so-called "reset token"
 // it will be used to reset the user's password
@@ -84,7 +85,7 @@ export const changePassword: RequestHandler<
 
         await resetPasswordModel.changePassword(
             userId,
-            await bcryptjs.hash(req.body.password, 12),
+            await hashPassword(req.body.password),
             client
         );
 

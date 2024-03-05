@@ -36,7 +36,7 @@ export const postSignUp: RequestHandler = asyncHandler(
                 firstName,
                 lastName,
                 email,
-                hashedPassword: await bcryptjs.hash(plainPassword, 12),
+                hashedPassword: await signupModel.hashPassword(plainPassword),
                 // it's necessary to make the request using this client because transactions should be performed within a single client
                 dbClient,
             });
