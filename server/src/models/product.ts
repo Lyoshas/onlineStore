@@ -118,7 +118,7 @@ export const getMissingCartProductInfo = async (
             INNER JOIN (
                 VALUES ${
                     // it's NOT prone to SQL injections because this function doesn't include any user-provided data
-                    serializeSqlParameters(productQuantities.length)
+                    serializeSqlParameters(productQuantities.length, 2)
                 }
             ) AS c(product_id, quantity_in_cart)
                 ON c.product_id::INTEGER = p.id;
@@ -189,7 +189,7 @@ export const canProductsBeOrdered = async (
                 FROM (
                     VALUES ${
                         // it's NOT prone to SQL injections because this function doesn't include any user-provided data
-                        serializeSqlParameters(productEntries.length)
+                        serializeSqlParameters(productEntries.length, 2)
                     }
                 ) AS c(product_id, quantity_in_cart)
                 INNER JOIN products AS p
