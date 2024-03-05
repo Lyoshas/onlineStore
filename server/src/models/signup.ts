@@ -6,7 +6,7 @@ export const signUpUser = async (options: {
     firstName: string;
     lastName: string;
     email: string;
-    password: string;
+    hashedPassword: string;
     isActivated?: boolean;
     dbClient?: PoolClient;
 }): Promise<number> => {
@@ -14,7 +14,7 @@ export const signUpUser = async (options: {
         firstName,
         lastName,
         email,
-        password,
+        hashedPassword,
         isActivated = false,
         dbClient,
     } = options;
@@ -33,7 +33,7 @@ export const signUpUser = async (options: {
             VALUES ($1, $2, $3, $4, $5)
             RETURNING id;
         `,
-        [email, password, firstName, lastName, isActivated]
+        [email, hashedPassword, firstName, lastName, isActivated]
     );
 
     return rows[0].id;
