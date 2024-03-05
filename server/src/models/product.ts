@@ -8,6 +8,7 @@ import CartEntry from '../interfaces/CartEntry.js';
 import formatSqlQuery from '../util/formatSqlQuery.js';
 import CartProductSummary from '../interfaces/CartProductSummary.js';
 import CheckOrderFeasabilityReqBody from '../interfaces/CheckOrderFeasabilityReqBody.js';
+import serializeSqlParameters from '../util/serializeSqlParameters.js';
 
 export type PossibleProductFields = (keyof DBProduct)[];
 
@@ -78,18 +79,6 @@ export const getLimitationsForProducts = async (
     }));
 };
 
-// creates parameters to prevent SQL injection
-const serializeParameters = (productEntriesNum: number): string => {
-    let i: number = 0;
-    let parameterizedQuery: string = '';
-
-    for (let j = 0; j < productEntriesNum; j++) {
-        parameterizedQuery += `($${++i}, $${++i}),`;
-    }
-
-    return parameterizedQuery.slice(0, -1);
-};
-
 // accepts product IDs, fetches info from the DB, and makes it adhere to the format of cart products
 // this function returns an object:
 // {
@@ -129,7 +118,7 @@ export const getMissingCartProductInfo = async (
             INNER JOIN (
                 VALUES ${
                     // it's NOT prone to SQL injections because this function doesn't include any user-provided data
-                    serializeParameters(productQuantities.length)
+                    serializeSqlParameters(productQuantities.length)
                 }
             ) AS c(product_id, quantity_in_cart)
                 ON c.product_id::INTEGER = p.id;
@@ -200,7 +189,7 @@ export const canProductsBeOrdered = async (
                 FROM (
                     VALUES ${
                         // it's NOT prone to SQL injections because this function doesn't include any user-provided data
-                        serializeParameters(productEntries.length)
+                        serializeSqlParameters(productEntries.length)
                     }
                 ) AS c(product_id, quantity_in_cart)
                 INNER JOIN products AS p
