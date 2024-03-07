@@ -143,18 +143,6 @@ export const getUsersWithProductInCart = async (
     return rows.map((row) => row.user_id);
 };
 
-export const isProductInTheCart = async (
-    userId: number,
-    productId: number
-): Promise<boolean> => {
-    const { rowCount } = await dbPool.query(
-        'SELECT 1 FROM carts WHERE user_id = $1 AND product_id = $2',
-        [userId, productId]
-    );
-
-    return rowCount > 0;
-};
-
 // returns the IDs of unique products in the cart
 export const getCartProductIDs = async (userId: number): Promise<number[]> => {
     const { rows } = await dbPool.query<{ productId: number }>(
