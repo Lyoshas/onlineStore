@@ -81,39 +81,6 @@ export const createOrder: RequestHandler = asyncHandler(
     }
 );
 
-// this returns "data" and "signature" for LiqPay
-// more: https://www.liqpay.ua/en/documentation/data_signature
-export const getLiqpayFormData: RequestHandler = asyncHandler(
-    async (req, res, next) => {
-        const orderId = +req.params.orderId;
-        const username = await orderModel.getFirstAndLastNameByOrderId(orderId);
-
-        const data = Buffer.from(
-            JSON.stringify({
-                version: 3,
-                public_key: process.env.LIQPAY_PUBLIC_KEY,
-                action: 'pay',
-                amount: await orderModel.getOrderPriceByOrderId(orderId),
-                currency: 'UAH',
-                description:
-                    `Оплата ордеру №${orderId}.\n` +
-                    `Ордер створив(-ла): ${username}`,
-                order_id: orderId,
-                result_url: `http://localhost:3000/user/order/callback`,
-            })
-        ).toString('base64');
-
-        res.json({
-            data,
-            signature: orderModel.createLiqPaySignature(
-                process.env.LIQPAY_PRIVATE_KEY +
-                    data +
-                    process.env.LIQPAY_PRIVATE_KEY
-            ),
-        });
-    }
-);
-
 export const postPaymentCallback: RequestHandler = asyncHandler(
     async (req, res, next) => {
         // if we make it here, it means the user paid for the product

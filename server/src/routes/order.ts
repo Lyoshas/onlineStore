@@ -218,13 +218,6 @@ async function checkOrderId(orderId: number) {
     return Promise.resolve();
 }
 
-router.get(
-    '/order/:orderId/payment-data/',
-    param('orderId').isNumeric().custom(checkOrderId),
-    validateRequest,
-    orderController.getLiqpayFormData
-);
-
 router.post(
     '/order/callback',
     body('data').custom((data, { req }) => {
