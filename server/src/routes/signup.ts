@@ -6,22 +6,16 @@ import passwordValidation from './util/passwordValidation.js';
 import { isEmailAvailable } from '../models/signup.js';
 import validateRequest from '../middlewares/validate-request.js';
 import * as signupController from '../controllers/signup.js';
+import firstNameValidation from './util/firstNameValidation.js';
+import lastNameValidation from './util/lastNameValidation.js';
 
 const router = Router();
 
 router.post(
     '/sign-up',
     recaptchaValidation,
-    body('firstName')
-        .isString()
-        .withMessage('the field "firstName" must be a string')
-        .isLength({ min: 1, max: 50 })
-        .withMessage('the field "firstName" must be 1 to 50 characters long'),
-    body('lastName')
-        .isString()
-        .withMessage('the field "lastName" must be a string')
-        .isLength({ min: 1, max: 50 })
-        .withMessage('the field "lastName" must be 1 to 50 characters long'),
+    firstNameValidation,
+    lastNameValidation,
     body('email')
         .isEmail()
         .withMessage('the field "email" must be a correct email address')

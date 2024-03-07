@@ -51,6 +51,7 @@
     - [Order Endpoints](#order-endpoints)
       - [1. Check order feasibility](#1-check-order-feasibility)
       - [2. Get order recipients associated with a single user](#2-get-order-recipients-associated-with-a-single-user)
+      - [3. Create a new order](#3-create-a-new-order)
 
 ## Prerequisites
 - Install Docker and Docker Compose
@@ -2511,3 +2512,152 @@ Some API endpoints require authentication using access tokens and refresh tokens
         ]
       }
       ```
+#### 3. Create a new order
+- **URL:** /api/user/order
+- **Method:** POST
+- **Description:** creates a new order. If any products exceed the available stock or the 'max_order_quantity' limit, those products will not be included in the order. However, at least one product must be available for ordering. If the request comes from an anonymous user, a unique email must be provided. In this scenario, the API will generate a new account and send the password to the provided email address. For orders with the payment method "Оплатити зараз" (Pay Now), the order confirmation email will be dispatched only after the online payment is completed. Conversely, if the payment method is "Оплата при отриманні товару" (Payment on Delivery), a notification will be sent to the admin via the Telegram bot indicating the creation of a new order. In all other cases, the admin will receive a notification only after the online payment is completed.
+- **Who can access:** everyone
+- **Rate limiting:** none
+- **Request body:**
+  - _phoneNumber_ - specifies the phone number of the order recipient. Must be specified and must be a valid Ukrainian number. Must adhere to either one of these formats: +380123456789 or +380-12-345-67-89
+  - _firstName_ - specifies the first name of the recipient. Must be specified and must not exceed 50 characters
+  - _lastName_ - specifies the last name of the recipient. Must be specified and must not exceed 50 characters
+  - _email_ - must only be specified if the user is NOT authenticated, otherwise this parameter will be ignored. If specified, it must be a valid email and must be unique across the application (no two users can have the same email)
+  - _paymentMethod_ - must be specified and must be a valid payment method. Please refer to the 'order_payment_methods' DB table for a list of available payment methods
+  - _city_ - must be specified and must be a valid Ukrainian city. Please refer to the 'cities' DB table for a list of available cities
+  - _deliveryWarehouse_ - must be specified and must point to an existing branch or pickup point of the selected postal service. Please refer to the 'postal_service_warehouses' DB table ('warehouse_description' column) for a list of available warehouses
+  - _orderProducts_ - this parameter should only be provided if the user is NOT authenticated, otherwise it will be ignored. If included, it must follow this format: "{ productId: number; quantity: number }[]". In this format, "productId" indicates the ID of the product the user wants to order, and "quantity" specifies how many instances of this product the user wants to order. Ensure that all specified product IDs are valid and correspond to existing products. Additionally, make sure that at least one provided product does not exceed the available stock. Furthermore, each product has a "max_order_quantity" limit, which specifies the maximum number of instances of the same product a user is allowed to order in a single transaction. Make sure that as least one provided product doesn't exceed this limit. All products that exceed the available stock or the 'max_order_quantity' limit will be ignored.
+- **Request params:** none
+- **Required cookies:** none
+- **Success responses:**
+  - **Example 1 (the payment method is "Оплатити зараз" (Pay now), so the API returns a link to the payment service):**
+    - **Status code:** 200
+    - **Description:** the order has been created successfully. The client application must use the provided signature and data to redirect the user to the LiqPay payment page (https://www.liqpay.ua/documentation/data_signature)
+    - **Content (example):**
+      ```JSON
+      {
+        "data": "eyJ2ZXJzaW9uIjozLCJwdWJsaWNfa2V5Ijoic2FuZGJveF9pNzM5NDQ3MzE5MDYiLCJhY3Rpb24iOiJwYXkiLCJhbW91bnQiOiIyNTQ5OS4wMCIsImN1cnJlbmN5IjoiVUFIIiwiZGVzY3JpcHRpb24iOiLQntC/0LvQsNGC0LAg0LfQsNC80L7QstC70LXQvdC90Y8g4oSWNDEg0LrQvtGA0LjRgdGC0YPQstCw0YfQtdC8INC3IElEIDIwNjNcbtCe0YLRgNC40LzRg9Cy0LDRhzogT2xla3NpaSBQb3RhcGNodWsiLCJvcmRlcl9pZCI6NDEsInJlc3VsdF91cmwiOiJodHRwOi8vbG9jYWxob3N0L3VzZXIvb3JkZXIvY2FsbGJhY2sifQ==",
+        "signature": "/R/bN+xDur7hbGo5Ebfca6jyA58="
+      }
+      ```
+  - **Example 2 (the payment method is "Оплата при отриманні товару" (Payment on Delivery), so the API returns the order id):**
+    - **Status code:** 200
+    - **Description:** the order has been created successfully.
+    - **Content (example):**
+      ```JSON
+      {
+        "orderId": 5
+      }
+      ```
+- **Error responses**:
+  - The parameter requirements were not met (please check the requirements above)
+    - **Status code**: 422 Unprocessable Entity
+    - **Content (example)**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "the field \"lastName\" must be 1 to 50 characters long",
+            "field": "lastName"
+          }
+        ]
+      }
+  - The user is trying to create a new order, and all products are either out of stock or surpass the 'max_order_quantity' limit (applicable to both anonymous and authenticated users)
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+              "message": "order cannot be placed for any products because they are either out of stock or surpass the maximum order quantity"
+          }
+        ]
+      }
+      ```
+  - The authenticated user does not have any products in the cart
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+              "message": "order cannot be placed because the cart is empty"
+          }
+        ]
+      }
+      ```
+  - The anonymous user is trying to create an order with an email that is already in use
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "The email is already taken",
+            "field": "email"
+          }
+        ]
+      }
+      ```
+  - The specified NovaPoshta branch or pickup point does not exist in the specified city
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "the specified warehouse doesn't exist in the provided city",
+            "field": "deliveryWarehouse"
+          }
+        ]
+      }
+      ```
+  - The specified payment method is not supported
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "the field \"paymentMethod\" has an unsupported value",
+            "field": "paymentMethod"
+          }
+        ]
+      }
+  - The anonymous user has provided too many unique products
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```TypeScript
+      {
+        "errors": [
+          {
+            "message": "only 5 products can be ordered per one order", // the exact number may vary depending on the server configuration
+            "field": "orderProducts"
+          }
+        ]
+      }
+  - The anonymous user has provided duplicate product IDs
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "orderProducts must not contain duplicate product IDs",
+            "field": "orderProducts"
+          }
+        ]
+      }
+  - The anonymous user provided products that do not exist
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "some of the provided products do not exist",
+            "field": "orderProducts"
+          }
+        ]
+      }
+

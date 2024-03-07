@@ -151,3 +151,13 @@ export function cleanCart(userId: unknown): unknown {
 
     return redis.del(...delKeys);
 }
+
+export const canAtLeastOneCartProductBeOrdered = async (
+    userId: number
+): Promise<boolean | null> => {
+    const cart = await getUserCart(userId);
+
+    if (cart === null) return null;
+
+    return cart.some((cartProduct) => cartProduct.canBeOrdered);
+};

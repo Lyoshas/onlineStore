@@ -1,3 +1,5 @@
+import { PoolClient } from 'pg';
+
 import AnyObject from '../interfaces/AnyObject.js';
 import ArrayElement from '../interfaces/ArrayElement.js';
 import DBProduct from '../interfaces/DBProduct.js';
@@ -216,4 +218,27 @@ export const canProductsBeOrdered = async (
     });
 
     return result;
+};
+
+// this function is used to decrease the stock of multiple products
+// this is used after creating an order
+export const decreaseProductsStock = async (
+    products: { productId: number; quantity: number }[],
+    dbClient?: PoolClient
+): Promise<void> => {
+    const client = dbClient || dbPool;
+    await client.query(
+        formatSqlQuery(`
+            UPDATE products
+            SET quantity_in_stock = quantity_in_stock - c.quantity::INTEGER
+            FROM (
+                VALUES ${
+                    // it's NOT prone to SQL injections because this function doesn't include any user-provided data
+                    serializeSqlParameters(products.length, 2)
+                }
+            ) AS c(product_id, quantity)
+            WHERE c.product_id::INTEGER = products.id
+        `),
+        products.map((product) => [product.productId, product.quantity]).flat()
+    );
 };

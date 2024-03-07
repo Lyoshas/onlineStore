@@ -103,3 +103,21 @@ export const getSupportedCities = async (): Promise<string[]> => {
     );
     return rows.map((row) => row.city_name);
 };
+
+export const doesPostalServiceWarehouseExist = async (
+    cityName: string,
+    warehouseDescription: string
+): Promise<boolean> => {
+    const { rows } = await dbPool.query<{ exists: boolean }>(
+        `SELECT EXISTS(
+            SELECT 1
+            FROM postal_service_warehouses
+            WHERE city_id = (
+                SELECT id FROM cities WHERE name = $1
+            ) AND warehouse_description = $2
+        )`,
+        [cityName, warehouseDescription]
+    );
+
+    return rows[0].exists;
+};

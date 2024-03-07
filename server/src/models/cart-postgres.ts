@@ -6,6 +6,7 @@ import SnakeCaseProperties from '../interfaces/SnakeCaseProperties.js';
 import camelCaseObject from '../util/camelCaseObject.js';
 import CartProductSummary from '../interfaces/CartProductSummary.js';
 import knex from '../services/knex.service.js';
+import formatSqlQuery from '../util/formatSqlQuery.js';
 
 export const getUserCart = async (userId: number): Promise<CartEntry[]> => {
     const { rows } = await dbPool.query<SnakeCaseProperties<CartEntry>>(
@@ -106,13 +107,15 @@ export const bulkInsert = (
     userId: number,
     cartProductsSummary: CartProductSummary[]
 ) => {
-    const sqlQuery = knex('carts').insert(
-        cartProductsSummary.map((cartProduct) => ({
-            user_id: userId,
-            product_id: cartProduct.productId,
-            quantity: cartProduct.quantityInCart,
-        }))
-    ).toString();
+    const sqlQuery = knex('carts')
+        .insert(
+            cartProductsSummary.map((cartProduct) => ({
+                user_id: userId,
+                product_id: cartProduct.productId,
+                quantity: cartProduct.quantityInCart,
+            }))
+        )
+        .toString();
     return dbPool.query(sqlQuery);
 };
 
@@ -150,4 +153,64 @@ export const getCartProductIDs = async (userId: number): Promise<number[]> => {
         [userId]
     );
     return rows.map((entry) => entry.productId);
+};
+
+export const canAtLeastOneCartProductBeOrdered = async (
+    userId: number
+): Promise<boolean> => {
+    const { rows } = await dbPool.query<{
+        at_least_one_can_be_ordered: boolean;
+    }>(
+        formatSqlQuery(`
+            SELECT
+                COUNT(*) > 0 AS at_least_one_can_be_ordered
+            FROM carts
+            INNER JOIN products ON products.id = carts.product_id
+            WHERE
+                user_id = $1
+                AND carts.quantity <= products.quantity_in_stock
+                AND carts.quantity <= products.max_order_quantity
+        `),
+        [userId]
+    );
+
+    return camelCaseObject(rows[0]).atLeastOneCanBeOrdered;
+};
+
+// "getUserIdsWithProductInOrder" returns the user IDs that have at least one item in their cart matching those in the specified order
+/* 
+    Example:
+    Order with the ID 2 contains these products:
+    1. productId = 2, quantity = 2
+    2. productId = 4, quantity = 3
+
+    User with the ID 52 has these products in the cart:
+    1. productId = 2, quantity = 10
+    2. productId = 100, quantity = 15
+    This user will be included, because this user has productId = 2 in their cart (order with the ID 2 has this product too)
+
+    User with the ID 53 has these products in the cart:
+    1. productId = 57, quantity = 10
+    2. productId = 189, quantity = 15
+    This user will NOT be included, because this user doesn't have any products that the order ID 2 has
+*/
+export const getUserIdsWithProductInOrder = async (
+    orderId: number,
+    dbClient?: PoolClient
+): Promise<number[]> => {
+    const client = dbClient || dbPool;
+    const { rows } = await client.query<{ user_id: number }>(
+        formatSqlQuery(`
+            SELECT user_id
+            FROM carts
+            WHERE product_id = ANY(
+                SELECT product_id
+                FROM orders_products
+                WHERE order_id = $1
+            )
+        `),
+        [orderId]
+    );
+
+    return rows.map((row) => camelCaseObject(row).userId);
 };

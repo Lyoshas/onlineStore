@@ -131,3 +131,17 @@ export const getCartProductIDs = async (userId: number): Promise<number[]> => {
         return postgresCartModel.getCartProductIDs(userId);
     }
 };
+
+export const canAtLeastOneCartProductBeOrdered = async (
+    userId: number
+): Promise<boolean> => {
+    try {
+        const canBeOrdered =
+            await redisCartModel.canAtLeastOneCartProductBeOrdered(userId);
+        if (canBeOrdered === null) throw new Error('No cart products in Redis');
+        return canBeOrdered;
+    } catch (e) {
+        console.error(e);
+        return postgresCartModel.canAtLeastOneCartProductBeOrdered(userId);
+    }
+};
