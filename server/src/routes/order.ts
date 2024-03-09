@@ -18,6 +18,8 @@ import lastNameValidation from './util/lastNameValidation.js';
 import { isEmailAvailable } from '../models/signup.js';
 import OrderProduct from '../interfaces/OrderProduct.js';
 import { combinedOutOfStockAndMaxQuantityErrorMessage } from '../errors/CombinedOutOfStockAndMaxQuantityError.js';
+import { base64Decode, base64Encode } from '../util/base64.js';
+import camelCaseObject from '../util/camelCaseObject.js';
 
 const router = express.Router();
 
@@ -267,30 +269,53 @@ router.get(
 
 router.post(
     '/order/callback',
-    body('data').custom((data, { req }) => {
-        // we have to verify the signature that's in req.body
-        // to do that, we need to hash this value:
-        // liqpay_private_key + req.body.data + liqpay_private_key
-        // and then compare the hash we've generated with the hash in req.body
-        // if there's a match, the request is genuine
-        if (typeof data !== 'string') {
-            return Promise.reject('data must be a string');
-        }
+    body(
+        'data',
+        'the field "data" must contain a JSON object encoded in base64'
+    )
+        .isString()
+        .withMessage('the field "data" must be a string')
+        .isBase64()
+        .bail()
+        .customSanitizer((data: string) => base64Decode(data))
+        .isJSON()
+        // encoding it again because we need need it to create a signature
+        .customSanitizer((data: string) => base64Encode(data)),
+    // if the 'data' parameter is invalid, there's no point in validating further
+    validateRequest,
+    body('signature')
+        .isString()
+        .withMessage('the field "signature" must be a string')
+        .custom((providedSignature: string, { req }) => {
+            // we have to verify the signature that the user provided
+            // to do that, we need to hash this value:
+            // liqpay_private_key + req.body.data + liqpay_private_key
+            // and then compare the hash we've generated with the hash in req.body
+            // if there's a match, the request is genuine
+            const genuineSignature = OrderModel.createLiqPaySignature(
+                req.body.data
+            );
 
-        const signature = OrderModel.createLiqPaySignature(data);
+            if (genuineSignature !== providedSignature) {
+                return Promise.reject('the provided signature is invalid');
+            }
 
-        if (signature !== req.body.signature) {
-            return Promise.reject('Invalid signature');
-        }
-
-        const orderId: string = JSON.parse(
-            OrderModel.decodeLiqPayData(data)
-        ).order_id;
-
-        req.body.orderId = orderId;
-
-        return Promise.resolve();
+            return Promise.resolve();
+        }),
+    // validating the most important fields that must be present
+    validateRequest,
+    body('data').customSanitizer((data: string) => {
+        // transforming the 'data' parameter to an object
+        return camelCaseObject(JSON.parse(base64Decode(data)));
     }),
+    body('data.orderId')
+        .isNumeric()
+        // LiqPay returns 'orderId' as a string, so we need to transform it to a number
+        .customSanitizer((orderId: string) => +orderId)
+        .withMessage('must be a numeric value'),
+    body('data.action').isString().withMessage('must be a string'),
+    body('data.status').isString().withMessage('must be a string'),
+    body('data.errCode').optional().isString().withMessage('must be a string'),
     validateRequest,
     orderController.postPaymentCallback
 );

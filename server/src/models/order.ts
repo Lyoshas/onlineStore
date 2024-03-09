@@ -10,6 +10,9 @@ import OrderRecipient from '../interfaces/OrderRecipient.js';
 import formatCurrencyUAH from '../util/formatCurrencyUAH.js';
 import OrderSummary from '../interfaces/OrderSummary.js';
 import { sendEmail } from '../services/email.service.js';
+import LiqpayDecodedData from '../interfaces/LiqpayDecodedData.js';
+import CamelCaseProperties from '../interfaces/CamelCaseProperties.js';
+import { base64Decode } from '../util/base64.js';
 
 // a separate class was created because almost all methods of this class
 // will be used inside a DB transaction
@@ -387,8 +390,12 @@ class OrderModel {
             .digest('base64');
     }
 
-    public static decodeLiqPayData(encodedBase64Data: string): string {
-        return Buffer.from(encodedBase64Data, 'base64').toString('utf-8');
+    public static decodeLiqPayData(
+        encodedBase64Data: string
+    ): CamelCaseProperties<LiqpayDecodedData> {
+        return camelCaseObject(
+            JSON.parse(base64Decode(encodedBase64Data)) as LiqpayDecodedData
+        );
     }
 
     public async markOrderAsPaid(orderId: number) {
@@ -399,10 +406,75 @@ class OrderModel {
     }
 
     public async sendOrderConfirmationEmail(
-        email: string,
-        phoneNumber: string,
-        orderSummary: OrderSummary
+        // you can either pass all the needed data directly to avoid fetching from the DB
+        // or provide the orderId and the function will make a DB call
+        orderDetails:
+            | { orderId: number }
+            | { email: string; phoneNumber: string; orderSummary: OrderSummary }
     ): Promise<void> {
+        let email: string, phoneNumber: string, orderSummary: OrderSummary;
+
+        if ('orderId' in orderDetails) {
+            const { rows } = await this.dbClient.query<{
+                phone_number: string;
+                email: string;
+                total_price: number;
+                order_products: {
+                    product_id: number;
+                    title: string;
+                    order_quantity: number;
+                    price: number;
+                }[];
+            }>(
+                formatSqlQuery(`
+                    SELECT
+                        recipients.phone_number,
+                        users.email,
+                        (
+                            SELECT
+                                SUM(orders_products.quantity * products.price)
+                            FROM orders_products
+                            INNER JOIN products
+                                ON products.id = orders_products.product_id
+                            WHERE orders_products.order_id = $1
+                        ) AS total_price,
+                        (
+                            SELECT json_agg(t)
+                            FROM (
+                                SELECT
+                                    products.id AS product_id,
+                                    products.title,
+                                    orders_products.quantity AS order_quantity,
+                                    products.price
+                                FROM orders_products
+                                INNER JOIN products
+                                    ON products.id = orders_products.product_id
+                                WHERE orders_products.order_id = $1
+                            ) AS t
+                        ) AS order_products
+                    FROM orders
+                    INNER JOIN order_recipients AS recipients
+                        ON recipients.id = orders.recipient_id
+                    INNER JOIN users
+                        ON users.id = recipients.associated_user_id
+                    WHERE orders.id = $1
+                `),
+                [orderDetails.orderId]
+            );
+            const orderInfo = camelCaseObject(rows[0]);
+            email = orderInfo.email;
+            phoneNumber = orderInfo.phoneNumber;
+            orderSummary = {
+                orderProducts: orderInfo.orderProducts,
+                totalPrice: orderInfo.totalPrice,
+            };
+        } else {
+            // if the user provided all the necessary data, don't fetch anything from the DB
+            email = orderDetails.email;
+            phoneNumber = orderDetails.phoneNumber;
+            orderSummary = orderDetails.orderSummary;
+        }
+
         await sendEmail(
             email,
             '[onlineStore] Замовлення успішно створено',
@@ -427,6 +499,16 @@ class OrderModel {
                 )}</b></p>
             `
         );
+    }
+
+    // this function returns 'null' if the provided order ID doesn't exist
+    public async isOrderPaidFor(orderId: number): Promise<boolean | null> {
+        const { rows, rowCount } = await this.dbClient.query<{
+            is_paid: boolean;
+        }>(formatSqlQuery(`SELECT is_paid FROM orders WHERE id = $1`), [
+            orderId,
+        ]);
+        return rowCount === 0 ? null : camelCaseObject(rows[0]).isPaid;
     }
 }
 

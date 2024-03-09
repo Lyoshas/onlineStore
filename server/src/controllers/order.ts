@@ -18,6 +18,9 @@ import { sendEmail } from '../services/email.service.js';
 import OrderRecipient from '../interfaces/OrderRecipient.js';
 import CombinedOutOfStockAndMaxQuantityError from '../errors/CombinedOutOfStockAndMaxQuantityError.js';
 import MissingCartItemsError from '../errors/MissingCartItemsError.js';
+import { base64Encode } from '../util/base64.js';
+import LiqpayDecodedData from '../interfaces/LiqpayDecodedData.js';
+import CamelCaseProperties from '../interfaces/CamelCaseProperties.js';
 
 export const checkOrderFeasability: RequestHandler<
     unknown,
@@ -195,11 +198,11 @@ export const createOrder: RequestHandler = asyncHandler(
 
             if (!isPayingNow) {
                 // if the user is paying now, the order confirmation email will only be sent after the order is paid for
-                await orderModel.sendOrderConfirmationEmail(
+                await orderModel.sendOrderConfirmationEmail({
                     email,
                     phoneNumber,
-                    orderSummary
-                );
+                    orderSummary,
+                });
                 await orderModel.notifyAboutOrderByTelegram(orderId);
             }
 
@@ -218,19 +221,62 @@ export const createOrder: RequestHandler = asyncHandler(
     }
 );
 
-export const postPaymentCallback: RequestHandler = asyncHandler(
-    async (req, res, next) => {
-        const orderModel = new OrderModel();
-        // if we make it here, it means the user paid for the product
+export const postPaymentCallback: RequestHandler<
+    unknown,
+    unknown,
+    { data: CamelCaseProperties<LiqpayDecodedData> }
+> = asyncHandler(async (req, res, next) => {
+    // if we make it here, it means the "signature" is valid for the provided "data" parameter
+    // we validated the signature using 'express-validator' (see routes/order.ts)
+    const redirectToClient = (
+        status: 'success' | 'failure' | 'cancel' | 'already paid'
+    ) => {
+        const response = { status };
+        res.redirect(
+            `${
+                process.env.REACT_APP_URL
+            }/user/order/callback?res=${base64Encode(JSON.stringify(response))}`
+        );
+    };
 
-        // req.params.orderId will be a number, but wrapped inside a string
-        // we made sure about it using express-validator (see routes/order.ts)
-        const orderId: number = req.body.orderId;
+    const paymentInfo = req.body.data;
 
-        await orderModel.markOrderAsPaid(orderId);
-
-        orderModel.notifyAboutOrderByTelegram(orderId);
-
-        res.sendStatus(204);
+    // checking order payment status without establishing a long-running transaction
+    if (await new OrderModel().isOrderPaidFor(paymentInfo.orderId)) {
+        return redirectToClient('already paid');
+    } else if (
+        // every order payment must have 'action' set to 'pay'
+        paymentInfo.action !== 'pay'
+    ) {
+        return redirectToClient('failure');
+    } else if (
+        // if the payment was cancelled
+        paymentInfo.errCode === 'cancel'
+    ) {
+        return redirectToClient('cancel');
+    } else if (paymentInfo.status !== 'success') {
+        // we will provide a vague error on purpose so that users can't create fake transactions
+        return redirectToClient('failure');
     }
-);
+
+    // if we make it here, the payment was successful and the order should be marked as paid
+    const dbClient = await dbPool.connect();
+    await transactionModel.beginTransaction(dbClient);
+    const orderModel = new OrderModel(dbClient);
+
+    try {
+        const orderId: number = paymentInfo.orderId;
+        await orderModel.markOrderAsPaid(orderId);
+        await orderModel.sendOrderConfirmationEmail({ orderId });
+        await orderModel.notifyAboutOrderByTelegram(orderId);
+        await transactionModel.commitTransaction(dbClient);
+
+        return redirectToClient('success');
+    } catch (e) {
+        console.log(e);
+        transactionModel.rollbackTransaction(dbClient);
+        throw new UnexpectedError();
+    } finally {
+        dbClient.release();
+    }
+});
