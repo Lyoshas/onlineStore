@@ -268,13 +268,23 @@ const CartContentsModal: FC<CartContentsModalProps> = (props) => {
                 )
             }
             actions={
-                <ButtonLink
-                    to="/user/cart/checkout"
-                    className={classes['modal-actions__checkout-btn']}
-                    onClick={props.onClose}
-                >
-                    Proceed to checkout
-                </ButtonLink>
+                <Fragment>
+                    {cartData !== void 0 &&
+                        cartData.products.some(
+                            (cartProduct) => cartProduct.canBeOrdered
+                        ) &&
+                        Object.values(cartData.products).length > 0 && (
+                            <ButtonLink
+                                to="/user/cart/checkout"
+                                className={
+                                    classes['modal-actions__checkout-btn']
+                                }
+                                onClick={props.onClose}
+                            >
+                                Proceed to checkout
+                            </ButtonLink>
+                        )}
+                </Fragment>
             }
             includeCancelButton={true}
             modalActionsClassName={classes['modal-actions-media-query']}

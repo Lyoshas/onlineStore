@@ -1,0 +1,8 @@
+.delivery-methods__item,
+.delivery-methods__heading {
+    margin-bottom: 10px;
+}
+
+.delivery-methods__city-picker {
+    margin-bottom: 15px;
+}

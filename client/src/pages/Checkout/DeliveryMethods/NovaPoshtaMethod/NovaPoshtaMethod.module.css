@@ -1,0 +1,13 @@
+.nova-poshta-warehouses {
+    margin-left: 50px;
+}
+
+.nova-poshta-method__loading-block {
+    margin: 0;
+}
+
+@media screen and (max-width: 450px) {
+    .nova-poshta-warehouses {
+        margin-left: 20px;
+    }
+}

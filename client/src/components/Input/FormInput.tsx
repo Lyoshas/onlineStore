@@ -1,4 +1,4 @@
-import React, { FC, forwardRef, useState } from 'react';
+import React, { FC, forwardRef, useEffect, useState } from 'react';
 import { FieldHookConfig, useField, useFormikContext } from 'formik';
 import { ValidationError } from 'yup';
 import { useContext } from 'react';
@@ -14,6 +14,7 @@ type FormInputProps = {
     isRequired: boolean;
     type: string;
     placeholder: string;
+    value?: string | number;
     defaultValue?: string | number;
     validateOnChange?: boolean; // it validates only this field
     validateOnBlur?: boolean; // it validates only this field
@@ -21,6 +22,9 @@ type FormInputProps = {
     max?: number;
     step?: number;
     TipComponent?: React.ReactNode;
+    considerAdditionalErrorFields?: string[];
+    onValueChangedOnBlur?: (newValue: string) => void;
+    onValueChanged?: (newValue: string) => void;
 } & FieldHookConfig<string>;
 
 const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
@@ -48,12 +52,22 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
             values: formikValues,
             setFieldError,
             setFieldValue,
-        } = useFormikContext();
+            errors,
+        } = useFormikContext<any>();
         const [isPasswordVisible, setIsPasswordVisible] =
             useState<boolean>(false);
         const validationSchema = useContext(SchemaContext);
 
-        const isInputInvalid = meta.touched && !!meta.error;
+        const relevantErrors: (string | undefined)[] = [meta.error];
+        if (props.considerAdditionalErrorFields) {
+            props.considerAdditionalErrorFields.forEach((fieldName) => {
+                relevantErrors.push(errors[fieldName] as string | undefined);
+            });
+        }
+        const errorMessage = relevantErrors.find(
+            (value) => typeof value === 'string'
+        );
+        const isInputInvalid = meta.touched && !!errorMessage;
 
         // validationFields() can be applied for multiple fields that are connected, but it's required to specify the main field we're interested in so that the function can extract the needed error message if there is one
         // for most cases this function will be used to validate only one field
@@ -160,6 +174,10 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
             if (validateOnChange) {
                 validateSeparateInput(inputName, inputValue);
             }
+
+            if (props.onValueChanged) {
+                props.onValueChanged(event.target.value);
+            }
         };
 
         const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
@@ -169,6 +187,10 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
 
             if (validateOnBlur) {
                 validateSeparateInput(inputName, inputValue);
+            }
+
+            if (props.onValueChangedOnBlur) {
+                props.onValueChangedOnBlur(event.target.value);
             }
         };
 
@@ -205,6 +227,7 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
                         className={classes['form-input']}
                         onChange={handleChange}
                         onBlur={handleBlur}
+                        value={value}
                         defaultValue={defaultValue}
                         min={min}
                         max={max}
@@ -230,7 +253,7 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
                     )}
                 </div>
                 {isInputInvalid && (
-                    <ErrorMessage>{meta.error as string}</ErrorMessage>
+                    <ErrorMessage>{errorMessage as string}</ErrorMessage>
                 )}
                 {TipComponent}
             </div>

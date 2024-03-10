@@ -1,0 +1,27 @@
+.radio-block {
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+}
+
+.radio-block__input {
+    min-width: 20px;
+    min-height: 20px;
+    appearance: none;
+    border: 0.2rem solid #fff;
+    background: white;
+    border-radius: 50%;
+}
+
+.radio-block__input:checked {
+    background-color: #5262A7
+}
+
+.radio-block__input,
+.radio-block__label {
+    cursor: pointer;
+}
+
+.radio-block__label {
+    margin-left: 5px;
+}

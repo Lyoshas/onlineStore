@@ -140,6 +140,19 @@ export const authApi = createApi({
                 };
             },
         }),
+        isEmailAvailable: builder.query<
+            { isEmailAvailable: boolean },
+            { email: string }
+        >({
+            query: (data) => {
+                return {
+                    url: `/is-email-available?${new URLSearchParams(
+                        data
+                    ).toString()}`,
+                    method: 'GET',
+                };
+            },
+        }),
     }),
 });
 
@@ -155,4 +168,5 @@ export const {
     useGetOAuthLinkQuery,
     useOAuthCallbackMutation,
     useLogoutMutation,
+    useLazyIsEmailAvailableQuery,
 } = authApi;

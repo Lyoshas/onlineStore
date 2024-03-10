@@ -1,0 +1,51 @@
+.order-summary {
+    width: 400px;
+    min-width: 250px;
+    align-self: flex-start;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 10px;
+    padding: 20px;
+    background: #5262a7;
+    font-size: 1.1rem;
+    box-sizing: border-box;
+}
+
+.order-summary__heading {
+    margin: 0;
+    margin-bottom: 10px;
+}
+
+.order-summary__delivery,
+.order-summary__total-price {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.order-summary__delivery-price-name,
+.order-summary__total-price-name {
+    margin-right: 15px;
+}
+
+.order-summary__order-button {
+    width: 100%;
+    padding: 15px 0;
+}
+
+.order-summary__delivery-price-value,
+.order-summary__total-price-value {
+    font-weight: bold;
+}
+
+.order-summary__delivery-price-value {
+    max-width: 60%;
+    text-align: right;
+}
+
+@media screen and (max-width: 330px) {
+    .order-summary {
+        min-width: auto;
+    }
+}

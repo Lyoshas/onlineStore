@@ -29,6 +29,7 @@ import { cartModalActions } from './store/slices/cartModal';
 import ProductCategoryList from './pages/ProductCategoryList/ProductCategoryList';
 import ProductListPage from './pages/ProductListPage/ProductListPage';
 import useSynchronizeLocalCartProducts from './components/hooks/useSynchronizeLocalCartProducts';
+import Checkout from './pages/Checkout/Checkout';
 
 const App: FC = () => {
     const { errorMessage, isErrorNotificationShown } = useSelector(
@@ -165,6 +166,15 @@ const App: FC = () => {
                     element={
                         <TopHeader
                             RenderAfter={<ProductListPage />}
+                            addOffset={true}
+                        />
+                    }
+                />
+                <Route
+                    path="/user/cart/checkout"
+                    element={
+                        <TopHeader
+                            RenderAfter={<Checkout />}
                             addOffset={true}
                         />
                     }
