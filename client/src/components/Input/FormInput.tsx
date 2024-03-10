@@ -14,7 +14,7 @@ type FormInputProps = {
     isRequired: boolean;
     type: string;
     placeholder: string;
-    value?: string | number;
+    defaultValue?: string | number;
     validateOnChange?: boolean; // it validates only this field
     validateOnBlur?: boolean; // it validates only this field
     min?: number;
@@ -31,6 +31,7 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
             type,
             placeholder,
             TipComponent,
+            defaultValue,
             value,
             validateOnChange = true,
             validateOnBlur = true,
@@ -204,7 +205,7 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
                         className={classes['form-input']}
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        defaultValue={value}
+                        defaultValue={defaultValue}
                         min={min}
                         max={max}
                         step={step}

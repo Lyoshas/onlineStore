@@ -79,7 +79,7 @@ const EditProductForm: FC<EditProductFormProps> = (props) => {
                             name="title"
                             placeholder="Enter product title"
                             isRequired={true}
-                            value={product.title}
+                            defaultValue={product.title}
                         />
                         <FormInput
                             type="number"
@@ -87,7 +87,7 @@ const EditProductForm: FC<EditProductFormProps> = (props) => {
                             name="price"
                             placeholder="Enter product price"
                             isRequired={true}
-                            value={product.price}
+                            defaultValue={product.price}
                         />
                         <FormInput
                             isRequired={false}
@@ -122,7 +122,7 @@ const EditProductForm: FC<EditProductFormProps> = (props) => {
                             name="quantityInStock"
                             placeholder="Enter how many products are available"
                             isRequired={true}
-                            value={product.quantityInStock}
+                            defaultValue={product.quantityInStock}
                         />
                         <FormInput
                             type="text"
@@ -130,7 +130,7 @@ const EditProductForm: FC<EditProductFormProps> = (props) => {
                             name="shortDescription"
                             placeholder="Enter product description"
                             isRequired={true}
-                            value={product.shortDescription}
+                            defaultValue={product.shortDescription}
                         />
                         <FormInput
                             type="number"
@@ -138,7 +138,7 @@ const EditProductForm: FC<EditProductFormProps> = (props) => {
                             name="maxOrderQuantity"
                             placeholder="Enter the maximum quantity per order"
                             isRequired={true}
-                            value={product.maxOrderQuantity}
+                            defaultValue={product.maxOrderQuantity}
                         />
                     </SchemaContext.Provider>
                     <FormActions>

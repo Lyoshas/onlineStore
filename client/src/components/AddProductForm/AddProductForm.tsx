@@ -125,7 +125,7 @@ const AddProductForm: FC<AddProductFormProps> = (props) => {
                                 label="Max order quantity"
                                 name="maxOrderQuantity"
                                 placeholder="Enter the maximum quantity per order"
-                                value={32767}
+                                defaultValue={32767}
                                 min={1}
                                 max={32767}
                                 step={1}
