@@ -17,6 +17,7 @@ import { useLazyCheckOrderFeasibilityQuery } from '../../store/apis/orderCheckAp
 import useApiError from '../hooks/useApiError';
 import calculateCartTotalPrice from '../../store/util/calculateCartTotalPrice';
 import { localCartActions } from '../../store/slices/localCart';
+import formatCurrencyUAH from '../../store/util/formatCurrencyUAH';
 
 const displayCartProducts = (cartProduct: ICartProduct) => {
     return (
@@ -260,7 +261,7 @@ const CartContentsModal: FC<CartContentsModalProps> = (props) => {
                                         ]
                                     }
                                 >
-                                    {cartData!.totalPrice} ₴
+                                    {formatCurrencyUAH(cartData.totalPrice)}
                                 </b>
                             </div>
                         )}

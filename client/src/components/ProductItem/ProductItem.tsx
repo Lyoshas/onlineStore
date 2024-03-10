@@ -10,6 +10,7 @@ import ButtonLink from '../UI/ButtonLink/ButtonLink';
 import DeleteButton from './DeleteButton/DeleteButton';
 import AddToCartButton from '../AddToCartButton/AddToCartButton';
 import StarRating from '../UI/StarRating/StarRating';
+import formatCurrencyUAH from '../../store/util/formatCurrencyUAH';
 
 interface ProductItemProps {
     id: number;
@@ -87,7 +88,7 @@ const ProductItem: FC<ProductItemProps> = (props) => {
                     </div>
                 )}
                 <p className={classes['product-item__price']}>
-                    {props.price} ₴
+                    {formatCurrencyUAH(props.price)}
                 </p>
                 <div
                     className={classNames(
