@@ -10,7 +10,7 @@ import ButtonLink from '../UI/ButtonLink/ButtonLink';
 import DeleteButton from './DeleteButton/DeleteButton';
 import AddToCartButton from '../AddToCartButton/AddToCartButton';
 import StarRating from '../UI/StarRating/StarRating';
-import formatCurrencyUAH from '../../store/util/formatCurrencyUAH';
+import formatCurrencyUAH from '../../util/formatCurrencyUAH';
 
 interface ProductItemProps {
     id: number;

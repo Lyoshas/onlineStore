@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { Link } from 'react-router-dom';
 
 import classes from './OrderProduct.module.css';
-import formatCurrencyUAH from '../../store/util/formatCurrencyUAH';
+import formatCurrencyUAH from '../../util/formatCurrencyUAH';
 
 interface OrderProductProps {
     previewURL: string;

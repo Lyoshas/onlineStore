@@ -16,7 +16,7 @@ import { useUploadImageToS3Mutation } from '../../store/apis/s3UploadApi';
 import ADD_PRODUCT from '../../graphql/mutations/addProduct';
 import SuccessMessage from './SuccessMessage/SuccessMessage';
 import apolloClient from '../../graphql/client';
-import { deleteProductsByPageCache } from '../../store/util/deleteProductsByPageCache';
+import { deleteProductsByPageCache } from '../../util/deleteProductsByPageCache';
 import LoadingScreen from '../../components/UI/LoadingScreen/LoadingScreen';
 
 const deriveErrorMessage = (

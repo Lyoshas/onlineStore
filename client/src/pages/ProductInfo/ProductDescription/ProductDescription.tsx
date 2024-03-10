@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import classes from './ProductDescription.module.css';
 import AddToCartButton from '../../../components/AddToCartButton/AddToCartButton';
 import StarRating from '../../../components/UI/StarRating/StarRating';
-import formatCurrencyUAH from '../../../store/util/formatCurrencyUAH';
+import formatCurrencyUAH from '../../../util/formatCurrencyUAH';
 
 interface ProductDescriptionProps {
     productId: number;

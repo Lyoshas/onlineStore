@@ -1,4 +1,4 @@
-import apolloClient from '../../graphql/client';
+import apolloClient from '../graphql/client';
 
 // this function deletes the getProductsByPage GraphQL query cache
 // for example, if you called "products($page: 2)", the response from the server will be cached, and this function will remove this cache

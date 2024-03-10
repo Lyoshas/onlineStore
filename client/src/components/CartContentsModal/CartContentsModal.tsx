@@ -15,9 +15,9 @@ import { RootState } from '../../store';
 import ICartProduct from '../../interfaces/CartProduct';
 import { useLazyCheckOrderFeasibilityQuery } from '../../store/apis/orderCheckApi';
 import useApiError from '../hooks/useApiError';
-import calculateCartTotalPrice from '../../store/util/calculateCartTotalPrice';
+import calculateCartTotalPrice from '../../util/calculateCartTotalPrice';
 import { localCartActions } from '../../store/slices/localCart';
-import formatCurrencyUAH from '../../store/util/formatCurrencyUAH';
+import formatCurrencyUAH from '../../util/formatCurrencyUAH';
 
 const displayCartProducts = (cartProduct: ICartProduct) => {
     return (

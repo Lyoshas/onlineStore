@@ -5,9 +5,9 @@ import { useSelector } from 'react-redux';
 
 import classes from './OrderSummary.module.css';
 import Button from '../../../components/UI/Button/Button';
-import calculateCartTotalPrice from '../../../store/util/calculateCartTotalPrice';
+import calculateCartTotalPrice from '../../../util/calculateCartTotalPrice';
 import { RootState } from '../../../store';
-import formatCurrencyUAH from '../../../store/util/formatCurrencyUAH';
+import formatCurrencyUAH from '../../../util/formatCurrencyUAH';
 
 const OrderSummary: FC<{ divClassName?: string }> = (props) => {
     const { errors: formikErrors, submitForm } = useFormikContext();

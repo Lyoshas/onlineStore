@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import clipNumber from '../../store/util/clipNumber';
+import clipNumber from '../../util/clipNumber';
 
 // this custom hook manages a numerical value within a specified range,
 // providing functions to increment, decrement, and set the value,

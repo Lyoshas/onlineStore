@@ -1,4 +1,4 @@
-import { RootState } from '..';
+import { RootState } from '../store';
 
 const calculateCartTotalPrice = (
     cartProducts: RootState['localCart']['products']

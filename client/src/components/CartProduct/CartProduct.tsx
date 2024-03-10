@@ -8,7 +8,7 @@ import classes from './CartProduct.module.css';
 import AdditionalOptions from './AdditionalOptions/AdditionalOptions';
 import { cartModalActions } from '../../store/slices/cartModal';
 import CartProductQuantity from './CartProductQuantity/CartProductQuantity';
-import formatCurrencyUAH from '../../store/util/formatCurrencyUAH';
+import formatCurrencyUAH from '../../util/formatCurrencyUAH';
 
 const CartProduct: FC<ICartProduct> = (props) => {
     const dispatch = useDispatch();

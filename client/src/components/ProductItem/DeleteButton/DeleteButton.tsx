@@ -11,7 +11,7 @@ import SuccessModal from '../../SuccessModal/SuccessModal';
 import ErrorModal from '../../ErrorModal/ErrorModal';
 import Loading from '../../UI/Loading/Loading';
 import apolloClient from '../../../graphql/client';
-import { deleteProductsByPageCache } from '../../../store/util/deleteProductsByPageCache';
+import { deleteProductsByPageCache } from '../../../util/deleteProductsByPageCache';
 import { GET_FEATURED_PRODUCTS_WITH_AUTH } from '../../../graphql/queries/getFeaturedProducts';
 import { cartApi } from '../../../store/apis/cartApi';
 
