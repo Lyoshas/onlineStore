@@ -80,6 +80,7 @@ export const getNovaPoshtaWarehousesByCityViaDB = async (cityName: string) => {
             FROM postal_service_warehouses AS p_s_w
             INNER JOIN cities ON cities.id = p_s_w.city_id 
             WHERE cities.name = $1
+            ORDER BY p_s_w.id
         `),
         [cityName]
     );
