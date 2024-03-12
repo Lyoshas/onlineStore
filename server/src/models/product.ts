@@ -242,3 +242,29 @@ export const decreaseProductsStock = async (
         products.map((product) => [product.productId, product.quantity]).flat()
     );
 };
+
+// This function is responsible for reverting the deduction of product
+// stocks from the database when an order is canceled due to payment
+// cancellation. It should be called whenever an order cancellation
+// occurs to ensure that the product stocks are returned to their original
+// quantities, maintaining accurate inventory levels
+export const restoreProductStocks = async (
+    orderId: number,
+    dbClient?: PoolClient
+): Promise<void> => {
+    const client = dbClient || dbPool;
+
+    await client.query(
+        formatSqlQuery(`
+            UPDATE products
+            SET quantity_in_stock = quantity_in_stock + c.ordered_quantity
+            FROM (
+                SELECT product_id, quantity AS ordered_quantity
+                FROM orders_products
+                WHERE order_id = $1
+            ) AS c(product_id, ordered_quantity)
+            WHERE c.product_id = products.id;
+        `),
+        [orderId]
+    );
+};

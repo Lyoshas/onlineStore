@@ -510,6 +510,21 @@ class OrderModel {
         ]);
         return rowCount === 0 ? null : camelCaseObject(rows[0]).isPaid;
     }
+
+    public async cancelOrder(orderId: number): Promise<void> {
+        await this.dbClient.query(
+            formatSqlQuery(`
+                UPDATE orders
+                SET status_id = (
+                    SELECT id
+                    FROM order_statuses
+                    WHERE name = 'Замовлення скасоване'
+                )
+                WHERE id = $1
+            `),
+            [orderId]
+        );
+    }
 }
 
 export default OrderModel;

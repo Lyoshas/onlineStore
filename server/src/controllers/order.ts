@@ -249,23 +249,38 @@ export const postPaymentCallback: RequestHandler<
         paymentInfo.action !== 'pay'
     ) {
         return redirectToClient('failure');
-    } else if (
-        // if the payment was cancelled
-        paymentInfo.errCode === 'cancel'
-    ) {
-        return redirectToClient('cancel');
-    } else if (paymentInfo.status !== 'success') {
-        // we will provide a vague error on purpose so that users can't create fake transactions
-        return redirectToClient('failure');
     }
 
-    // if we make it here, the payment was successful and the order should be marked as paid
     const dbClient = await dbPool.connect();
     await transactionModel.beginTransaction(dbClient);
     const orderModel = new OrderModel(dbClient);
+    const orderId: number = paymentInfo.orderId;
+
+    // this function cancels the order and returns the stock levels to the original state
+    // use it only in appropriate circumstances
+    const orderCancellationCleanup = async (orderId: number) => {
+        await orderModel.cancelOrder(orderId);
+        await productModel.restoreProductStocks(orderId, dbClient);
+        await transactionModel.commitTransaction(dbClient);
+    };
 
     try {
-        const orderId: number = paymentInfo.orderId;
+        if (
+            // if the payment was cancelled
+            paymentInfo.errCode === 'cancel'
+        ) {
+            await orderCancellationCleanup(orderId);
+            return redirectToClient('cancel');
+        } else if (
+            // if the payment fails
+            paymentInfo.status !== 'success'
+        ) {
+            await orderCancellationCleanup(orderId);
+            // we will provide a vague error on purpose so that users can't create fake transactions
+            return redirectToClient('failure');
+        }
+
+        // if we make it here, the payment was successful and the order should be marked as paid
         await orderModel.markOrderAsPaid(orderId);
         await orderModel.sendOrderConfirmationEmail({ orderId });
         await orderModel.notifyAboutOrderByTelegram(orderId);
