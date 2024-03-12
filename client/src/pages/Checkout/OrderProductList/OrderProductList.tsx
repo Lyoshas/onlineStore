@@ -11,6 +11,7 @@ import { useLazyCheckOrderFeasibilityQuery } from '../../../store/apis/orderChec
 import { localCartActions } from '../../../store/slices/localCart';
 import useApiError from '../../../components/hooks/useApiError';
 import LoadingScreen from '../../../components/UI/LoadingScreen/LoadingScreen';
+import getEligibleCartProducts from '../../../util/getEligibleCartProducts';
 
 const OrderProductList = () => {
     const navigate = useNavigate();
@@ -31,15 +32,7 @@ const OrderProductList = () => {
     ] = useLazyCheckOrderFeasibilityQuery();
     useApiError(isOrderFeasibilityCheckError, orderFeasibilityCheckError, []);
     const eligibleCartProducts = useMemo(() => {
-        return Object.values(cartProducts)
-            .filter((cartProduct) => cartProduct!.canBeOrdered)
-            .map((cartProduct) => ({
-                productId: cartProduct!.productId,
-                title: cartProduct!.title,
-                price: cartProduct!.price,
-                initialImageUrl: cartProduct!.initialImageUrl,
-                quantity: cartProduct!.quantity,
-            }));
+        return getEligibleCartProducts(cartProducts);
     }, [cartProducts]);
 
     useEffect(() => {
