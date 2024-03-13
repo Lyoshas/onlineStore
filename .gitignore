@@ -11,3 +11,4 @@ aws/lambda-functions/**/node_modules
 aws/lambda-functions/**/dist
 pg-admin/dev.env
 postgres/dev.env
+elasticsearch/dev.env
