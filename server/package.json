@@ -13,7 +13,8 @@
     "db:migrate:rollback": "node --loader ts-node/esm ./node_modules/.bin/knex migrate:rollback --all --knexfile ./knexfile.ts",
     "db:seed:run": "node --loader ts-node/esm ./node_modules/.bin/knex seed:run --knexfile ./knexfile.ts",
     "knex": "node --loader ts-node/esm ./node_modules/.bin/knex",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "load-pg-products-to-elasticsearch": "node --loader ts-node/esm -r dotenv/config ./src/util/loadPgProductsToElasticsearch.ts dotenv_config_path='./src/config/product-loader.env'"
   },
   "repository": {
     "type": "git",
@@ -43,6 +44,7 @@
     "@apollo/server": "^4.3.3",
     "@aws-sdk/client-s3": "^3.359.0",
     "@aws-sdk/s3-request-presigner": "^3.359.0",
+    "@elastic/elasticsearch": "^8.12.2",
     "@sendgrid/mail": "^8.1.0",
     "@types/axios": "^0.14.0",
     "@types/bcryptjs": "^2.4.2",
