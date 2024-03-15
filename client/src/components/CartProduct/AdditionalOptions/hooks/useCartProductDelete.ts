@@ -50,14 +50,20 @@ const useCartProductDelete = (productId: number) => {
     useEffect(() => {
         if (!isDeleteCartProductSuccess) return;
         // modifying the GraphQL cache associated with the deleted cart product
-        apolloClient.cache.modify({
-            id: `Product:${productId}`,
-            fields: {
-                isInTheCart() {
-                    return false;
+        for (let graphqlPrefix of [
+            'ProductInfoWithReviews',
+            'ProductInfoWithoutReviews',
+        ]) {
+            apolloClient.cache.modify({
+                id: `${graphqlPrefix}:${productId}`,
+                fields: {
+                    // modifying the "isInTheCart" field to be "false", because we've just deleted this product from the cart
+                    isInTheCart() {
+                        return false;
+                    },
                 },
-            },
-        });
+            });
+        }
         dispatch(localCartActions.deleteCartProduct({ productId }));
         // there was a bug where a user authenticates, adds a product to the cart from the main page, then deletes it from the cart, then logs out, and then adds this product to the cart again. This would cause the product to be deleted
         resetRequestState();
