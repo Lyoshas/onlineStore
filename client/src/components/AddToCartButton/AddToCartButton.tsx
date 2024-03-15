@@ -69,15 +69,20 @@ const AddToCartButton: FC<AddToCartButtonProps> = ({
     const modifyCache = useCallback(() => {
         // since we are trying to add this product to the cart, we need to modify the local cache so that the user sees that the product was indeed added to the cart
         // this doesn't cause any new API requests to the server
-        apolloClient.cache.modify({
-            id: `Product:${props.productId}`,
-            fields: {
-                // modifying the "isInTheCart" field to be "true", because we've just added this product to the cart
-                isInTheCart() {
-                    return true;
+        for (let graphqlPrefix of [
+            'ProductInfoWithReviews',
+            'ProductInfoWithoutReviews',
+        ]) {
+            apolloClient.cache.modify({
+                id: `${graphqlPrefix}:${props.productId}`,
+                fields: {
+                    // modifying the "isInTheCart" field to be "true", because we've just added this product to the cart
+                    isInTheCart() {
+                        return true;
+                    },
                 },
-            },
-        });
+            });
+        }
         // updating the local cart in Redux
         dispatch(
             localCartActions.upsertCartProduct({
