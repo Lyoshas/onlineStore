@@ -1,9 +1,15 @@
 import { PoolClient } from 'pg';
+import {
+    QueryDslQueryContainer,
+    SearchResponse,
+    SearchTotalHits,
+} from '@elastic/elasticsearch/lib/api/typesWithBodyKey.js';
+import { errors as elasticsearchErrors } from '@elastic/elasticsearch';
 
 import AnyObject from '../interfaces/AnyObject.js';
 import ArrayElement from '../interfaces/ArrayElement.js';
 import DBProduct from '../interfaces/DBProduct.js';
-import knexInstance from '../services/knex.service.js';
+import knex from '../services/knex.service.js';
 import dbPool from '../services/postgres.service.js';
 import ProductNotFoundError from '../errors/ProductNotFoundError.js';
 import CartEntry from '../interfaces/CartEntry.js';
@@ -11,6 +17,12 @@ import formatSqlQuery from '../util/formatSqlQuery.js';
 import CartProductSummary from '../interfaces/CartProductSummary.js';
 import CheckOrderFeasabilityReqBody from '../interfaces/CheckOrderFeasabilityReqBody.js';
 import serializeSqlParameters from '../util/serializeSqlParameters.js';
+import esClient from '../services/elasticsearch.service.js';
+import { Knex } from 'knex';
+import getUserRatingSubquery from '../graphql/helpers/getUserRatingSubquery.js';
+import camelCaseObject from '../util/camelCaseObject.js';
+import isProductAvailable from '../graphql/helpers/isProductAvailable.js';
+import isProductRunningOut from '../graphql/helpers/isProductRunningOut.js';
 
 export type PossibleProductFields = (keyof DBProduct)[];
 
@@ -26,7 +38,7 @@ export const getProduct = async <T extends PossibleProductFields>(
     productId: number,
     productFields: T
 ): Promise<{ [key in ArrayElement<T>]: DBProduct[key] }> => {
-    const sqlQuery = knexInstance('products')
+    const sqlQuery = knex('products')
         .select(productFields)
         .where({ id: productId })
         .toString();
@@ -267,4 +279,139 @@ export const restoreProductStocks = async (
         `),
         [orderId]
     );
+};
+
+export const getProductIDsBySearchQuery = async (
+    searchQuery: string,
+    page: number
+): Promise<{ productIDs: number[]; totalElasticsearchHits: number }> => {
+    const productsPerPage: number = +process.env.PRODUCTS_PER_PAGE!;
+    let result: SearchResponse;
+    const queryOptions: QueryDslQueryContainer = {
+        multi_match: {
+            query: searchQuery,
+            fields: ['title^3', 'category^2', 'shortDescription'],
+            fuzziness: 2, // edit distance of 2 (2 typos are allowed)
+        },
+    };
+
+    try {
+        result = await esClient.search({
+            index: 'products',
+            _source: false,
+            query: queryOptions,
+            from: productsPerPage * (page - 1),
+            size: productsPerPage,
+        });
+    } catch (e) {
+        if (
+            e instanceof elasticsearchErrors.ResponseError &&
+            (e.message.includes('Result window is too large') ||
+                e.message.includes('out of range of int'))
+        ) {
+            // by default, Elasticsearch allows (offset + limit) to be up to 10,000
+            // if the user specifies more than that, we will return an empty product array and return the total number of pages
+            // this is suitable for this application because it will probably never have that many products
+            result = await esClient.search({
+                index: 'products',
+                // we don't want to return any documents, we just want to count them
+                size: 0,
+                query: queryOptions,
+            });
+        } else {
+            throw e;
+        }
+    }
+
+    return {
+        productIDs: result.hits.hits.map((hit) => +hit._id),
+        totalElasticsearchHits: (result.hits.total as SearchTotalHits).value,
+    };
+};
+
+export const getProductsByIDs = async (
+    productIDs: number[],
+    // if "userId" is NOT 'null', this function will include the 'isInTheCart' field
+    userId: number | null
+): Promise<
+    {
+        id: number;
+        title: string;
+        price: number;
+        category: string;
+        userRating: number | null;
+        initialImageUrl: string;
+        additionalImageUrl: string;
+        shortDescription: string;
+        isAvailable: boolean;
+        isRunningOut: boolean;
+        isInTheCart?: boolean;
+    }[]
+> => {
+    const fieldsToSelect: (string | Knex.Raw | Knex.QueryBuilder)[] = [
+        'products.id',
+        'title',
+        'price',
+        'initial_image_url',
+        'additional_image_url',
+        'short_description',
+        'quantity_in_stock',
+        'product_categories.category',
+        getUserRatingSubquery(knex.raw('products.id')),
+    ];
+
+    if (userId !== null) {
+        fieldsToSelect.push(
+            knex.raw(
+                formatSqlQuery(`
+                    (
+                        SELECT EXISTS(
+                            SELECT 1
+                            FROM carts
+                            WHERE user_id = ? AND product_id = products.id
+                        )
+                    ) AS is_in_the_cart
+                `),
+                [userId]
+            )
+        );
+    }
+
+    let query = knex
+        .select(fieldsToSelect)
+        .from('products')
+        .innerJoin(
+            'product_categories',
+            'product_categories.id',
+            '=',
+            'products.category_id'
+        )
+        .where(knex.raw('products.id = ANY(?)', [productIDs]));
+
+    const sqlQuery = query.toQuery();
+
+    const { rows } = await dbPool.query<{
+        id: number;
+        title: string;
+        price: string;
+        initial_image_url: string;
+        additional_image_url: string;
+        short_description: string;
+        quantity_in_stock: number;
+        category: string;
+        user_rating: string;
+        is_in_the_cart?: boolean;
+    }>(sqlQuery);
+
+    return rows.map((row) => {
+        const { quantityInStock, price, userRating, ...productSummary } =
+            camelCaseObject(row);
+        return {
+            ...productSummary,
+            userRating: userRating !== null ? +userRating : null,
+            price: +price,
+            isAvailable: isProductAvailable(quantityInStock),
+            isRunningOut: isProductRunningOut(quantityInStock),
+        };
+    });
 };

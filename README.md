@@ -29,12 +29,13 @@
     - [GraphQL Queries and Mutations](#graphql-queries-and-mutations)
       - [1. Get basic information about an individual product (optionally with reviews to this product as well)](#1-get-basic-information-about-an-individual-product-optionally-with-reviews-to-this-product-as-well)
       - [2. Get a list of products by specifying a category and a page](#2-get-a-list-of-products-by-specifying-a-category-and-a-page)
-      - [3. Get featured products](#3-get-featured-products)
-      - [4. Get product info including 'quantity\_in\_stock' and/or 'max\_order\_quantity'](#4-get-product-info-including-quantity_in_stock-andor-max_order_quantity)
-      - [5. Add a new product](#5-add-a-new-product)
-      - [6. Update a product](#6-update-a-product)
-      - [7. Delete a product](#7-delete-a-product)
-      - [8. Add a product review](#8-add-a-product-review)
+      - [3. Get a list of products by search query](#3-get-a-list-of-products-by-search-query)
+      - [4. Get featured products](#4-get-featured-products)
+      - [5. Get product info including 'quantity\_in\_stock' and/or 'max\_order\_quantity'](#5-get-product-info-including-quantity_in_stock-andor-max_order_quantity)
+      - [6. Add a new product](#6-add-a-new-product)
+      - [7. Update a product](#7-update-a-product)
+      - [8. Delete a product](#8-delete-a-product)
+      - [9. Add a product review](#9-add-a-product-review)
     - [Cart Endpoints](#cart-endpoints)
       - [1. Get the contents of your shopping cart](#1-get-the-contents-of-your-shopping-cart)
       - [2. Get the total number of items in the cart](#2-get-the-total-number-of-items-in-the-cart)
@@ -1047,7 +1048,118 @@ Some API endpoints require authentication using access tokens and refresh tokens
       ]
     }
     ```
-#### 3. Get featured products
+#### 3. Get a list of products by search query
+- **Who can access:** everyone (but if you request the 'isInTheCart' field, you have to provide a valid [access token](#access-token))
+- **Required parameters:**
+  - _searchQuery_ - the query that is used for product searching. Must be a string consisting of 1 to 1000 characters
+  - _page_ - the page that the user is trying to fetch. Must be greater than 0 and must not exceed the number 2,147,483,647
+- **Example**:
+  ```graphql
+  query SearchProducts($searchQuery: String!, $page: Int!) {
+    searchProducts(searchQuery: $searchQuery, page: $page) {
+      productList {
+        id
+        title
+        price
+        category
+        initialImageUrl
+        additionalImageUrl
+        shortDescription
+        isInTheCart
+        isAvailable
+        isRunningOut
+        userRating
+      }
+      totalPages
+    }
+  }
+  ```
+  **Result**:
+  ```JSON
+  {
+    "data": {
+      "searchProducts": {
+        "productList": [
+          {
+            "id": 181,
+            "title": "Консоль Sony PlayStation 4 Slim 500GB Black",
+            "price": 12999,
+            "category": "Ігрові консолі",
+            "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/0667d9bf-ba25-4743-ac5b-9d94a416a616.png",
+            "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/bcd55bb0-aa38-47af-8015-0df8375bc72c.png",
+            "shortDescription": "Компактна версія ультрапопулярної ігрової консолі четвертого покоління від Sony. Консоль отримала оновлений дизайн і зменшений корпус. Начинка не зазнала змін. По суті, версія Slim є старою доброю Playstation 4 в новому вигляді.",
+            "isInTheCart": true,
+            "isAvailable": true,
+            "isRunningOut": false,
+            "userRating": 5
+          },
+          {
+            "id": 183,
+            "title": "PlayStation 5 Ultra HD Blu-ray Call of Duty: Modern Warfare III",
+            "price": 25499,
+            "category": "Ігрові консолі",
+            "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/e97939e5-8a9c-4cf4-b663-f51b57622236.png",
+            "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/f1d27468-3f9d-4de1-9c76-2917aeef98f2.png",
+            "shortDescription": "Sony PlayStation 5 – нова консоль п'ятого покоління. Значні зміни торкнулися як внутрішнього наповнення, так і дизайну загалом. Ігрова приставка отримала 8 ядерний 16 потоковий процесор на архітектурі AMD Zen 2, продуктивності якої достатньо для гри в роздільній здатності аж до 8K.",
+            "isInTheCart": false,
+            "isAvailable": true,
+            "isRunningOut": false,
+            "userRating": 4.5
+          },
+          {
+            "id": 185,
+            "title": "Sony PlayStation 5 Digital Edition 825GB White",
+            "price": 28999,
+            "category": "Ігрові консолі",
+            "initialImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/64d22b21-b6be-4038-b37c-7e5696b7bd14.png",
+            "additionalImageUrl": "https://onlinestore-product-images.s3.amazonaws.com/a6a8ec93-7d54-493f-9990-eba1fd22c03f.png",
+            "shortDescription": "Sony PlayStation 5 – нова консоль п'ятого покоління. Значні зміни торкнулися як внутрішнього наповнення, так і дизайну загалом. Ігрова приставка отримала 8 ядерний 16 потоковий процесор на архітектурі AMD Zen 2, продуктивності якої достатньо для гри в роздільній здатності аж до 8K.",
+            "isInTheCart": false,
+            "isAvailable": true,
+            "isRunningOut": false,
+            "userRating": 4.5
+          }
+        ],
+        "totalPages": 1
+      }
+    }
+  }
+  ```
+- **Error responses**:
+  - The 'page' parameter is less than or equal to zero
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "The 'page' parameter must be greater than zero"
+        }
+      ]
+    }
+    ```
+  - The user is trying to access the 'isInTheCart' parameter while being unauthenticated
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "User must be authenticated to request the \"isInTheCart\" field"
+        }
+      ]
+    }
+    ```
+  - The 'searchQuery' parameter is longer than 1000 characters
+    ```JSON
+    {
+      "data": {},
+      "errors": [
+        {
+          "message": "the 'searchQuery' parameter must be a string containing between 1 and 1000 characters"
+        }
+      ]
+    }
+    ```
+#### 4. Get featured products
 - **Who can access:** everyone (but if you request the 'isInTheCart' field, you have to provide a valid access token)
 - **Required parameters:** none
 - **Example**:
@@ -1090,7 +1202,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
     }
   }
   ```
-#### 4. Get product info including 'quantity_in_stock' and/or 'max_order_quantity'
+#### 5. Get product info including 'quantity_in_stock' and/or 'max_order_quantity'
 - **Who can access:** only administrators with the correct [access token](#access-token)
 - **Required parameters:**
   - _productId_ - the id of the product that you are trying to get information about. Must be a number.
@@ -1177,7 +1289,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
       ]
     }
     ```
-#### 5. Add a new product
+#### 6. Add a new product
 - **Who can access:** only administrators with the correct [access token](#access-token)
 - **Required parameters:**
   - _title_ - must be a string with a length between 1 and 200 characters
@@ -1363,7 +1475,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
     - If the provided product category does not exist in the database.
 
     For example, if you've just uploaded two images to S3 and then try to execute the addProduct mutation with these images and you specify an incorrect category, these 2 images will be deleted from the S3 bucket. However, if these 2 images already point to another product, they will not be deleted.
-#### 6. Update a product
+#### 7. Update a product
 - **Who can access:** only administrators with the correct [access token](#access-token)
 - **Required parameters:**
   - _id_ - must be a valid id of a product that you are trying to update. Must point to a product in the database
@@ -1563,7 +1675,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
     - If the provided product category does not exist in the database.
 
     For example, if you've just uploaded two images to S3 and then try to execute the updateProduct mutation with these images and you specify an incorrect category, these 2 images will be deleted from the S3 bucket. However, if these 2 images already point to any product (including the product that you are trying to change), they will not be deleted.
-#### 7. Delete a product
+#### 8. Delete a product
 - **Who can access:** only administrators with the correct [access token](#access-token)
 - **Required parameters:**
   - _id_ - must be a valid id of a product that you are trying to delete. Must point to a product in the database
@@ -1648,7 +1760,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
   - When the product is deleted, the associated images that are stored in S3 will be deleted only if these images are not tied to any other product in the database.
   
     For example, if you try to delete a product and the images that are tied to this product don't point to any other product, these images will be deleted from the S3 bucket. However, if another product uses these images, they will stay in the S3 bucket and won't be deleted.
-#### 8. Add a product review
+#### 9. Add a product review
 - **Who can access:** only authenticated users with the provided [access token](#access-token)
 - **Required parameters:**
   - _productId_ - must be a valid product ID for an existing product to which the user is adding a review

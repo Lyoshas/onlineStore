@@ -14,18 +14,14 @@ import formatSqlQuery from '../../util/formatSqlQuery.js';
 import mapRequestedFieldsToProductInfo from '../helpers/mapRequestedFieldsToProductInfo.js';
 import checkProductCategory from '../validators/checkProductCategory.js';
 import getUserRatingSubquery from '../helpers/getUserRatingSubquery.js';
+import GetProductsByPageOutput from '../../interfaces/GetProductsByPageOutput.js';
 
-type GetProductsByCategoryAndPageOutput = RequireAtLeastOneProperty<{
-    productList: Partial<DisplayProduct>[];
-    totalPages: number;
-}>;
+type GetProductsByCategoryAndPageOutput =
+    RequireAtLeastOneProperty<GetProductsByPageOutput>;
 
-type ProductInfo = Omit<
-    {
-        [productField in keyof DisplayProduct]: {};
-    },
-    'userRating'
->;
+type ProductInfo = {
+    [productField in keyof DisplayProduct]: {};
+};
 
 interface PossibleGraphQLFields {
     productList?: Partial<ProductInfo>;

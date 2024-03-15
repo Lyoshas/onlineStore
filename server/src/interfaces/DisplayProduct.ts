@@ -10,7 +10,7 @@ type DisplayProduct = Omit<
     isAvailable: boolean;
     isRunningOut: boolean;
     isInTheCart: boolean;
-    userRating: number;
-}
+    userRating: number | null;
+};
 
 export default DisplayProduct;

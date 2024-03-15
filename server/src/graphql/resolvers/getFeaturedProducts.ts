@@ -14,12 +14,9 @@ import getUserRatingSubquery from '../helpers/getUserRatingSubquery.js';
 
 type GetFeaturedProductsOutput = Partial<DisplayProduct>[];
 
-type PossibleGraphQLFields = Omit<
-    {
-        [productField in keyof DisplayProduct]?: {};
-    },
-    'userRating'
->;
+type PossibleGraphQLFields = {
+    [productField in keyof DisplayProduct]?: {};
+}
 
 // this function should get featured (or most popular) products,
 // but for now we're going to only get 12 random products

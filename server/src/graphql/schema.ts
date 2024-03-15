@@ -6,15 +6,18 @@ import deleteProduct from './resolvers/deleteProduct.js';
 import getFeaturedProducts from './resolvers/getFeaturedProducts.js';
 import getAdminProduct from './resolvers/getAdminProduct.js';
 import addProductReview from './resolvers/addProductReview.js';
+import getProductsBySearchQuery from './resolvers/getProductsBySearchQuery.js';
 
 export const typeDefs = `#graphql
     type Query {
         "Get products by category and page"
-        products(category: String!, page: Int!): GetProductsByCategoryAndPageReturnValue!
+        products(category: String!, page: Int!): GetProductsByPage!
         "Get a single product by its id"
         product(id: Int!): ProductInfoWithReviews!
         "Get featured products"
         featuredProducts: [ProductInfoWithoutReviews!]!
+        "Get products by search query"
+        searchProducts(searchQuery: String!, page: Int!): GetProductsByPage!
         "Get product info including 'quantity_in_stock' (only for admins)"
         adminProduct(productId: Int!): AdminProduct!
     }
@@ -56,7 +59,7 @@ export const typeDefs = `#graphql
         id: Int!
     }
 
-    type GetProductsByCategoryAndPageReturnValue {
+    type GetProductsByPage {
         productList: [ProductInfoWithoutReviews!]!
         totalPages: Int!
     }
@@ -140,6 +143,7 @@ export const resolvers = {
         product: getProduct,
         featuredProducts: getFeaturedProducts,
         adminProduct: getAdminProduct,
+        searchProducts: getProductsBySearchQuery,
     },
     Mutation: {
         addProduct,
