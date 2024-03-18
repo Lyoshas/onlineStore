@@ -24,7 +24,7 @@ interface ProductItemProps {
     isAvailable: boolean;
     isRunningOut: boolean;
     isInTheCart: boolean;
-    userRating: number | null;
+    userRating?: number | null;
 }
 
 const ProductItem: FC<ProductItemProps> = (props) => {
@@ -78,15 +78,16 @@ const ProductItem: FC<ProductItemProps> = (props) => {
                 >
                     {props.title}
                 </Link>
-                {props.userRating !== null && (
-                    <div className={classes['product-item__user-rating']}>
-                        <StarRating
-                            value={props.userRating}
-                            readOnly
-                            starSize={isLessThan250px ? '1.2rem' : ''}
-                        />
-                    </div>
-                )}
+                {props.userRating !== null &&
+                    props.userRating !== undefined && (
+                        <div className={classes['product-item__user-rating']}>
+                            <StarRating
+                                value={props.userRating}
+                                readOnly
+                                starSize={isLessThan250px ? '1.2rem' : ''}
+                            />
+                        </div>
+                    )}
                 <p className={classes['product-item__price']}>
                     {formatCurrencyUAH(props.price)}
                 </p>
