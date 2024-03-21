@@ -15,6 +15,7 @@
     height: 30px;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
 }
 
 .product-pagination-ul__item:not(:last-child) {

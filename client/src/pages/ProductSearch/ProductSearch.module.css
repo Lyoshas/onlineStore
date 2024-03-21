@@ -1,0 +1,8 @@
+.product-search-layout {
+    padding: 20px 0;
+}
+
+.product-search__hint {
+    font-size: 1.2rem;
+    text-align: center;
+}

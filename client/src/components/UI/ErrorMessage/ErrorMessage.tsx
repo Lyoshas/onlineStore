@@ -8,6 +8,7 @@ const ErrorMessage: FC<{
     addBackground?: boolean;
     className?: string;
     children: React.ReactNode;
+    textColor?: string;
 }> = (props) => {
     const { centered = false, addBackground = false } = props;
 
@@ -15,7 +16,11 @@ const ErrorMessage: FC<{
     if (centered) className += ' ' + classes.centered;
     if (addBackground) className += ' ' + classes['red-background'];
 
-    return <p className={className}>{props.children}</p>;
+    return (
+        <p className={className} style={{ color: props.textColor }}>
+            {props.children}
+        </p>
+    );
 };
 
 export default ErrorMessage;

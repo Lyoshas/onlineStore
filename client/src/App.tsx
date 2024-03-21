@@ -31,6 +31,7 @@ import ProductListPage from './pages/ProductListPage/ProductListPage';
 import useSynchronizeLocalCartProducts from './components/hooks/useSynchronizeLocalCartProducts';
 import Checkout from './pages/Checkout/Checkout';
 import OrderCallback from './pages/OrderCallback/OrderCallback';
+import ProductSearch from './pages/ProductSearch/ProductSearch';
 
 const App: FC = () => {
     const { errorMessage, isErrorNotificationShown } = useSelector(
@@ -158,6 +159,15 @@ const App: FC = () => {
                     element={
                         <TopHeader
                             RenderAfter={<ProductCategoryList />}
+                            addOffset={true}
+                        />
+                    }
+                />
+                <Route
+                    path="/search/products"
+                    element={
+                        <TopHeader
+                            RenderAfter={<ProductSearch />}
                             addOffset={true}
                         />
                     }

@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import classNames from 'classnames';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 import classes from './Navigation.module.css';
@@ -38,6 +38,7 @@ const NavigationLink: FC<NavigationLinkProps> = (props) => {
     );
 };
 
+const PRODUCT_SEARCH_URL = '/search/products';
 // onNavItemClick will be used to reset the hamburger menu upon navigation item click
 const Navigation: FC<{ className?: string; onNavItemClick: () => void }> = (
     props
@@ -45,10 +46,21 @@ const Navigation: FC<{ className?: string; onNavItemClick: () => void }> = (
     const { isAuthenticated, isAdmin } = useSelector(
         (state: RootState) => state.auth
     );
+    const location = useLocation();
 
     const linksInfo = [
         ['/', 'Home', getStaticAssetUrl('home-icon.svg')],
         ['/products', 'Products', getStaticAssetUrl('product-icon.svg')],
+        [
+            // the product search page contains some query parameters that may be set
+            // if they are lost, it may cause some bugs, so this logic will preserve
+            // all query parameters if a user is on the product search page
+            location.pathname === PRODUCT_SEARCH_URL
+                ? location.pathname + location.search
+                : PRODUCT_SEARCH_URL,
+            'Product search',
+            getStaticAssetUrl('search-icon.svg'),
+        ],
         isAuthenticated
             ? ['/orders', 'Orders', getStaticAssetUrl('order-icon.svg')]
             : null,

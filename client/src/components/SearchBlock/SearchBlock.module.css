@@ -1,0 +1,32 @@
+.search-block {
+    background: #5262A7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 80px;
+}
+
+.search-block__error-message {
+    margin-bottom: 0;
+}
+
+.search-block__loading-block {
+    width: 100%;
+    height: calc(100% - 80px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@media screen and (max-width: 1200px) {
+    .search-block__search-input {
+        width: 50%;
+    }
+}
+
+@media screen and (max-width: 800px) {
+    .search-block__search-input {
+        width: 70%;
+    }
+}

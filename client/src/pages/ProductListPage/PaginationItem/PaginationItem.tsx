@@ -1,6 +1,6 @@
-import { FC } from 'react';
+import { FC, useCallback } from 'react';
 import classNames from 'classnames';
-import { Link } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 import classes from './PaginationItem.module.css';
 
@@ -13,6 +13,15 @@ const PaginationItem: FC<PaginationItemProps> = ({
     page,
     isCurrentPage = false,
 }) => {
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const pageChangeHandler = useCallback(() => {
+        setSearchParams((prevSearchParams) => {
+            prevSearchParams.set('page', String(page));
+            return prevSearchParams;
+        });
+    }, [setSearchParams, page]);
+
     return (
         <li
             className={classNames(
@@ -20,12 +29,12 @@ const PaginationItem: FC<PaginationItemProps> = ({
                 isCurrentPage && classes['product-pagination-ul__item_current']
             )}
         >
-            <Link
-                to={`?page=${page}`}
+            <span
                 className={classes['product-pagination-item__link']}
+                onClick={pageChangeHandler}
             >
                 {page}
-            </Link>
+            </span>
         </li>
     );
 };
