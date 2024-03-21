@@ -52,13 +52,6 @@ const Navigation: FC<{ className?: string; onNavItemClick: () => void }> = (
         isAuthenticated
             ? ['/orders', 'Orders', getStaticAssetUrl('order-icon.svg')]
             : null,
-        isAdmin
-            ? [
-                  '/add-product',
-                  'Add Product',
-                  getStaticAssetUrl('add-product.svg'),
-              ]
-            : null,
     ].filter((value) => value !== null) as string[][];
 
     return (
