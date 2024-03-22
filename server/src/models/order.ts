@@ -103,17 +103,11 @@ class OrderModel {
                     recipient_id,
                     payment_method_id,
                     is_paid,
-                    status_id,
                     delivery_warehouse_id
                 ) VALUES (
                     $1,
                     (SELECT id FROM order_payment_methods WHERE name = $2),
                     false,
-                    (
-                        SELECT id
-                        FROM order_statuses
-                        WHERE name = 'Замовлення оброблюється'
-                    ),
                     (
                         SELECT id
                         FROM postal_service_warehouses
@@ -127,7 +121,24 @@ class OrderModel {
             [recipientId, paymentMethodName, cityName, warehouseDescription]
         );
 
-        return rows[0].id;
+        const orderId: number = rows[0].id;
+
+        await this.dbClient.query(
+            `
+                INSERT INTO order_status_history (order_id, status_id)
+                VALUES (
+                    $1,
+                    (
+                        SELECT id
+                        FROM order_statuses
+                        WHERE name = 'Замовлення оброблюється'
+                    )
+                );
+            `,
+            [orderId]
+        );
+
+        return orderId;
     }
 
     // use this only for anonymous users
