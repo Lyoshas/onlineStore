@@ -7,6 +7,7 @@ export async function seed(knex: Knex): Promise<void> {
     // Inserts seed entries
     await knex('order_statuses').insert([
         { name: 'Замовлення оброблюється' },
+        { name: 'Замовлення очікує відправлення' },
         { name: 'Замовлення відправлене' },
         { name: 'Замовлення чекає у поштовому відділенні' },
         { name: 'Замовлення виконане' },
