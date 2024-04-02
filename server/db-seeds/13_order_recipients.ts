@@ -1,7 +1,7 @@
 import { Knex } from 'knex';
 import snakeCaseObject from '../src/util/snakeCaseObject.js';
 
-interface OrderRecipient {
+export interface SeedOrderRecipient {
     associatedUserId: number;
     firstName: string;
     lastName: string;
@@ -16,7 +16,7 @@ export async function seed(knex: Knex): Promise<void> {
         .select('id')
         .where({ email: process.env.DB_SEEDING_ADMIN_EMAIL });
 
-    const orderRecipients: Omit<OrderRecipient, 'associatedUserId'>[] = [
+    const orderRecipients: Omit<SeedOrderRecipient, 'associatedUserId'>[] = [
         {
             firstName: process.env.DB_SEEDING_ADMIN_FIRST_NAME!,
             lastName: process.env.DB_SEEDING_ADMIN_LAST_NAME!,
