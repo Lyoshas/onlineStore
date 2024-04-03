@@ -320,4 +320,6 @@ router.post(
     orderController.postPaymentCallback
 );
 
+router.get('/orders', ensureAuthentication, orderController.getOrders);
+
 export default router;

@@ -13,6 +13,7 @@ import { sendEmail } from '../services/email.service.js';
 import LiqpayDecodedData from '../interfaces/LiqpayDecodedData.js';
 import CamelCaseProperties from '../interfaces/CamelCaseProperties.js';
 import { base64Decode } from '../util/base64.js';
+import formatDate from '../util/formatDate.js';
 
 // a separate class was created because almost all methods of this class
 // will be used inside a DB transaction
@@ -535,6 +536,127 @@ class OrderModel {
             `),
             [orderId]
         );
+    }
+
+    public async getOrderListByUserId(userId: number): Promise<
+        {
+            orderId: number;
+            previewURL: string;
+            paymentMethod: string;
+            totalPrice: number;
+            isPaid: boolean;
+            deliveryPostalService: {
+                name: string;
+                warehouseDescription: string;
+            };
+            recipient: {
+                firstName: string;
+                lastName: string;
+                phoneNumber: string;
+            };
+            creationTime: string; // dd.mm.yyyy
+            statusChangeHistory: {
+                orderStatus: string;
+                statusChangeTime: string; // dd.mm.yyyy hh:mm
+            }[];
+        }[]
+    > {
+        const { rows: orders } = await this.dbClient.query<{
+            order_id: number;
+            payment_method: string;
+            preview_url: string;
+            total_price: string;
+            is_paid: boolean;
+            delivery_postal_service_name: string;
+            delivery_warehouse_description: string;
+            recipient_first_name: string;
+            recipient_last_name: string;
+            recipient_phone_number: string;
+            status_change_history: { status: string; change_time: string }[];
+        }>(
+            `
+                SELECT
+                    orders.id AS order_id,
+                    opm.name AS payment_method,
+                    (
+                        SELECT initial_image_url
+                        FROM orders_products
+                        INNER JOIN products
+                            ON products.id = orders_products.product_id
+                        -- referring to the outer table 'orders'
+                        WHERE orders_products.order_id = orders.id
+                        ORDER BY products.title ASC
+                        LIMIT 1
+                    ) AS preview_url,
+                    (
+                        SELECT SUM(products.price * orders_products.quantity)
+                        FROM orders_products
+                        INNER JOIN products
+                            ON products.id = orders_products.product_id
+                        -- referring to the outer table 'orders'
+                        WHERE orders_products.order_id = orders.id
+                    ) AS total_price,
+                    orders.is_paid,
+                    ps.name AS delivery_postal_service_name,
+                    psw.warehouse_description AS delivery_warehouse_description,
+                    recipients.first_name AS recipient_first_name,
+                    recipients.last_name AS recipient_last_name,
+                    recipients.phone_number AS recipient_phone_number,
+                    (
+                        SELECT json_agg(t)
+                        FROM (
+                            SELECT os.name AS status, osh.change_time
+                            FROM order_status_history AS osh
+                            INNER JOIN order_statuses AS os
+                                ON os.id = osh.status_id
+                            WHERE osh.order_id = orders.id
+                            ORDER BY osh.change_time ASC
+                        ) AS t
+                    ) AS status_change_history
+                FROM orders
+                INNER JOIN order_payment_methods AS opm
+                    ON opm.id = orders.payment_method_id
+                INNER JOIN postal_service_warehouses AS psw
+                    ON psw.id = orders.delivery_warehouse_id
+                INNER JOIN postal_services AS ps
+                    ON ps.id = psw.postal_service_id
+                INNER JOIN order_recipients AS recipients
+                    ON recipients.id = orders.recipient_id
+                WHERE recipients.associated_user_id = $1
+                ORDER BY orders.id DESC
+            `,
+            [userId]
+        );
+
+        return orders.map((order) => ({
+            orderId: order.order_id,
+            previewURL: order.preview_url,
+            paymentMethod: order.payment_method,
+            totalPrice: +order.total_price,
+            isPaid: order.is_paid,
+            deliveryPostalService: {
+                name: order.delivery_postal_service_name,
+                warehouseDescription: order.delivery_warehouse_description,
+            },
+            recipient: {
+                firstName: order.recipient_first_name,
+                lastName: order.recipient_last_name,
+                phoneNumber: order.recipient_phone_number,
+            },
+            creationTime: formatDate(
+                new Date(order.status_change_history[0].change_time),
+                'dd.mm.yyyy'
+            ),
+            statusChangeHistory: order.status_change_history.map(
+                (statusInfo) => ({
+                    orderStatus: statusInfo.status,
+                    statusChangeTime: formatDate(
+                        new Date(statusInfo.change_time),
+                        'dd.mm.yyyy hh:mm'
+                    ),
+                })
+            ),
+        }));
     }
 }
 

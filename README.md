@@ -54,6 +54,7 @@
       - [2. Get order recipients associated with a single user](#2-get-order-recipients-associated-with-a-single-user)
       - [3. Create a new order](#3-create-a-new-order)
       - [4. Process a payment (LiqPay callback)](#4-process-a-payment-liqpay-callback)
+      - [5. Get a list of orders](#5-get-a-list-of-orders)
 
 ## Prerequisites
 - Install Docker and Docker Compose
@@ -2819,6 +2820,112 @@ Some API endpoints require authentication using access tokens and refresh tokens
           {
             "message": "the provided signature is invalid",
             "field": "signature"
+          }
+        ]
+      }
+      ```
+#### 5. Get a list of orders
+- **URL:** /api/user/orders
+- **Method:** GET
+- **Description:** retrieves a list of orders associated with the current user
+- **Who can access:** only authenticated users with the provided [access token](#access-token)
+- **Rate limiting:** none
+- **Request body:** none
+- **Request params:** none
+- **Required cookies:** none
+- **Success response:**
+  - **Status code:** 200 OK
+  - **Description:** the list of orders has been retrieved successfully
+  - **Content (example):**
+    ```JSON
+    {
+      "orders": [
+        {
+          "orderId": 4,
+          "previewURL": "https://onlinestore-product-images.s3.amazonaws.com/c7d3bf2a-8a81-4201-81ed-f20cb7912ac8.png",
+          "paymentMethod": "Оплата при отриманні товару",
+          "totalPrice": 31499,
+          "isPaid": false,
+          "deliveryPostalService": {
+            "name": "Нова Пошта",
+            "warehouseDescription": "Відділення №6: вул. Миколи Василенка, 2"
+          },
+          "recipient": {
+            "firstName": "Єлизавета",
+            "lastName": "Прокопенко",
+            "phoneNumber": "+380-23-456-78-90"
+          },
+          "creationTime": "03.04.2024",
+          "statusChangeHistory": [
+            {
+              "orderStatus": "Замовлення оброблюється",
+              "statusChangeTime": "03.04.2024 06:27"
+            }
+          ]
+        },
+        {
+          "orderId": 1,
+          "previewURL": "https://onlinestore-product-images.s3.amazonaws.com/55b36dd7-30d7-48d3-808c-f8becc060917.png",
+          "paymentMethod": "Оплатити зараз",
+          "totalPrice": 971085,
+          "isPaid": true,
+          "deliveryPostalService": {
+            "name": "Нова Пошта",
+            "warehouseDescription": "Відділення №68 (до 30 кг): вул. Миколайчука, 8"
+          },
+          "recipient": {
+            "firstName": "Сергій",
+            "lastName": "Ткаченко",
+            "phoneNumber": "+380-12-345-67-89"
+          },
+          "creationTime": "03.03.2024",
+          "statusChangeHistory": [
+              {
+                "orderStatus": "Замовлення оброблюється",
+                "statusChangeTime": "03.03.2024 06:15"
+              },
+              {
+                "orderStatus": "Замовлення очікує відправлення",
+                "statusChangeTime": "03.03.2024 12:53"
+              },
+              {
+                "orderStatus": "Замовлення відправлене",
+                "statusChangeTime": "03.03.2024 13:49"
+              },
+              {
+                "orderStatus": "Замовлення чекає у поштовому відділенні",
+                "statusChangeTime": "04.03.2024 09:23"
+              },
+              {
+                "orderStatus": "Замовлення виконане",
+                "statusChangeTime": "04.03.2024 15:57"
+              }
+          ]
+        }
+      ]
+    }
+    ```
+- **Error responses**:
+  - The access token is not specified or is invalid
+    - **Status code**: 401 Unauthorized
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "The access token is either invalid or is not provided",
+          }
+        ]
+      }
+      ```
+  - The access token has expired
+    - **Status code**: 401 Unauthorized
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "The access token has expired",
           }
         ]
       }

@@ -295,3 +295,12 @@ export const postPaymentCallback: RequestHandler<
         dbClient.release();
     }
 });
+
+export const getOrders: RequestHandler = asyncHandler(
+    async (req, res, next) => {
+        const orderModel = new OrderModel();
+        res.json({
+            orders: await orderModel.getOrderListByUserId(req.user!.id),
+        });
+    }
+);
