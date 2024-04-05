@@ -27,7 +27,7 @@ const SuccessMessage: FC<{
                         </p>
                     )}
                     {!props.showEmailNotice ? (
-                        <ButtonLink to="/orders">Order Tracking</ButtonLink>
+                        <ButtonLink to="/user/orders">Order Tracking</ButtonLink>
                     ) : (
                         <ButtonLink to="/auth/sign-in">Sign In</ButtonLink>
                     )}

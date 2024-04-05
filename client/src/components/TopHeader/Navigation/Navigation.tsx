@@ -62,7 +62,7 @@ const Navigation: FC<{ className?: string; onNavItemClick: () => void }> = (
             getStaticAssetUrl('search-icon.svg'),
         ],
         isAuthenticated
-            ? ['/orders', 'Orders', getStaticAssetUrl('order-icon.svg')]
+            ? ['/user/orders', 'Orders', getStaticAssetUrl('order-icon.svg')]
             : null,
     ].filter((value) => value !== null) as string[][];
 

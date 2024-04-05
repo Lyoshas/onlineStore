@@ -1,0 +1,145 @@
+.order-list__item {
+    background: #5262a7;
+    max-width: 700px;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.order-item__summary {
+    height: 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.order-item__preview-img-block {
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 20px;
+}
+
+.order-item__preview-img {
+    max-width: 100%;
+    max-height: 100%;
+    height: auto;
+    width: auto;
+}
+
+.order-item__summary-text {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 1;
+}
+
+.order-item__total-price,
+.order-item__identifier {
+    font-weight: bold;
+}
+
+.order-item__summary-text span {
+    display: block;
+}
+
+.expand-block__item_rotated {
+    transform: rotate(180deg);
+}
+
+.order-item__status-history-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.order-item__details.hidden {
+    display: none;
+}
+
+.order-item__details {
+    display: flex;
+}
+
+.order-item__status-history {
+    width: 55%;
+}
+
+.order-item__delivery-data {
+    width: 45%;
+}
+
+.order-status-history__heading,
+.delivery-data__term:first-of-type {
+    margin-top: 20px;
+}
+
+.order-status-history__heading,
+.delivery-data__term {
+    font-size: 1.1rem;
+}
+
+.order-item__status-history {
+    margin-right: 20px;
+}
+
+.delivery-data__term-list {
+    margin: 0;
+    text-align: right;
+}
+
+.delivery-data__term {
+    font-weight: bold;
+}
+
+.delivery-data__term:not(:first-of-type) {
+    margin-top: 10px;
+}
+
+.delivery-data__definition {
+    margin: 0;
+}
+
+@media screen and (max-width: 650px) {
+    .order-item__details {
+        flex-wrap: wrap;
+    }
+
+    .order-item__status-history,
+    .order-item__delivery-data {
+        width: 100%;
+    }
+
+    .order-item__status-history {
+        margin-bottom: 10px;
+    }
+
+    .delivery-data__term-list {
+        text-align: left;
+    }
+}
+
+@media screen and (max-width: 450px) {
+    .order-item__summary {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .order-item__summary-text {
+        text-align: center;
+    }
+
+    .order-item__preview-img-block {
+        margin-right: 0;
+        height: 100px;
+    }
+
+    .order-item__preview-img-block,
+    .order-item__summary-text > span {
+        margin-bottom: 10px; 
+    }
+}

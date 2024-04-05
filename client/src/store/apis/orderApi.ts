@@ -44,7 +44,40 @@ const extendedCartApi = cartApi.injectEndpoints({
                 method: 'POST',
                 body: args,
             }),
-            invalidatesTags: ['CartItemCount', 'GetCart'],
+            invalidatesTags: ['CartItemCount', 'GetCart', 'DisplayOrderList'],
+        }),
+        getOrderList: builder.query<
+            {
+                orders: [
+                    {
+                        orderId: number;
+                        previewURL: string;
+                        paymentMethod: string;
+                        totalPrice: number;
+                        isPaid: boolean;
+                        deliveryPostalService: {
+                            name: string;
+                            warehouseDescription: string;
+                        };
+                        recipient: {
+                            firstName: string;
+                            lastName: string;
+                            phoneNumber: string;
+                        };
+                        creationTime: string;
+                        statusChangeHistory: {
+                            orderStatus: string;
+                            statusChangeTime: string;
+                        }[];
+                    }
+                ];
+            },
+            void
+        >({
+            query: () => ({
+                url: '/orders',
+            }),
+            providesTags: ['DisplayOrderList'],
         }),
     }),
     overrideExisting: false,
@@ -53,7 +86,7 @@ const extendedCartApi = cartApi.injectEndpoints({
 export const orderApi = createApi({
     reducerPath: 'orderApi',
     baseQuery: createBaseQuery({
-        baseUrl: 'http://localhost/api/user/order',
+        baseUrl: 'http://localhost/api/user/',
         includeAccessToken: true,
     }),
     tagTypes: ['CartItemCount', 'GetCart'],
@@ -69,13 +102,13 @@ export const orderApi = createApi({
             void
         >({
             query: () => ({
-                url: '/recipients',
+                url: '/order/recipients',
                 method: 'GET',
             }),
         }),
     }),
 });
 
-export const { useCreateOrderMutation } = extendedCartApi;
+export const { useCreateOrderMutation, useGetOrderListQuery } = extendedCartApi;
 
 export const { useLazyGetOrderRecipientsQuery } = orderApi;

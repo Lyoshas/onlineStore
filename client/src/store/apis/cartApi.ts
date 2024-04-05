@@ -10,7 +10,7 @@ export const cartApi = createApi({
         baseUrl: 'http://localhost/api/user',
         includeAccessToken: true,
     }),
-    tagTypes: ['CartItemCount', 'GetCart'],
+    tagTypes: ['CartItemCount', 'GetCart', 'DisplayOrderList'],
     endpoints: (builder) => ({
         countCartItems: builder.query<{ cartItemCount: number }, void>({
             query: () => {

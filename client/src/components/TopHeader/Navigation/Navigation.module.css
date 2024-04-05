@@ -56,7 +56,7 @@
     }
 }
 
-@media screen and (max-width: 640px) {
+@media screen and (max-width: 670px) {
     .admin.navigation-ul {
         flex-direction: column;
     }

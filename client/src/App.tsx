@@ -32,6 +32,7 @@ import useSynchronizeLocalCartProducts from './components/hooks/useSynchronizeLo
 import Checkout from './pages/Checkout/Checkout';
 import OrderCallback from './pages/OrderCallback/OrderCallback';
 import ProductSearch from './pages/ProductSearch/ProductSearch';
+import OrdersPage from './pages/OrdersPage/OrdersPage';
 
 const App: FC = () => {
     const { errorMessage, isErrorNotificationShown } = useSelector(
@@ -195,6 +196,19 @@ const App: FC = () => {
                     element={
                         <TopHeader
                             RenderAfter={<OrderCallback />}
+                            addOffset={true}
+                        />
+                    }
+                />
+                <Route
+                    path="/user/orders"
+                    element={
+                        <TopHeader
+                            RenderAfter={
+                                <EnsureStatus auth={true} admin={false}>
+                                    <OrdersPage activePage="orders" />
+                                </EnsureStatus>
+                            }
                             addOffset={true}
                         />
                     }
