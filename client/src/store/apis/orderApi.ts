@@ -1,7 +1,4 @@
-import { createApi } from '@reduxjs/toolkit/query/react';
-
-import createBaseQuery from '../util/createBaseQuery';
-import { cartApi } from './cartApi';
+import { backendApi } from './backendApi';
 
 // this is what the order creation endpoint returns if the payment method is 'Pay now'
 export interface OrderCreationResultPayNow {
@@ -33,18 +30,33 @@ export interface OrderCreationInputNoAuth extends OrderCreationInputAuth {
 // the 'createOrder' endpoint invalidates 2 endpoints from 'cartApi'
 // RTK Query doesn't allow to invalidate tags from other APIs
 // the only way is to "inject" the createOrder endpoint into cartApi
-const extendedCartApi = cartApi.injectEndpoints({
+export const orderApi = backendApi.injectEndpoints({
     endpoints: (builder) => ({
         createOrder: builder.mutation<
             OrderCreationResultPayNow | OrderCreationResultPayUponDelivery,
             OrderCreationInputAuth | OrderCreationInputNoAuth
         >({
             query: (args) => ({
-                url: '/order',
+                url: '/user/order',
                 method: 'POST',
                 body: args,
             }),
             invalidatesTags: ['CartItemCount', 'GetCart', 'DisplayOrderList'],
+        }),
+        getOrderRecipients: builder.query<
+            {
+                orderRecipients: {
+                    firstName: string;
+                    lastName: string;
+                    phoneNumber: string;
+                }[];
+            },
+            void
+        >({
+            query: () => ({
+                url: '/user/order/recipients',
+                method: 'GET',
+            }),
         }),
         getOrderList: builder.query<
             {
@@ -75,40 +87,29 @@ const extendedCartApi = cartApi.injectEndpoints({
             void
         >({
             query: () => ({
-                url: '/orders',
+                url: '/user/orders',
             }),
             providesTags: ['DisplayOrderList'],
         }),
-    }),
-    overrideExisting: false,
-});
-
-export const orderApi = createApi({
-    reducerPath: 'orderApi',
-    baseQuery: createBaseQuery({
-        baseUrl: 'http://localhost/api/user/',
-        includeAccessToken: true,
-    }),
-    tagTypes: ['CartItemCount', 'GetCart'],
-    endpoints: (builder) => ({
-        getOrderRecipients: builder.query<
-            {
-                orderRecipients: {
-                    firstName: string;
-                    lastName: string;
-                    phoneNumber: string;
-                }[];
-            },
-            void
+        checkOrderFeasibility: builder.query<
+            { [productId: number]: { canBeOrdered: boolean } },
+            { productId: number; quantity: number }[]
         >({
-            query: () => ({
-                url: '/order/recipients',
-                method: 'GET',
-            }),
+            query: (body) => {
+                return {
+                    url: '/user/order/check-feasibility',
+                    method: 'POST',
+                    body,
+                };
+            },
+            providesTags: ['CheckOrderFeasibility'],
         }),
     }),
 });
 
-export const { useCreateOrderMutation, useGetOrderListQuery } = extendedCartApi;
-
-export const { useLazyGetOrderRecipientsQuery } = orderApi;
+export const {
+    useCreateOrderMutation,
+    useGetOrderListQuery,
+    useLazyGetOrderRecipientsQuery,
+    useLazyCheckOrderFeasibilityQuery,
+} = orderApi;

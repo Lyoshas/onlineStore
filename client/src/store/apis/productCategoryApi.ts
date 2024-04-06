@@ -1,14 +1,7 @@
-import { createApi } from '@reduxjs/toolkit/query/react';
-
-import createBaseQuery from '../util/createBaseQuery';
 import ProductCategory from '../../interfaces/ProductCategory';
+import { backendApi } from './backendApi';
 
-export const productCategoryApi = createApi({
-    reducerPath: 'productCategoryApi',
-    baseQuery: createBaseQuery({
-        baseUrl: 'http://localhost/api/product',
-        includeAccessToken: false,
-    }),
+export const productCategoryApi = backendApi.injectEndpoints({
     endpoints: (builder) => ({
         productCategories: builder.query<
             { categories: ProductCategory[] },
@@ -16,7 +9,7 @@ export const productCategoryApi = createApi({
         >({
             query: (data) => {
                 return {
-                    url: '/categories',
+                    url: '/product/categories',
                     method: 'GET',
                 };
             },

@@ -1,6 +1,4 @@
-import { createApi } from '@reduxjs/toolkit/query/react';
-
-import createBaseQuery from '../util/createBaseQuery';
+import { backendApi } from './backendApi';
 
 export interface IUserData {
     firstName: string;
@@ -17,17 +15,12 @@ export interface IUserCredentials {
     recaptchaToken: string;
 }
 
-export const authApi = createApi({
-    reducerPath: 'authApi',
-    baseQuery: createBaseQuery({
-        baseUrl: 'http://localhost/api/auth',
-        includeAccessToken: false,
-    }),
+export const authApi = backendApi.injectEndpoints({
     endpoints: (builder) => ({
         signUp: builder.mutation<{ msg: string }, IUserData>({
             query: (user) => {
                 return {
-                    url: '/sign-up',
+                    url: '/auth/sign-up',
                     method: 'POST',
                     body: user,
                 };
@@ -36,7 +29,7 @@ export const authApi = createApi({
         activateAccount: builder.mutation<{ msg: string }, string>({
             query: (activationToken: string) => {
                 return {
-                    url: `/activate-account/${activationToken}`,
+                    url: `/auth/activate-account/${activationToken}`,
                     method: 'PATCH',
                 };
             },
@@ -44,7 +37,7 @@ export const authApi = createApi({
         requestAccessToken: builder.query<{ accessToken: string }, void>({
             query: () => {
                 return {
-                    url: '/refresh',
+                    url: '/auth/refresh',
                     method: 'GET',
                     credentials: 'include',
                 };
@@ -53,7 +46,7 @@ export const authApi = createApi({
         signIn: builder.mutation<{ accessToken: string }, IUserCredentials>({
             query: (credentials) => {
                 return {
-                    url: '/sign-in',
+                    url: '/auth/sign-in',
                     method: 'POST',
                     body: credentials,
                 };
@@ -65,7 +58,7 @@ export const authApi = createApi({
         >({
             query: (credentials) => {
                 return {
-                    url: '/resend-activation-link',
+                    url: '/auth/resend-activation-link',
                     method: 'POST',
                     body: credentials,
                 };
@@ -77,7 +70,7 @@ export const authApi = createApi({
         >({
             query: (data) => {
                 return {
-                    url: '/send-reset-token',
+                    url: '/auth/send-reset-token',
                     method: 'POST',
                     body: data,
                 };
@@ -93,7 +86,7 @@ export const authApi = createApi({
         >({
             query: (data) => {
                 return {
-                    url: '/change-password',
+                    url: '/auth/change-password',
                     method: 'PATCH',
                     body: data,
                 };
@@ -105,7 +98,7 @@ export const authApi = createApi({
         >({
             query: (data) => {
                 return {
-                    url: `/is-reset-token-valid/${data.resetToken}`,
+                    url: `/auth/is-reset-token-valid/${data.resetToken}`,
                     method: 'GET',
                 };
             },
@@ -114,7 +107,7 @@ export const authApi = createApi({
             {
                 query: (data) => {
                     return {
-                        url: `/oauth-link/${data.oauthProvider}`,
+                        url: `/auth/oauth-link/${data.oauthProvider}`,
                         method: 'GET',
                     };
                 },
@@ -127,7 +120,7 @@ export const authApi = createApi({
             query: (data) => {
                 console.log(data.queryString);
                 return {
-                    url: `/oauth-callback?${data.queryString}`,
+                    url: `/auth/oauth-callback?${data.queryString}`,
                     method: 'POST',
                 };
             },
@@ -135,7 +128,7 @@ export const authApi = createApi({
         logout: builder.mutation<void, void>({
             query: () => {
                 return {
-                    url: `/logout`,
+                    url: '/auth/logout',
                     method: 'POST',
                 };
             },
@@ -146,7 +139,7 @@ export const authApi = createApi({
         >({
             query: (data) => {
                 return {
-                    url: `/is-email-available?${new URLSearchParams(
+                    url: `/auth/is-email-available?${new URLSearchParams(
                         data
                     ).toString()}`,
                     method: 'GET',

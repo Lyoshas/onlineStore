@@ -1,21 +1,13 @@
-import { createApi } from '@reduxjs/toolkit/query/react';
-
-import createBaseQuery from '../util/createBaseQuery';
 import CartProduct from '../../interfaces/CartProduct';
 import { localCartActions } from '../slices/localCart';
+import { backendApi } from './backendApi';
 
-export const cartApi = createApi({
-    reducerPath: 'cartApi',
-    baseQuery: createBaseQuery({
-        baseUrl: 'http://localhost/api/user',
-        includeAccessToken: true,
-    }),
-    tagTypes: ['CartItemCount', 'GetCart', 'DisplayOrderList'],
+export const cartApi = backendApi.injectEndpoints({
     endpoints: (builder) => ({
         countCartItems: builder.query<{ cartItemCount: number }, void>({
             query: () => {
                 return {
-                    url: '/cart/count',
+                    url: '/user/cart/count',
                     method: 'GET',
                 };
             },
@@ -29,7 +21,7 @@ export const cartApi = createApi({
         >({
             query: (productData) => {
                 return {
-                    url: '/cart',
+                    url: '/user/cart',
                     method: 'PUT',
                     body: productData,
                 };
@@ -47,7 +39,7 @@ export const cartApi = createApi({
         >({
             query: () => {
                 return {
-                    url: '/cart',
+                    url: '/user/cart',
                     method: 'GET',
                 };
             },
@@ -67,7 +59,7 @@ export const cartApi = createApi({
         deleteCartProduct: builder.mutation<void, { productId: number }>({
             query: ({ productId }) => {
                 return {
-                    url: `/cart/${productId}`,
+                    url: `/user/cart/${productId}`,
                     method: 'DELETE',
                 };
             },
@@ -85,10 +77,12 @@ export const cartApi = createApi({
         >({
             query: ({ productId, quantityToAdd }) => {
                 return {
-                    url: `/cart/is-safe-to-add-product?${new URLSearchParams({
-                        productId: String(productId),
-                        quantityToAdd: String(quantityToAdd),
-                    }).toString()}`,
+                    url: `/user/cart/is-safe-to-add-product?${new URLSearchParams(
+                        {
+                            productId: String(productId),
+                            quantityToAdd: String(quantityToAdd),
+                        }
+                    ).toString()}`,
                     method: 'GET',
                 };
             },
@@ -99,7 +93,7 @@ export const cartApi = createApi({
         >({
             query: (cartItems) => {
                 return {
-                    url: '/cart/synchronize',
+                    url: '/user/cart/synchronize',
                     method: 'PUT',
                     body: cartItems,
                 };
@@ -114,7 +108,7 @@ export const cartApi = createApi({
             // this is done to prevent a bug where multiple components get the same state (same requestId)
             query: ({ productId }) => {
                 return {
-                    url: '/cart/maximum-items',
+                    url: '/user/cart/maximum-items',
                     method: 'GET',
                 };
             },

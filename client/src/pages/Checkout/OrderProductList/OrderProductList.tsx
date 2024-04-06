@@ -7,7 +7,7 @@ import classes from './OrderProductList.module.css';
 import OrderProduct from '../../../components/OrderProduct/OrderProduct';
 import { RootState } from '../../../store';
 import CheckoutInitialValues from '../interfaces/CheckoutInitialValues';
-import { useLazyCheckOrderFeasibilityQuery } from '../../../store/apis/orderCheckApi';
+import { useLazyCheckOrderFeasibilityQuery } from '../../../store/apis/orderApi';
 import { localCartActions } from '../../../store/slices/localCart';
 import useApiError from '../../../components/hooks/useApiError';
 import LoadingScreen from '../../../components/UI/LoadingScreen/LoadingScreen';

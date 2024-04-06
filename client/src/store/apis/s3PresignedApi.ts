@@ -1,13 +1,6 @@
-import { createApi } from '@reduxjs/toolkit/query/react';
+import { backendApi } from './backendApi';
 
-import createBaseQuery from '../util/createBaseQuery';
-
-export const s3PresignedUrlApi = createApi({
-    reducerPath: 's3PresignedUrlApi',
-    baseQuery: createBaseQuery({
-        baseUrl: 'http://localhost/api/s3',
-        includeAccessToken: true,
-    }),
+export const s3PresignedUrlApi = backendApi.injectEndpoints({
     endpoints: (builder) => ({
         getPresignedUrlForUpload: builder.query<
             { presignedUrl: string },
@@ -25,7 +18,7 @@ export const s3PresignedUrlApi = createApi({
                 };
 
                 return {
-                    url: `/presigned-url?${new URLSearchParams(
+                    url: `/s3/presigned-url?${new URLSearchParams(
                         queryParams
                     ).toString()}`,
                     method: 'GET',

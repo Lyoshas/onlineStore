@@ -1,17 +1,10 @@
-import { createApi } from '@reduxjs/toolkit/query/react';
+import { backendApi } from './backendApi';
 
-import createBaseQuery from '../util/createBaseQuery';
-
-export const shippingApi = createApi({
-    reducerPath: 'shippingApi',
-    baseQuery: createBaseQuery({
-        baseUrl: 'http://localhost/api/shipping',
-        includeAccessToken: false,
-    }),
+export const shippingApi = backendApi.injectEndpoints({
     endpoints: (builder) => ({
         getSupportedCities: builder.query<{ supportedCities: string[] }, void>({
             query: () => ({
-                url: '/supported-cities',
+                url: '/shipping/supported-cities',
                 method: 'GET',
             }),
         }),
@@ -20,7 +13,7 @@ export const shippingApi = createApi({
             { city: string }
         >({
             query: (args) => ({
-                url: `/nova-poshta/warehouses?${new URLSearchParams({
+                url: `/shipping/nova-poshta/warehouses?${new URLSearchParams({
                     city: args.city,
                 }).toString()}`,
                 method: 'GET',

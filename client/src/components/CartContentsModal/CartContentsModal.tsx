@@ -13,7 +13,7 @@ import Image from '../TopHeader/Image/Image';
 import ErrorIcon from '../UI/Icons/ErrorIcon';
 import { RootState } from '../../store';
 import ICartProduct from '../../interfaces/CartProduct';
-import { useLazyCheckOrderFeasibilityQuery } from '../../store/apis/orderCheckApi';
+import { useLazyCheckOrderFeasibilityQuery } from '../../store/apis/orderApi';
 import useApiError from '../hooks/useApiError';
 import calculateCartTotalPrice from '../../util/calculateCartTotalPrice';
 import { localCartActions } from '../../store/slices/localCart';
