@@ -15,8 +15,6 @@ interface Order {
             | 'Замовлення виконане'
             | 'Замовлення скасоване';
     }[];
-    deliveryWarehouseDescription: string;
-    deliveryCity: string;
     recipient: Omit<SeedOrderRecipient, 'associatedUserId'>;
     products: { title: string; quantity: number }[];
 }
@@ -34,9 +32,6 @@ export async function seed(knex: Knex): Promise<void> {
             id: 1,
             paymentMethod: 'Оплатити зараз',
             isPaid: true,
-            deliveryWarehouseDescription:
-                'Відділення №68 (до 30 кг): вул. Миколайчука, 8',
-            deliveryCity: 'Львів',
             recipient: {
                 firstName: process.env.DB_SEEDING_ADMIN_FIRST_NAME!,
                 lastName: process.env.DB_SEEDING_ADMIN_LAST_NAME!,
@@ -114,9 +109,6 @@ export async function seed(knex: Knex): Promise<void> {
             id: 2,
             paymentMethod: 'Оплата при отриманні товару',
             isPaid: false,
-            deliveryWarehouseDescription:
-                'Відділення №100: вул. Промислова, 50/52',
-            deliveryCity: 'Львів',
             recipient: {
                 firstName: process.env.DB_SEEDING_ADMIN_FIRST_NAME!,
                 lastName: process.env.DB_SEEDING_ADMIN_LAST_NAME!,
@@ -143,9 +135,6 @@ export async function seed(knex: Knex): Promise<void> {
             id: 3,
             paymentMethod: 'Оплатити зараз',
             isPaid: false,
-            deliveryWarehouseDescription:
-                'Відділення №24 (до 2 кг): вул. 15 Квітня, б.5а (маг."Сільпо")',
-            deliveryCity: 'Тернопіль',
             recipient: {
                 firstName: 'Сергій',
                 lastName: 'Ткаченко',
@@ -168,9 +157,6 @@ export async function seed(knex: Knex): Promise<void> {
             id: 4,
             paymentMethod: 'Оплата при отриманні товару',
             isPaid: false,
-            deliveryWarehouseDescription:
-                'Відділення №6: вул. Миколи Василенка, 2',
-            deliveryCity: 'Київ',
             recipient: {
                 firstName: 'Єлизавета',
                 lastName: 'Прокопенко',
@@ -201,12 +187,8 @@ export async function seed(knex: Knex): Promise<void> {
             is_paid: order.isPaid,
             delivery_warehouse_id: knex('postal_service_warehouses')
                 .select('id')
-                .where({
-                    warehouse_description: order.deliveryWarehouseDescription,
-                    city_id: knex('cities')
-                        .select('id')
-                        .where({ name: order.deliveryCity }),
-                }),
+                .orderByRaw('RANDOM()')
+                .limit(1),
             recipient_id: knex('order_recipients')
                 .select('id')
                 .where({
