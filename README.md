@@ -55,6 +55,8 @@
       - [3. Create a new order](#3-create-a-new-order)
       - [4. Process a payment (LiqPay callback)](#4-process-a-payment-liqpay-callback)
       - [5. Get a list of orders](#5-get-a-list-of-orders)
+    - [Warranty Request Endpoints](#warranty-request-endpoints)
+      - [1. Get a list of warranty requests for the current user](#1-get-a-list-of-warranty-requests-for-the-current-user)
 
 ## Prerequisites
 - Install Docker and Docker Compose
@@ -2900,6 +2902,112 @@ Some API endpoints require authentication using access tokens and refresh tokens
                 "orderStatus": "Замовлення виконане",
                 "statusChangeTime": "04.03.2024 15:57"
               }
+          ]
+        }
+      ]
+    }
+    ```
+- **Error responses**:
+  - The access token is not specified or is invalid
+    - **Status code**: 401 Unauthorized
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "The access token is either invalid or is not provided",
+          }
+        ]
+      }
+      ```
+  - The access token has expired
+    - **Status code**: 401 Unauthorized
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "The access token has expired",
+          }
+        ]
+      }
+      ```
+
+### Warranty Request Endpoints
+#### 1. Get a list of warranty requests for the current user
+- **URL:** /api/user/warranty-requests
+- **Method:** GET
+- **Description:** returns a list of warranty requests that are associated with the user who made the request. A warranty request is basically a formal way of asking a manufacturer or seller to fix or replace something that's gone wrong with a product you bought, because it's still under warranty.
+- **Who can access:** only authenticated users with the provided [access token](#access-token)
+- **Rate limiting:** none
+- **Request body:** none
+- **Request params:** none
+- **Required cookies:** none
+- **Success response:**
+  - **Status code:** 200
+  - **Description:** the warranty requests have been fetched successfully
+  - **Content (example):**
+    ```JSON
+    {
+      "warrantyRequests": [
+        {
+          "id": 3,
+          "issueDescription": "Неправильно працюючі датчики",
+          "serviceCenter": "Сервісний центр №3 (вул. Героїв Незалежності, 16, Житомир, 03003)",
+          "userDataRequestInitiator": {
+            "firstName": "Олексій",
+            "lastName": "Потапчук",
+            "email": "lyoshachuk@gmail.com"
+          },
+          "repairingProductData": {
+            "title": "Квадрокоптер DJI Mini 4 Pro with RC-N2 Remote Controller",
+            "reviewURL": "https://onlinestore-product-images.s3.amazonaws.com/cff1d10c-f5d5-4907-8b13-8d89dafb648d.png"
+          },
+          "statusHistory": [
+            {
+              "statusChangeTime": "14.04.2024 15:48",
+              "status": "Йдуть ремонтні роботи"
+            },
+            {
+              "statusChangeTime": "14.04.2024 11:07",
+              "status": "Сервісний центр оцінює стан товару"
+            },
+            {
+              "statusChangeTime": "14.04.2024 06:34",
+              "status": "Товар зданий у сервіс"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "issueDescription": "Непрацюючі динаміки",
+          "serviceCenter": "Сервісний центр №2 (вул. Дегтярівська, 32, Львів, 02002)",
+          "userDataRequestInitiator": {
+            "firstName": "Oleksii",
+            "lastName": "Potapchuk",
+            "email": "lyoshachuk@gmail.com"
+          },
+          "repairingProductData": {
+            "title": "Apple MacBook Pro 16\" M1 Pro 512GB 2021",
+            "reviewURL": "https://onlinestore-product-images.s3.amazonaws.com/8bd44131-8cc9-4503-9d38-a784e90220f4.png"
+          },
+          "statusHistory": [
+            {
+              "statusChangeTime": "20.03.2024 16:52",
+              "status": "Товар був успішно отриманий"
+            },
+            {
+              "statusChangeTime": "20.03.2024 11:48",
+              "status": "Не було знайдено жодних дефектів; товар очікує клієнта в сервісному центрі"
+            },
+            {
+              "statusChangeTime": "20.03.2024 08:07",
+              "status": "Сервісний центр оцінює стан товару"
+            },
+            {
+              "statusChangeTime": "20.03.2024 07:34",
+              "status": "Товар зданий у сервіс"
+            }
           ]
         }
       ]

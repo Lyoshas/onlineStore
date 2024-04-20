@@ -31,6 +31,7 @@ import productCategoriesRoutes from './routes/product-category.js';
 import s3Routes from './routes/file-upload.js';
 import shippingRoutes from './routes/shipping.js';
 import userRoutes from './routes/user.js';
+import warrantyRequestRoutes from './routes/warranty-request.js';
 
 const app = express();
 
@@ -54,7 +55,8 @@ app.use('/auth', [
 app.use('/user', [
     cartRoutes,
     orderRoutes,
-    userRoutes
+    userRoutes,
+    warrantyRequestRoutes,
 ])
 
 app.use('/product', productCategoriesRoutes);
