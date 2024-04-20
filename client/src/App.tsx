@@ -214,6 +214,19 @@ const App: FC = () => {
                     }
                 />
                 <Route
+                    path="/user/orders/warranty-requests"
+                    element={
+                        <TopHeader
+                            RenderAfter={
+                                <EnsureStatus auth={true} admin={false}>
+                                    <OrdersPage activePage="warranty requests" />
+                                </EnsureStatus>
+                            }
+                            addOffset={true}
+                        />
+                    }
+                />
+                <Route
                     path="/edit-product/:productId"
                     element={
                         // ensure the user is logged in and is an admin

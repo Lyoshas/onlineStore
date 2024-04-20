@@ -1,0 +1,31 @@
+.expandable-block {
+    background: #5262a7;
+    max-width: 700px;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.expandable-block__summary {
+    height: 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.expandable-block__details.hidden {
+    display: none;
+}
+
+.expandable-block__details {
+    display: flex;
+}
+
+.expand-block__item_rotated {
+    transform: rotate(180deg);
+}
+
+.order-item__expand-block {
+    margin-left: 20px;
+}

@@ -1,0 +1,83 @@
+.warranty-request__summary-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex-grow: 1;
+    height: 100%;
+    justify-content: space-between;
+}
+
+.warranty-request__identifier {
+    font-weight: bold;
+}
+
+.warranty-request__last-status {
+    width: 400px;
+    text-align: left;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.warranty-request__details-flex-container {
+    text-align: left;
+    width: 50%;
+}
+
+.warranty-request__details-flex-container:not(:first-child) {
+    margin-left: 20px;
+}
+
+.warranty-request__user-contact-data {
+    word-break: break-all;
+}
+
+@media screen and (max-width: 760px) {
+    .warranty-request__last-status {
+        width: 300px;
+    }
+
+    .warranty-request__details-block {
+        flex-direction: column;
+    }
+
+    .warranty-request__details-flex-container {
+        width: 100%;
+    }
+
+    .warranty-request__details-flex-container:not(:first-child) {
+        margin-left: 0;
+    }
+}
+
+@media screen and (max-width: 650px) {
+    .warranty-request__expand-arrow-block {
+        margin-top: 20px;
+        margin-left: 0;
+    }
+
+    .warranty-request__preview-img {
+        margin-bottom: 20px;
+        margin-right: 0;
+    }
+
+    .warranty-request__summary-block {
+        flex-direction: column; 
+        height: auto;
+    }
+
+    .warranty-request__summary-text {
+        align-items: center;
+    }
+
+    .warranty-request__last-status {
+        width: 100%;
+        overflow: auto;
+        white-space: normal;
+        text-overflow: initial;
+    }
+
+    .warranty-request__last-status {
+        text-align: center;
+    }
+}
