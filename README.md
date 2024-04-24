@@ -57,6 +57,8 @@
       - [5. Get a list of orders](#5-get-a-list-of-orders)
     - [Warranty Request Endpoints](#warranty-request-endpoints)
       - [1. Get a list of warranty requests for the current user](#1-get-a-list-of-warranty-requests-for-the-current-user)
+    - [Fundraising Campaign Endpoints](#fundraising-campaign-endpoints)
+      - [1. Get a list of fundraising campaigns](#1-get-a-list-of-fundraising-campaigns)
 
 ## Prerequisites
 - Install Docker and Docker Compose
@@ -3034,6 +3036,60 @@ Some API endpoints require authentication using access tokens and refresh tokens
         "errors": [
           {
             "message": "The access token has expired",
+          }
+        ]
+      }
+      ```
+
+### Fundraising Campaign Endpoints
+#### 1. Get a list of fundraising campaigns
+- **URL:** /api/fundraising-campaigns
+- **Method:** GET
+- **Description:** returns a list of fundraising campaigns based on the provided status.
+- **Who can access:** everyone
+- **Rate limiting:** none
+- **Request body:** none
+- **Request params:** none
+- **Query string parameters:**
+  - _status_ - specifies the status that fundraising campaigns must have. Can be either 'ongoing' (active campaigns that are currently accepting donations) and 'finished' (finished campaigns that are no longer accepting donations).
+- **Required cookies:** none
+- **Success response:**
+  - **Status code:** 200
+  - **Description:** the fundraising campaigns have been fetched successfully
+  - **Content (example):**
+    ```TypeScript
+    {
+      "fundraisingCampaigns": [
+        {
+          "id": 2,
+          "title": "Збір на дрони для 54 окремої механізованої бригади",
+          "financialObjective": 295000,
+          "previewUrl": "https://onlinestore-product-images.s3.eu-north-1.amazonaws.com/255db5b8-6df6-404f-8a3d-6eeabab4e975.png",
+          "raisedMoney": 150739,
+          // "fundingProgressPercentage" represents the progress made towards the fundraising goal in terms of a percentage
+          "fundingProgressPercentage": 51.1
+        },
+        {
+          "id": 3,
+          "title": "Збір на дрони для 23 окремої механізованої бригади",
+          "financialObjective": 400000,
+          "previewUrl": "https://onlinestore-product-images.s3.eu-north-1.amazonaws.com/25139a87-3d4e-4d70-9677-c6353f9d6b1f.png",
+          "raisedMoney": 241267,
+          "fundingProgressPercentage": 60.32
+        }
+      ]
+    }
+    ```
+- **Error responses**:
+  - The 'status' query string parameter doesn't meet the requirements
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "status must be either \"ongoing\" or \"finished\"",
+            "field": "status"
           }
         ]
       }

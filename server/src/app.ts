@@ -32,6 +32,7 @@ import s3Routes from './routes/file-upload.js';
 import shippingRoutes from './routes/shipping.js';
 import userRoutes from './routes/user.js';
 import warrantyRequestRoutes from './routes/warranty-request.js';
+import fundraisingCampaignRoutes from './routes/fundraising-campaign.js';
 
 const app = express();
 
@@ -64,6 +65,8 @@ app.use('/product', productCategoriesRoutes);
 app.use('/s3', s3Routes);
 
 app.use('/shipping', shippingRoutes);
+
+app.use('/fundraising-campaigns', fundraisingCampaignRoutes);
 
 const startGraphQLServer = async () => {
     const server = new ApolloServer<ApolloServerContext>({
