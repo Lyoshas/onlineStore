@@ -1,15 +1,14 @@
 import { FC, Fragment, useState, useEffect, useLayoutEffect } from 'react';
 import classNames from 'classnames';
 import { useMediaQuery } from 'react-responsive';
+import { useSelector } from 'react-redux';
 
 import classes from './TopHeader.module.css';
 import Logo from './Logo/Logo';
 import Navigation from './Navigation/Navigation';
 import HeaderButtons from './HeaderButtons/HeaderButtons';
-import Loading from '../UI/Loading/Loading';
 import MainBlock from './MainBlock/MainBlock';
 import Layout from '../Layout/Layout';
-import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import HamburgerMenuIcon from './HambugerMenuIcon/HamburgerMenuIcon';
 import LoadingScreen from '../UI/LoadingScreen/LoadingScreen';
@@ -27,10 +26,7 @@ const TopHeader: FC<{
     const isAuthenticated = useSelector(
         (state: RootState) => state.auth.isAuthenticated
     );
-    const isAdmin = useSelector((state: RootState) => state.auth.isAdmin);
-    const isLargeScreen = useMediaQuery({
-        query: `(min-width: ${isAdmin ? 1201 : 941}px)`,
-    });
+    const isLargeScreen = useMediaQuery({ query: `(min-width: 1201px)` });
 
     useEffect(() => {
         const handleScroll = () => {
@@ -49,7 +45,6 @@ const TopHeader: FC<{
 
     const handleHamburgerClick = () => setShowResponsiveMenu((prev) => !prev);
     const handleNavItemClick = () => {
-        // if the screen size is >= 941px (1201px if a user is an admin), do nothing
         if (isLargeScreen) return;
         setShowResponsiveMenu(false);
     };
@@ -61,16 +56,13 @@ const TopHeader: FC<{
             <header
                 className={classNames(
                     classes['top-header'],
-                    isAdmin ? classes['admin'] : classes['basic-user'],
+                    classes['basic-user'],
                     isScrolled && classes.darkened
                 )}
             >
                 <Layout className={classes['top-header__layout']}>
                     <Logo className={classes['top-header-layout__logo']} />
-                    <HamburgerMenuIcon
-                        onClick={handleHamburgerClick}
-                        isAdmin={isAdmin}
-                    />
+                    <HamburgerMenuIcon onClick={handleHamburgerClick} />
                     {showResponsiveMenu && (
                         <Fragment>
                             <Navigation

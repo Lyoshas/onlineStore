@@ -45,36 +45,12 @@
 }
 
 @media screen and (max-width: 1200px) {
-    .navigation__link.admin {
-        padding-bottom: 10px;
-    }
-}
-
-@media screen and (max-width: 940px) {
-    .navigation__link.basic-user {
+    .navigation__link {
         padding-bottom: 10px;
     }
 }
 
 @media screen and (max-width: 670px) {
-    .admin.navigation-ul {
-        flex-direction: column;
-    }
-
-    .admin.navigation-ul .navigation__li {
-        margin-right: 0;
-    }
-
-    .admin.navigation-ul .navigation__li:not(:last-child) {
-        margin-bottom: 20px;
-    }
-
-    .admin.navigation__link {
-        justify-content: center;
-    }
-}
-
-@media screen and (max-width: 420px) {
     .navigation-ul {
         flex-direction: column;
     }

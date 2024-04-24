@@ -16,8 +16,6 @@ interface NavigationLinkProps {
 }
 
 const NavigationLink: FC<NavigationLinkProps> = (props) => {
-    const isAdmin = useSelector((state: RootState) => state.auth.isAdmin);
-
     return (
         <li className={classes['navigation__li']}>
             <NavLink
@@ -25,7 +23,6 @@ const NavigationLink: FC<NavigationLinkProps> = (props) => {
                 className={({ isActive }) => {
                     return classNames(
                         classes['navigation__link'],
-                        isAdmin ? classes['admin'] : classes['basic-user'],
                         isActive && classes.active
                     );
                 }}
