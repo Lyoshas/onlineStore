@@ -26,9 +26,6 @@ export const activateAccount: RequestHandler = asyncHandler(
             });
         }
 
-        console.log('USER_ID TYPE CHECKING!');
-        console.log(userId);
-        console.log(typeof userId);
         await activationModel.activateAccount(+userId);
 
         res.status(200).json({ msg: 'The account has been activated' });
