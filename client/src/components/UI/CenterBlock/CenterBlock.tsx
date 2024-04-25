@@ -2,7 +2,6 @@ import { FC } from 'react';
 import classnames from 'classnames';
 
 import classes from './CenterBlock.module.css';
-import Card from '../Card/Card';
 
 const CenterBlock: FC<{
     children: React.ReactNode;
@@ -11,7 +10,7 @@ const CenterBlock: FC<{
 }> = ({ whiteBackground = true, ...props }) => {
     return (
         <div className="flex-wrapper">
-            <Card
+            <div
                 className={classnames(
                     classes['center-block'],
                     whiteBackground && classes['white-background'],
@@ -19,7 +18,7 @@ const CenterBlock: FC<{
                 )}
             >
                 {props.children}
-            </Card>
+            </div>
         </div>
     );
 };

@@ -5,7 +5,6 @@ import classNames from 'classnames';
 
 import Backdrop from '../Backdrop/Backdrop';
 import Button from '../Button/Button';
-import Card from '../Card/Card';
 import classes from './Modal.module.css';
 
 interface ModalProps {
@@ -44,7 +43,7 @@ const Modal: FC<ModalProps> = ({ includeCancelButton = true, ...props }) => {
     return createPortal(
         <Fragment>
             <Backdrop onClick={props.onClose} />
-            <Card className={classes.modal} ref={modalRef}>
+            <div className={classes.modal} ref={modalRef}>
                 {/* if props.title is defined and its length is bigger than 0 */}
                 {props.title?.length && (
                     <div className={classes['modal__header']}>
@@ -74,7 +73,7 @@ const Modal: FC<ModalProps> = ({ includeCancelButton = true, ...props }) => {
                         {props.actions}
                     </div>
                 ) : null}
-            </Card>
+            </div>
         </Fragment>,
         document.getElementById('modal-window')!
     );
