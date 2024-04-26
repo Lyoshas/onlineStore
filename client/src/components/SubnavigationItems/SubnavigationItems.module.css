@@ -1,0 +1,20 @@
+.subnavigation-items__link {
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-decoration: none;
+    transition: 0.2s color ease;
+    padding-bottom: 5px;
+}
+
+.subnavigation-items__link:hover {
+    color: #b9b9b9;
+}
+
+.subnavigation-items__link:not(:last-child) {
+    margin-right: 40px;
+}
+
+.subnevigation-item__link_underline {
+    border-bottom: 3px solid white;
+}

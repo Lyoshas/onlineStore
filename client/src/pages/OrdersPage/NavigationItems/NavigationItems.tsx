@@ -1,35 +1,26 @@
-import { Link } from 'react-router-dom';
-import classNames from 'classnames';
-
-import classes from './NavigationItems.module.css';
 import { FC } from 'react';
 
-const NavigationItems: FC<{ activePage: 'orders' | 'warranty requests' }> = (
+import classes from './NavigationItems.module.css';
+import SubnavigationItems from '../../../components/SubnavigationItems/SubnavigationItems';
+
+const linksInfo: { name: 'Orders' | 'Warranty requests'; url: string }[] = [
+    { name: 'Orders', url: '/user/orders' },
+    {
+        name: 'Warranty requests',
+        url: '/user/orders/warranty-requests',
+    },
+];
+
+const NavigationItems: FC<{ activePage: 'Orders' | 'Warranty requests' }> = (
     props
 ) => {
     return (
-        <div className={classes['order-navigation-items']}>
-            <Link
-                to="/user/orders"
-                className={classNames(
-                    classes['order-navigation-items__link'],
-                    props.activePage === 'orders' &&
-                        classes['order-nevigation-item__link_underline']
-                )}
-            >
-                Orders
-            </Link>
-            <Link
-                to="/user/orders/warranty-requests"
-                className={classNames(
-                    classes['order-navigation-items__link'],
-                    props.activePage === 'warranty requests' &&
-                        classes['order-nevigation-item__link_underline']
-                )}
-            >
-                Warranty requests
-            </Link>
-        </div>
+        <SubnavigationItems
+            links={linksInfo}
+            selectedLink={props.activePage}
+            divBlockClassName={classes['order-subnavigation-items']}
+            linkItemClassName={classes['order-subnavigation-items__link']}
+        />
     );
 };
 

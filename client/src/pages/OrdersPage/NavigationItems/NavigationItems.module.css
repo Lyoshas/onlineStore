@@ -1,32 +1,11 @@
-.order-navigation-items__link {
-    color: white;
-    font-weight: bold;
-    font-size: 1.2rem;
-    text-decoration: none;
-    transition: 0.2s color ease;
-    padding-bottom: 5px;
-}
-
-.order-navigation-items__link:hover {
-    color: #b9b9b9;
-}
-
-.order-navigation-items__link:not(:last-child) {
-    margin-right: 40px;
-}
-
-.order-nevigation-item__link_underline {
-    border-bottom: 3px solid white;
-}
-
 @media screen and (max-width: 400px) {
-    .order-navigation-items {
+    .order-subnavigation-items {
         display: flex;
         flex-direction: column;
         align-items: center;
     }
 
-    .order-navigation-items__link:not(:last-child) {
+    .order-subnavigation-items .order-subnavigation-items__link:not(:last-child) {
         margin-right: 0;
     }
 }
