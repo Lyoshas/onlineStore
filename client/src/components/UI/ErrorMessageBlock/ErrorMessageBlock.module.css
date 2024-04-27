@@ -1,4 +1,11 @@
 .error-message-block {
-    color: black;
     text-align: center;
+}
+
+.error-message-block.white-font {
+    color: white;
+}
+
+.error-message-block.black-font {
+    color: black;
 }
