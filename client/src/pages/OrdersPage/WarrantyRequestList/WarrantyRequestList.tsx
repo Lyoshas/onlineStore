@@ -1,28 +1,14 @@
-import { FC } from 'react';
+import { FC, Fragment } from 'react';
 import classNames from 'classnames';
 
 import { useGetWarrantyRequestListQuery } from '../../../store/apis/warrantyRequestApi';
 import classes from './WarrantyRequestList.module.css';
 import LoadingScreen from '../../../components/UI/LoadingScreen/LoadingScreen';
-import ErrorIcon from '../../../components/UI/Icons/ErrorIcon';
 import WarrantyRequestItem from './WarrantyRequestItem/WarrantyRequestItem';
-
-const ErrorMessage = () => {
-    return (
-        <div className={classes['order-page__error-message']}>
-            <ErrorIcon className="icon" />
-            <p>
-                Something went wrong while displaying a list of warranty
-                requests. Please try reloading the page.
-            </p>
-        </div>
-    );
-};
+import ErrorMessageBlock from '../../../components/UI/ErrorMessageBlock/ErrorMessageBlock';
 
 const WarrantyRequestList: FC<{ className?: string }> = (props) => {
     const { isLoading, isError, data } = useGetWarrantyRequestListQuery();
-
-    console.log('hello');
 
     return (
         <div
@@ -31,7 +17,13 @@ const WarrantyRequestList: FC<{ className?: string }> = (props) => {
                 props.className
             )}
         >
-            {isError && <ErrorMessage />}
+            {isError && (
+                <ErrorMessageBlock
+                    whiteBackground={false}
+                    message="Something went wrong while displaying a list of warranty requests. Please try reloading the page."
+                    buttonLinks={<Fragment />}
+                />
+            )}
             {isLoading && <LoadingScreen />}
             {!isLoading &&
                 data &&

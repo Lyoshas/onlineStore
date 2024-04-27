@@ -1,30 +1,24 @@
-import { FC } from 'react';
+import { FC, Fragment } from 'react';
 import OrderItem from './OrderItem/OrderItem';
 import classes from './OrderList.module.css';
 import classNames from 'classnames';
 
 import LoadingScreen from '../../../components/UI/LoadingScreen/LoadingScreen';
 import { useGetOrderListQuery } from '../../../store/apis/orderApi';
-import ErrorIcon from '../../../components/UI/Icons/ErrorIcon';
-
-const ErrorMessage = () => {
-    return (
-        <div className={classes['order-page__error-message']}>
-            <ErrorIcon className="icon" />
-            <p>
-                Something went wrong while displaying a list of orders. Please
-                try reloading the page.
-            </p>
-        </div>
-    );
-};
+import ErrorMessageBlock from '../../../components/UI/ErrorMessageBlock/ErrorMessageBlock';
 
 const OrderList: FC<{ className?: string }> = (props) => {
     const { isLoading, isError, data } = useGetOrderListQuery();
 
     return (
         <div className={classNames(classes['order-list'], props.className)}>
-            {isError && !data && <ErrorMessage />}
+            {isError && !data && (
+                <ErrorMessageBlock
+                    message="Something went wrong while displaying a list of orders. Please try reloading the page."
+                    whiteBackground={false}
+                    buttonLinks={<Fragment />}
+                />
+            )}
             {isLoading && <LoadingScreen />}
             {!isLoading &&
                 data &&
