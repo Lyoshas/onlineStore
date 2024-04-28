@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 
 import { RootState } from '../../store';
-import Loading from '../UI/Loading/Loading';
 import LoadingScreen from '../UI/LoadingScreen/LoadingScreen';
 
 // this component is used to create protected routes

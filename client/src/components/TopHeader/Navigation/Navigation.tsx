@@ -40,7 +40,7 @@ const PRODUCT_SEARCH_URL = '/search/products';
 const Navigation: FC<{ className?: string; onNavItemClick: () => void }> = (
     props
 ) => {
-    const { isAuthenticated, isAdmin } = useSelector(
+    const { isAuthenticated } = useSelector(
         (state: RootState) => state.auth
     );
     const location = useLocation();
@@ -65,12 +65,7 @@ const Navigation: FC<{ className?: string; onNavItemClick: () => void }> = (
 
     return (
         <nav className={props.className}>
-            <ul
-                className={classNames(
-                    classes['navigation-ul'],
-                    isAdmin && classes.admin
-                )}
-            >
+            <ul className={classNames(classes['navigation-ul'])}>
                 {linksInfo.map(([to, label, imageURL], i) => (
                     <NavigationLink
                         key={i}
