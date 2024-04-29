@@ -30,7 +30,7 @@ main.position-adjustable-block {
     height: calc(100% - 107px);
 }
 
-@media screen and (max-width: 1200px) {
+@media screen and (max-width: 1450px) {
     .top-header__layout {
         flex-wrap: wrap;
     }

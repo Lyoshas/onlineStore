@@ -1,0 +1,12 @@
+.progress-bar {
+    max-width: 250px;
+    height: 10px;
+    border: 1px solid white;
+    border-radius: 5px;
+}
+
+.progress-bar__fill {
+    background: rgb(57, 255, 57);
+    width: 100%;
+    height: 100%;
+}

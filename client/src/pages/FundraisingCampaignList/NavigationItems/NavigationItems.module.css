@@ -1,0 +1,17 @@
+.fundraising-subnavigation-items {
+    margin: 20px 0 30px;
+}
+
+@media screen and (max-width: 540px) {
+    .fundraising-subnavigation-items {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 20px 0;
+    }
+
+    .fundraising-subnavigation-items .fundraising-subnavigation-items__link {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+}

@@ -26,7 +26,7 @@ const TopHeader: FC<{
     const isAuthenticated = useSelector(
         (state: RootState) => state.auth.isAuthenticated
     );
-    const isLargeScreen = useMediaQuery({ query: `(min-width: 1201px)` });
+    const isLargeScreen = useMediaQuery({ query: `(min-width: 1451px)` });
 
     useEffect(() => {
         const handleScroll = () => {

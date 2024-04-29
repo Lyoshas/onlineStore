@@ -33,6 +33,7 @@ import Checkout from './pages/Checkout/Checkout';
 import OrderCallback from './pages/OrderCallback/OrderCallback';
 import ProductSearch from './pages/ProductSearch/ProductSearch';
 import OrdersPage from './pages/OrdersPage/OrdersPage';
+import FundraisingCampaignList from './pages/FundraisingCampaignList/FundraisingCampaignList';
 
 const App: FC = () => {
     const { errorMessage, isErrorNotificationShown } = useSelector(
@@ -222,6 +223,15 @@ const App: FC = () => {
                                     <OrdersPage activePage="Warranty requests" />
                                 </EnsureStatus>
                             }
+                            addOffset={true}
+                        />
+                    }
+                />
+                <Route
+                    path="/fundraising-campaigns"
+                    element={
+                        <TopHeader
+                            RenderAfter={<FundraisingCampaignList />}
                             addOffset={true}
                         />
                     }
