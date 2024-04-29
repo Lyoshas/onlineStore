@@ -1,4 +1,5 @@
-import React, { FC, forwardRef } from 'react';
+import React, { forwardRef } from 'react';
+import classNames from 'classnames';
 
 import classes from './Card.module.css';
 
@@ -10,13 +11,13 @@ interface CardProps {
 
 const Card = forwardRef<HTMLDivElement, CardProps>((props, ref) => {
     return (
-        <div
-            className={`${classes['card']} ${props.className || ''}`}
+        <article
+            className={classNames(classes.card, props.className)}
             onClick={props.onClick}
             ref={ref}
         >
             {props.children}
-        </div>
+        </article>
     );
 });
 
