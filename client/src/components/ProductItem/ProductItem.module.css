@@ -1,27 +1,17 @@
 .product-list__item {
-    width: 300px;
     height: 400px;
-    border: 1px solid white;
-    padding: 20px;
-    text-align: center;
     flex-basis: 29%;
-    overflow: hidden;
     position: relative;
-    margin-bottom: 20px;
-    box-sizing: border-box;
-    background: #273c99;
 }
 
 .product-list__item.extended-height {
     height: 450px;
 }
 
-.product-list__item,
 .product-item__description {
     transition: 0.2s box-shadow ease;
 }
 
-.product-list__item:hover,
 .product-list__item:hover .product-item__description {
     box-shadow: 0 5px 20px 1px white;
 }

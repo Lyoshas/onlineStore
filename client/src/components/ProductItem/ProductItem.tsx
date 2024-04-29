@@ -7,6 +7,7 @@ import classes from './ProductItem.module.css';
 import AddToCartButton from '../AddToCartButton/AddToCartButton';
 import StarRating from '../UI/StarRating/StarRating';
 import formatCurrencyUAH from '../../util/formatCurrencyUAH';
+import Card from '../UI/Card/Card';
 
 interface ProductItemProps {
     id: number;
@@ -31,7 +32,7 @@ const ProductItem: FC<ProductItemProps> = (props) => {
     const handleMouseLeave = () => setShowMainImage(true);
 
     return (
-        <article
+        <Card
             className={classNames(
                 classes['product-list__item'],
                 props.userRating !== undefined && classes['extended-height'],
@@ -102,7 +103,7 @@ const ProductItem: FC<ProductItemProps> = (props) => {
                     <span>{props.shortDescription}</span>
                 </div>
             )}
-        </article>
+        </Card>
     );
 };
 
