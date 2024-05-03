@@ -53,3 +53,42 @@ export const getFundraisingCampaigns = async (
         };
     });
 };
+
+// creates a transaction with 'is_paid' = false
+export const createPendingTransaction = async (transactionInfo: {
+    userId: number;
+    campaignId: number;
+    donationAmount: number;
+}): Promise<number> => {
+    const { userId, campaignId, donationAmount } = transactionInfo;
+
+    const { rows } = await dbPool.query<{ id: number }>(
+        `
+            INSERT INTO fundraising_transactions (
+                user_id,
+                campaign_id,
+                donation_amount,
+                is_paid
+            ) VALUES ($1, $2, $3, false)
+            RETURNING id;
+        `,
+        [userId, campaignId, donationAmount]
+    );
+
+    return rows[0].id;
+};
+
+export const fundraisingCampaignExists = async (
+    campaignId: number
+): Promise<boolean> => {
+    const { rows } = await dbPool.query<{ campaign_exists: boolean }>(
+        `
+            SELECT EXISTS(
+                SELECT 1 FROM fundraising_campaigns WHERE id = $1
+            ) AS campaign_exists;
+        `,
+        [campaignId]
+    );
+
+    return rows[0].campaign_exists;
+};

@@ -3094,3 +3094,76 @@ Some API endpoints require authentication using access tokens and refresh tokens
         ]
       }
       ```
+#### 2. Create a new pending transaction
+- **URL:** /api/fundraising-campaigns/pending-transactions
+- **Method:** POST
+- **Description:** creates a new pending transaction for a fundraising campaign. A pending transaction is a transaction that hasn't been paid for yet. Returns 'data' and 'signature' parameters, which are to be used for redirecting a user to the LiqPay payment page.
+- **Who can access:** only authenticated users with the provided [access token](#access-token)
+- **Rate limiting:** none
+- **Request body:**
+  - _campaignId_: ID of the campaign that the user wants to donate to. Must point to an existing fundraising campaign.
+  - _donationAmount_: how much money the user wants to donate. Must be a number and be at least 100.
+- **Request params:** none
+- **Query string parameters:** none
+- **Required cookies:** none
+- **Success response:**
+  - **Status code:** 201 Created
+  - **Description:** the pending transaction has been created successfully
+  - **Content (example):**
+    ```JSON
+    {
+        "data": "eyJ2ZXJzaW9uIjozLCJwdWJsaWNfa2V5Ijoic2FuZGJveF9pNTIxNzAwNzc5MjkiLCJhY3Rpb24iOiJwYXlkb25hdGUiLCJhbW91bnQiOiIxMDAuMDAiLCJjdXJyZW5jeSI6IlVBSCIsImRlc2NyaXB0aW9uIjoi0J/QvtC20LXRgNGC0LLRg9Cy0LDQvdC90Y8g0LrQvtGI0YLRltCyINC90LAg0LfQsdGW0YAg4oSWMSDQutC+0YDQuNGB0YLRg9Cy0LDRh9C10Lwg0LcgSUQgMSIsIm9yZGVyX2lkIjoxMiwicmVzdWx0X3VybCI6Imh0dHA6Ly9sb2NhbGhvc3QvYXBpL2Z1bmRyYWlzaW5nLWNhbXBhaWduL2NhbGxiYWNrIn0=",
+        "signature": "xc6arufajfplwFlBrC/x/lrfS4Q="
+    }
+    ```
+- **Error responses**:
+  - The access token is not specified or is invalid
+    - **Status code**: 401 Unauthorized
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "The access token is either invalid or is not provided",
+          }
+        ]
+      }
+      ```
+  - The access token has expired
+    - **Status code**: 401 Unauthorized
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "The access token has expired",
+          }
+        ]
+      }
+      ```
+  - The campaignId field is not a number or it points to a non-existent fundraising campaign
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "campaignId must be a number pointing at an existing fundraising campaign",
+            "field": "campaignId"
+          }
+        ]
+      }
+      ```
+  - The donationAmount parameter is not a number or it is less than 100
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "donationAmount must be a number that is greater than 100",
+            "field": "donationAmount"
+          }
+        ]
+      }
+      ```
