@@ -358,58 +358,6 @@ class OrderModel {
         return Promise.resolve(telegramResponse);
     }
 
-    // use it only inside the order creation endpoint
-    public createLiqPayFormData(args: {
-        orderInfo: {
-            orderId: number;
-            recipientFirstName: string;
-            recipientLastName: string;
-            totalPrice: number;
-        };
-        userId: number;
-    }): { data: string; signature: string } {
-        const { orderId, recipientFirstName, recipientLastName, totalPrice } =
-            args.orderInfo;
-        const userId = args.userId;
-
-        const data = Buffer.from(
-            JSON.stringify({
-                version: 3,
-                public_key: process.env.LIQPAY_PUBLIC_KEY,
-                action: 'pay',
-                amount: totalPrice,
-                currency: 'UAH',
-                description:
-                    `Оплата замовлення №${orderId} користувачем з ID ${userId}\n` +
-                    `Отримувач: ${recipientFirstName} ${recipientLastName}`,
-                order_id: orderId,
-                result_url: 'http://localhost/api/user/order/callback',
-            })
-        ).toString('base64');
-
-        return {
-            data,
-            signature: OrderModel.createLiqPaySignature(data),
-        };
-    }
-
-    // signature = base64_encode( sha1( privateKey + data + privateKey ) )
-    public static createLiqPaySignature(data: string): string {
-        const privateKey: string = process.env.LIQPAY_PRIVATE_KEY!;
-        return crypto
-            .createHash('sha1')
-            .update(privateKey + data + privateKey)
-            .digest('base64');
-    }
-
-    public static decodeLiqPayData(
-        encodedBase64Data: string
-    ): CamelCaseProperties<LiqpayDecodedData> {
-        return camelCaseObject(
-            JSON.parse(base64Decode(encodedBase64Data)) as LiqpayDecodedData
-        );
-    }
-
     public async markOrderAsPaid(orderId: number) {
         return this.dbClient.query(
             'UPDATE orders SET is_paid = true WHERE id = $1',

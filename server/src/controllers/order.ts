@@ -8,6 +8,7 @@ import * as postgresCartModel from '../models/cart-postgres.js';
 import * as transactionModel from '../models/pg-transaction.js';
 import * as productModel from '../models/product.js';
 import * as signupModel from '../models/signup.js';
+import * as liqpayModel from '../models/liqpay.js';
 import UnexpectedError from '../errors/UnexpectedError.js';
 import dbPool from '../services/postgres.service.js';
 import CheckOrderFeasabilityReqBody from '../interfaces/CheckOrderFeasabilityReqBody.js';
@@ -185,14 +186,14 @@ export const createOrder: RequestHandler = asyncHandler(
 
             // we are passing data to this function because otherwise we would need to make unnecessary SQL requests, which would delay the response
             const response = isPayingNow
-                ? orderModel.createLiqPayFormData({
-                      orderInfo: {
-                          orderId,
-                          recipientFirstName: orderRecipient.firstName,
-                          recipientLastName: orderRecipient.lastName,
-                          totalPrice: orderSummary.totalPrice,
-                      },
-                      userId: userId!,
+                ? liqpayModel.createLiqPayFormData({
+                      action: 'pay',
+                      amount: orderSummary.totalPrice,
+                      orderId,
+                      description:
+                          `Оплата замовлення №${orderId} користувачем з ID ${userId}\n` +
+                          `Отримувач: ${orderRecipient.firstName} ${orderRecipient.lastName}`,
+                      resultUrl: 'http://localhost/api/user/order/callback',
                   })
                 : { orderId };
 

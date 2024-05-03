@@ -20,6 +20,7 @@ import OrderProduct from '../interfaces/OrderProduct.js';
 import { combinedOutOfStockAndMaxQuantityErrorMessage } from '../errors/CombinedOutOfStockAndMaxQuantityError.js';
 import { base64Decode, base64Encode } from '../util/base64.js';
 import camelCaseObject from '../util/camelCaseObject.js';
+import { createLiqPaySignature } from '../models/liqpay.js';
 
 const router = express.Router();
 
@@ -292,9 +293,7 @@ router.post(
             // liqpay_private_key + req.body.data + liqpay_private_key
             // and then compare the hash we've generated with the hash in req.body
             // if there's a match, the request is genuine
-            const genuineSignature = OrderModel.createLiqPaySignature(
-                req.body.data
-            );
+            const genuineSignature = createLiqPaySignature(req.body.data);
 
             if (genuineSignature !== providedSignature) {
                 return Promise.reject('the provided signature is invalid');
