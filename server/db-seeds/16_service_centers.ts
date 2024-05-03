@@ -27,4 +27,13 @@ export async function seed(knex: Knex): Promise<void> {
             address_id: 5,
         },
     ]);
+
+    await knex.raw(
+        `
+            SELECT setval(
+                pg_get_serial_sequence('service_centers', 'id'),
+                (SELECT MAX(id) FROM service_centers) + 1
+            );
+        `
+    );
 }

@@ -214,6 +214,15 @@ export async function seed(knex: Knex): Promise<void> {
         }))
     );
 
+    await knex.raw(
+        `
+            SELECT setval(
+                pg_get_serial_sequence('warranty_requests', 'id'),
+                (SELECT MAX(id) FROM warranty_requests) + 1
+            );
+        `
+    );
+
     for (let warrantyRequest of warrantyRequests) {
         await knex('warranty_request_status_history').insert(
             warrantyRequest.statusHistory.map((statusEntry) => ({

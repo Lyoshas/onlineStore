@@ -36,6 +36,15 @@ export async function seed(knex: Knex): Promise<void> {
         },
     ];
 
+    await knex.raw(
+        `
+            SELECT setval(
+                pg_get_serial_sequence('fundraising_campaigns', 'id'),
+                (SELECT MAX(id) FROM fundraising_campaigns) + 1
+            );
+        `
+    );
+
     // Inserts seed entries
     await knex('fundraising_campaigns').insert(
         fundraisingCampaigns.map((campaign) => snakeCaseObject(campaign))

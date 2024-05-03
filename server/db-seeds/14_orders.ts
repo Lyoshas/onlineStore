@@ -127,7 +127,9 @@ export async function seed(knex: Knex): Promise<void> {
             statusHistory: [
                 {
                     status: 'Замовлення оброблюється',
-                    statusChangeTime: new Date(+currentDate - 4 * 60 * 60 * 1000), // subtract 4 hours from the current time
+                    statusChangeTime: new Date(
+                        +currentDate - 4 * 60 * 60 * 1000
+                    ), // subtract 4 hours from the current time
                 },
             ],
         },
@@ -149,7 +151,9 @@ export async function seed(knex: Knex): Promise<void> {
             statusHistory: [
                 {
                     status: 'Замовлення оброблюється',
-                    statusChangeTime: new Date(+currentDate - 3 * 60 * 60 * 1000), // subtract 3 hours from the current time
+                    statusChangeTime: new Date(
+                        +currentDate - 3 * 60 * 60 * 1000
+                    ), // subtract 3 hours from the current time
                 },
             ],
         },
@@ -171,7 +175,9 @@ export async function seed(knex: Knex): Promise<void> {
             statusHistory: [
                 {
                     status: 'Замовлення оброблюється',
-                    statusChangeTime: new Date(+currentDate - 2 * 60 * 60 * 1000), // subtract 2 hours from the current time
+                    statusChangeTime: new Date(
+                        +currentDate - 2 * 60 * 60 * 1000
+                    ), // subtract 2 hours from the current time
                 },
             ],
         },
@@ -200,6 +206,15 @@ export async function seed(knex: Knex): Promise<void> {
                     phone_number: order.recipient.phoneNumber,
                 }),
         }))
+    );
+
+    await knex.raw(
+        `
+            SELECT setval(
+                pg_get_serial_sequence('orders', 'id'),
+                (SELECT MAX(id) FROM orders) + 1
+            );
+        `
     );
 
     for (let order of orders) {
