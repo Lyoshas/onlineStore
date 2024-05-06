@@ -59,6 +59,7 @@
       - [1. Get a list of warranty requests for the current user](#1-get-a-list-of-warranty-requests-for-the-current-user)
     - [Fundraising Campaign Endpoints](#fundraising-campaign-endpoints)
       - [1. Get a list of fundraising campaigns](#1-get-a-list-of-fundraising-campaigns)
+      - [2. Create a new pending transaction](#2-create-a-new-pending-transaction)
 
 ## Prerequisites
 - Install Docker and Docker Compose
