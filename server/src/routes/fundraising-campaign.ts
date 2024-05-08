@@ -3,10 +3,11 @@ import { body, query } from 'express-validator';
 
 import validateRequest from '../middlewares/validate-request.js';
 import * as fundraisingCampaignController from '../controllers/fundraising-campaign.js';
-import { fundraisingCampaignExists } from '../models/fundraising-campaign.js';
+import FundraisingCampaignModel from '../models/fundraising-campaign.js';
 import ensureAuthentication from '../middlewares/ensure-authentication.js';
 
 const router = Router();
+const fundraisingCampaignModel = new FundraisingCampaignModel();
 
 router.get(
     '/',
@@ -27,7 +28,10 @@ router.post(
         .isNumeric()
         .bail()
         .custom(async (campaignId: number) => {
-            const exists = await fundraisingCampaignExists(campaignId);
+            const exists =
+                await fundraisingCampaignModel.fundraisingCampaignExists(
+                    campaignId
+                );
             return exists ? Promise.resolve() : Promise.reject();
         }),
     body(

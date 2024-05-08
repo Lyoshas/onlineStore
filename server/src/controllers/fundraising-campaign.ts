@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express';
 import asyncHandler from 'express-async-handler';
 
-import * as fundraisingCampaignModel from '../models/fundraising-campaign.js';
+import FundraisingCampaignModel from '../models/fundraising-campaign.js';
 import * as liqpayModel from '../models/liqpay.js';
 
 export const getFundraisingCampaigns: RequestHandler<
@@ -10,6 +10,8 @@ export const getFundraisingCampaigns: RequestHandler<
     unknown,
     { status: 'ongoing' | 'finished' }
 > = asyncHandler(async (req, res, next) => {
+    const fundraisingCampaignModel = new FundraisingCampaignModel();
+
     res.json({
         fundraisingCampaigns:
             await fundraisingCampaignModel.getFundraisingCampaigns(
@@ -28,6 +30,7 @@ export const createPendingTransaction: RequestHandler<
 > = asyncHandler(async (req, res, next) => {
     const { campaignId, donationAmount } = req.body;
     const userId = req.user!.id;
+    const fundraisingCampaignModel = new FundraisingCampaignModel();
 
     const transactionId =
         await fundraisingCampaignModel.createPendingTransaction({
