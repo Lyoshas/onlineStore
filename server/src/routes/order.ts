@@ -21,6 +21,8 @@ import { combinedOutOfStockAndMaxQuantityErrorMessage } from '../errors/Combined
 import { base64Decode, base64Encode } from '../util/base64.js';
 import camelCaseObject from '../util/camelCaseObject.js';
 import { createLiqPaySignature } from '../models/liqpay.js';
+import liqpayDataValidation from './util/liqpayDataValidation.js';
+import liqpaySignatureValidation from './util/liqpaySignatureValidation.js';
 
 const router = express.Router();
 
@@ -270,37 +272,10 @@ router.get(
 
 router.post(
     '/order/callback',
-    body(
-        'data',
-        'the field "data" must contain a JSON object encoded in base64'
-    )
-        .isString()
-        .withMessage('the field "data" must be a string')
-        .isBase64()
-        .bail()
-        .customSanitizer((data: string) => base64Decode(data))
-        .isJSON()
-        // encoding it again because we need need it to create a signature
-        .customSanitizer((data: string) => base64Encode(data)),
+    liqpayDataValidation,
     // if the 'data' parameter is invalid, there's no point in validating further
     validateRequest,
-    body('signature')
-        .isString()
-        .withMessage('the field "signature" must be a string')
-        .custom((providedSignature: string, { req }) => {
-            // we have to verify the signature that the user provided
-            // to do that, we need to hash this value:
-            // liqpay_private_key + req.body.data + liqpay_private_key
-            // and then compare the hash we've generated with the hash in req.body
-            // if there's a match, the request is genuine
-            const genuineSignature = createLiqPaySignature(req.body.data);
-
-            if (genuineSignature !== providedSignature) {
-                return Promise.reject('the provided signature is invalid');
-            }
-
-            return Promise.resolve();
-        }),
+    liqpaySignatureValidation,
     // validating the most important fields that must be present
     validateRequest,
     body('data').customSanitizer((data: string) => {
