@@ -60,6 +60,7 @@
     - [Fundraising Campaign Endpoints](#fundraising-campaign-endpoints)
       - [1. Get a list of fundraising campaigns](#1-get-a-list-of-fundraising-campaigns)
       - [2. Create a new pending transaction](#2-create-a-new-pending-transaction)
+      - [3. Process a donation (LiqPay callback)](#3-process-a-donation-liqpay-callback)
 
 ## Prerequisites
 - Install Docker and Docker Compose
@@ -3164,6 +3165,56 @@ Some API endpoints require authentication using access tokens and refresh tokens
           {
             "message": "donationAmount must be a number that is greater than 100",
             "field": "donationAmount"
+          }
+        ]
+      }
+      ```
+#### 3. Process a donation (LiqPay callback)
+- **URL:** /api/fundraising-campaign/callback
+- **Method:** POST
+- **Description:** after a user completes payment for their donation, they will be redirected to this endpoint. Here, the system will confirm that the request originated from LiqPay and then mark the previously created fundraising transaction as paid.
+- **Who can access:** everyone
+- **Rate limiting:** none
+- **Request body:**
+  - _data_ - must be a string encoded in base64 and should include parameters as specified on this page: [LiqPay API Callback Documentation](https://www.liqpay.ua/documentation/api/callback).
+  - _signature_ - must be a string generated in the following manner: base64_encode( sha1( liqpay_private_key + data + liqpay_private_key) ). This parameter serves the purpose of ensuring that the request originates from LiqPay and not from any other source.
+- **Request params:** none
+- **Required cookies:** none
+- **Success responses:**
+  - **Example 1 (the payment was successful, so LiqPay sent a successful response):**
+    - **Status code:** 302
+    - **Description:** the fundraising transaction has been marked as paid, so a redirect takes place to the React app to this URL: "/fundraising-campaign/callback?res=eyJzdGF0dXMiOiJzdWNjZXNzIn0=". The 'res' query parameter is used to transfer base64 encoded data indicating that the payment was successful. The base64 decoded data will look like this: '{"status":"success"}'
+  - **Example 2 (the fundraising transaction has already been paid for):**
+    - **Status code:** 302
+    - **Description:** the fundraising transaction has already been marked as paid in the past, so a redirect takes place to the React app to this URL: "/fundraising-campaign/callback?res=eyJzdGF0dXMiOiJhbHJlYWR5IHBhaWQifQ==". The 'res' query parameter is used to transfer base64 encoded data indicating that the fundraising transaction has already been paid for. The base64 decoded data will look like this: '{"status":"already paid"}'
+  - **Example 3 (the payment was cancelled):**
+    - **Status code:** 302
+    - **Description:** the payment was cancelled, so a redirect takes place to the React app to this URL: "/fundraising-campaign/callback?res=eyJzdGF0dXMiOiJjYW5jZWwifQ==". The 'res' query parameter is used to transfer base64 encoded data indicating that the payment was cancelled. The base64 decoded data will look like this: '{"status":"cancel"}'
+  - **Example 4 (the payment failed):**
+    - **Status code:** 302
+    - **Description:** the payment failed, so a redirect takes place to the React app to this URL: "/fundraising-campaign/callback?res=eyJzdGF0dXMiOiJmYWlsdXJlIn0=". The 'res' query parameter is used to transfer base64 encoded data indicating that the payment failed. The base64 decoded data will look like this: '{"status":"failure"}'
+- **Error responses**:
+  - The parameter requirements were not met (please check the requirements above)
+    - **Status code**: 422 Unprocessable Entity
+    - **Content (example)**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "the field \"data\" must contain a JSON object encoded in base64",
+            "field": "data"
+          }
+        ]
+      }
+  - The provided signature is invalid
+    - **Status code**: 422 Unprocessable Entity
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "the provided signature is invalid",
+            "field": "signature"
           }
         ]
       }

@@ -58,15 +58,15 @@ app.use('/user', [
     orderRoutes,
     userRoutes,
     warrantyRequestRoutes,
-])
+]);
+
+app.use('/', fundraisingCampaignRoutes);
 
 app.use('/product', productCategoriesRoutes);
 
 app.use('/s3', s3Routes);
 
 app.use('/shipping', shippingRoutes);
-
-app.use('/fundraising-campaigns', fundraisingCampaignRoutes);
 
 const startGraphQLServer = async () => {
     const server = new ApolloServer<ApolloServerContext>({
