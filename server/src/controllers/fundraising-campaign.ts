@@ -37,7 +37,8 @@ export const createPendingTransaction: RequestHandler<
         });
 
     const { data, signature } = liqpayModel.createLiqPayFormData({
-        action: 'paydonate',
+        // using 'paydonate' is not an option here, because 'paydonate' allows users to enter any sum of money on the payment page
+        action: 'pay',
         amount: donationAmount,
         description: `Пожертвування коштів на збір №${campaignId} користувачем з ID ${userId}`,
         orderId: transactionId,
