@@ -63,7 +63,12 @@ const FundraisingCampaignItem: FC<{
             {props.fundingProgressPercentage !== 100 && (
                 <Button onClick={showContributeModal}>Contribute</Button>
             )}
-            {showModal && <DonationModal onClose={hideContributeModal} />}
+            {showModal && (
+                <DonationModal
+                    campaignId={props.id}
+                    onClose={hideContributeModal}
+                />
+            )}
         </Card>
     );
 };

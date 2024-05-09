@@ -34,6 +34,7 @@ import OrderCallback from './pages/OrderCallback/OrderCallback';
 import ProductSearch from './pages/ProductSearch/ProductSearch';
 import OrdersPage from './pages/OrdersPage/OrdersPage';
 import FundraisingCampaignList from './pages/FundraisingCampaignList/FundraisingCampaignList';
+import FundraisingCampaignCallback from './pages/FundraisingCampaignCallback/FundraisingCampaignCallback';
 
 const App: FC = () => {
     const { errorMessage, isErrorNotificationShown } = useSelector(
@@ -232,6 +233,15 @@ const App: FC = () => {
                     element={
                         <TopHeader
                             RenderAfter={<FundraisingCampaignList />}
+                            addOffset={true}
+                        />
+                    }
+                />
+                <Route
+                    path="/fundraising-campaign/callback"
+                    element={
+                        <TopHeader
+                            RenderAfter={<FundraisingCampaignCallback />}
                             addOffset={true}
                         />
                     }

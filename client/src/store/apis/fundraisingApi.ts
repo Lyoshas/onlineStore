@@ -20,7 +20,20 @@ export const fundraisingApi = backendApi.injectEndpoints({
                 method: 'GET',
             }),
         }),
+        createPendingTransaction: builder.mutation<
+            { data: string; signature: string },
+            { campaignId: number; donationAmount: number }
+        >({
+            query: (args) => ({
+                url: `/fundraising-campaigns/pending-transactions`,
+                method: 'POST',
+                body: args,
+            }),
+        }),
     }),
 });
 
-export const { useLazyGetFundraisingCampaignsQuery } = fundraisingApi;
+export const {
+    useLazyGetFundraisingCampaignsQuery,
+    useCreatePendingTransactionMutation,
+} = fundraisingApi;
