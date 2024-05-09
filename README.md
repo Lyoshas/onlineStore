@@ -3169,6 +3169,18 @@ Some API endpoints require authentication using access tokens and refresh tokens
         ]
       }
       ```
+  - The fundraising campaign is no longer accepting donations as it has been completed
+    - **Status code**: 409 Conflict
+    - **Content**:
+      ```JSON
+      {
+        "errors": [
+          {
+            "message": "The fundraising campaign has already reached its goal and is now closed for further donations."
+          }
+        ]
+      }
+      ```
 #### 3. Process a donation (LiqPay callback)
 - **URL:** /api/fundraising-campaign/callback
 - **Method:** POST

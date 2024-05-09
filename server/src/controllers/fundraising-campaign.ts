@@ -8,6 +8,7 @@ import { base64Encode } from '../util/base64.js';
 import CamelCaseProperties from '../interfaces/CamelCaseProperties.js';
 import LiqpayDecodedData from '../interfaces/LiqpayDecodedData.js';
 import dbPool from '../services/postgres.service.js';
+import FundraisingCampaignFinishedError from '../errors/FundraisingCampaignFinishedError.js';
 
 export const getFundraisingCampaigns: RequestHandler<
     unknown,
@@ -36,6 +37,10 @@ export const createPendingTransaction: RequestHandler<
     const { campaignId, donationAmount } = req.body;
     const userId = req.user!.id;
     const fundraisingCampaignModel = new FundraisingCampaignModel();
+
+    if (await fundraisingCampaignModel.isCampaignFinished({ campaignId })) {
+        throw new FundraisingCampaignFinishedError();
+    }
 
     const transactionId =
         await fundraisingCampaignModel.createPendingTransaction({
