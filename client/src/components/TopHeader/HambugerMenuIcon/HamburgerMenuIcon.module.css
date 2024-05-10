@@ -14,7 +14,7 @@
     background: white;
 }
 
-@media screen and (max-width: 1450px) {
+@media screen and (max-width: 1350px) {
     .hamburger-block {
         display: flex;
     }

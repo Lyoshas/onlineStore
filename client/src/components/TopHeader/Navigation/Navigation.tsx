@@ -46,7 +46,6 @@ const Navigation: FC<{ className?: string; onNavItemClick: () => void }> = (
     const location = useLocation();
 
     const linksInfo = [
-        ['/', 'Home', getStaticAssetUrl('home-icon.svg')],
         ['/products', 'Products', getStaticAssetUrl('product-icon.svg')],
         [
             // the product search page contains some query parameters that may be set
