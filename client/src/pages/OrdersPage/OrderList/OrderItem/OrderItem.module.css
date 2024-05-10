@@ -75,6 +75,10 @@
 }
 
 @media screen and (max-width: 450px) {
+    div.order-item__expand-arrow-block {
+        margin-left: 0;
+    }
+
     div.order-item__summary {
         flex-direction: column;
         height: auto;

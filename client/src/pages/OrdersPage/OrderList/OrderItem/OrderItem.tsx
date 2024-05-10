@@ -33,6 +33,9 @@ const OrderItem: FC<{
         <ExpandableBlock
             summaryBlockClassName={classes['order-item__summary']}
             detailsBlockClassName={classes['order-item__details']}
+            expandArrowBlockClassName={
+                classes['order-item__expand-arrow-block']
+            }
             SummaryContent={
                 <Fragment>
                     <PreviewImage
