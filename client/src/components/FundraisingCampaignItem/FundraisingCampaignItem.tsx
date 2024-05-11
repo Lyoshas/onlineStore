@@ -1,5 +1,6 @@
 import { FC, useCallback, useState } from 'react';
 import classNames from 'classnames';
+import { useSelector } from 'react-redux';
 
 import Card from '../UI/Card/Card';
 import classes from './FundraisingCampaignItem.module.css';
@@ -7,6 +8,7 @@ import Button from '../UI/Button/Button';
 import formatCurrencyUAH from '../../util/formatCurrencyUAH';
 import Progress from '../UI/Progress/Progress';
 import DonationModal from './DonationModal/DonationModal';
+import { RootState } from '../../store';
 
 const FundraisingCampaignItem: FC<{
     id: number;
@@ -18,6 +20,9 @@ const FundraisingCampaignItem: FC<{
     divClassName?: string;
 }> = (props) => {
     const [showModal, setShowContributeModal] = useState<boolean>(false);
+    const isAuthenticated = useSelector(
+        (state: RootState) => state.auth.isAuthenticated
+    );
 
     const showContributeModal = useCallback(() => {
         setShowContributeModal(true);
@@ -60,7 +65,7 @@ const FundraisingCampaignItem: FC<{
                     classes['campaign__funding-progress-bar']
                 }
             />
-            {props.fundingProgressPercentage !== 100 && (
+            {props.fundingProgressPercentage !== 100 && isAuthenticated && (
                 <Button onClick={showContributeModal}>Contribute</Button>
             )}
             {showModal && (
