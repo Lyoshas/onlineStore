@@ -35,6 +35,23 @@
     }
 }
 
+@media screen and (max-width: 470px) {
+    .checkout-intro__heading {
+        text-align: center;
+        margin: 10px 0;
+    }
+
+    .checkout-intro {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .checkout-intro__edit-btn {
+        margin: 10px 0 20px;
+    }
+}
+
 @media screen and (max-width: 330px) {
     .checkout-intro__heading {
         font-size: 1.5rem;

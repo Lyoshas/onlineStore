@@ -4,11 +4,11 @@ import SubnavigationItems from '../../../components/SubnavigationItems/Subnaviga
 import classes from './NavigationItems.module.css';
 
 const links: {
-    name: 'Ongoing campaigns' | 'Finished campaigns';
+    name: 'Активні збори' | 'Завершені збори';
     url: string;
 }[] = [
-    { name: 'Ongoing campaigns', url: '?status=ongoing' },
-    { name: 'Finished campaigns', url: '?status=finished' },
+    { name: 'Активні збори', url: '?status=ongoing' },
+    { name: 'Завершені збори', url: '?status=finished' },
 ];
 
 const NavigationItems: FC<{ activePage: (typeof links)[0]['name'] }> = (

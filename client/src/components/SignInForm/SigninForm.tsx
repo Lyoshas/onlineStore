@@ -75,17 +75,17 @@ const SignInForm = () => {
                         <SchemaContext.Provider value={schema}>
                             <FormInput
                                 type="text"
-                                label="Email"
+                                label="Електронна пошта"
                                 isRequired={true}
                                 name="login"
-                                placeholder="Enter your email address"
+                                placeholder="Уведіть свою електронну пошту"
                             />
                             <FormInput
                                 type="password"
-                                label="Password"
+                                label="Пароль"
                                 isRequired={true}
                                 name="password"
-                                placeholder="Enter your password"
+                                placeholder="Уведіть свій пароль"
                             />
                         </SchemaContext.Provider>
                         <p
@@ -97,7 +97,7 @@ const SignInForm = () => {
                                 to="/auth/forgot-password"
                                 className={`link ${classes['sign-in__forgot-password-link']}`}
                             >
-                                Forgot password?
+                                Забули пароль?
                             </Link>
                         </p>
                         <SuggestAccountCreation />
@@ -107,16 +107,16 @@ const SignInForm = () => {
                             <Fragment>
                                 <ErrorMessage centered={true}>
                                     {statusCode === 401
-                                        ? 'Invalid login or password'
+                                        ? 'Неправильний логін або пароль'
                                         : statusCode === 422
-                                        ? 'Wrong inputs'
-                                        : 'Something went wrong'}
+                                        ? 'Неправильні вхідні дані'
+                                        : 'Щось пішло не так'}
                                 </ErrorMessage>
                             </Fragment>
                         )}
                         <FormActions>
                             <SubmitButton
-                                label="Sign In"
+                                label="Увійти"
                                 isLoading={isLoading}
                             />
                         </FormActions>
@@ -124,7 +124,7 @@ const SignInForm = () => {
                     {statusCode === 403 && (
                         <Fragment>
                             <ErrorMessage centered={true}>
-                                The account is not activated
+                                Акаунт не активований
                             </ErrorMessage>
                             <SuggestAccountActivation
                                 login={formik.values.login}

@@ -31,7 +31,7 @@
 
 .order-summary__order-button {
     width: 100%;
-    padding: 15px 0;
+    padding: 15px;
 }
 
 .order-summary__delivery-price-value,
@@ -44,8 +44,28 @@
     text-align: right;
 }
 
+.order-summary__total-price-value {
+    text-wrap: nowrap;
+}
+
 @media screen and (max-width: 330px) {
     .order-summary {
         min-width: auto;
+    }
+
+    .order-summary__delivery,
+    .order-summary__total-price {
+        flex-direction: column;
+    }
+
+    .order-summary__delivery-price-value {
+        max-width: 100%;
+        text-align: left;
+    }
+
+    .order-summary__delivery-price-name,
+    .order-summary__total-price-name {
+        margin-right: 0;
+        margin-bottom: 5px;
     }
 }

@@ -2,38 +2,38 @@ import * as Yup from 'yup';
 
 const checkoutSchemaWithAuth = Yup.object({
     firstName: Yup.string()
-        .required('First name is a required field')
+        .required("Власне ім'я має бути вказано")
         .matches(
             /^[a-zа-яЄҐІЇ']+$/i,
-            'Only Cyrillic and Latin characters are allowed'
+            'Допускаються тільки кириличні та латинські символи'
         )
         .test(
             'is-of-correct-length',
-            'First name must not exceed 50 characters',
+            "Власне ім'я не повинно перевищувати 50 символів",
             (value) => {
                 if (!value) return true;
                 return value.length <= 50;
             }
         ),
     lastName: Yup.string()
-        .required('Last name is a required field')
+        .required('Прізвище має бути вказано')
         .matches(
             /^[a-zа-яЄҐІЇ']+$/i,
-            'Only Cyrillic and Latin characters are allowed'
+            'Допускаються тільки кириличні та латинські символи'
         )
         .test(
             'is-of-correct-length',
-            'Last name must not exceed 50 characters',
+            'Прізвище не повинно перевищувати 50 символів',
             (value) => {
                 if (!value) return true;
                 return value.length <= 50;
             }
         ),
     phoneNumber: Yup.string()
-        .required('Phone number is a required field')
+        .required('Номер телефону має бути вказаний')
         .test(
             'is-of-correct-format',
-            'Phone number must be of format +380-12-345-67-89 or +380123456789',
+            'Номер телефону має бути у форматі +380-12-345-67-89 або +380123456789',
             (value) => {
                 if (!value) return true;
                 return (
@@ -42,24 +42,24 @@ const checkoutSchemaWithAuth = Yup.object({
                 );
             }
         ),
-    city: Yup.string().required('City is a required field'),
-    paymentMethod: Yup.string().required('Payment method is a required field'),
+    city: Yup.string().required('Місто має бути вказано'),
+    paymentMethod: Yup.string().required('Спосіб оплати має бути вказаний'),
     deliveryMethod: Yup.object().shape({
         postalService: Yup.string()
-            .required('Postal Service is a required field')
+            .required('Поштова служба має бути вказана')
             .test(
                 'is-of-correct-length',
-                'Postal service must be chosen',
+                'Поштова служба має бути обрана',
                 (value) => {
                     if (!value) return true;
                     return value.length > 0;
                 }
             ),
         office: Yup.string()
-            .required('Office is a required field')
+            .required('Поштове відділення має бути вказане')
             .test(
                 'is-of-correct-length',
-                'Postal office must be chosen',
+                'Поштове відділення має бути обрано',
                 (value) => {
                     if (!value) return true;
                     return value.length > 0;

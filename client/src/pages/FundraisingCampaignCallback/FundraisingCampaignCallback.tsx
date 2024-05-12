@@ -6,11 +6,7 @@ import SuccessMessageBlock from '../../components/UI/SuccessMessageBlock/Success
 import ButtonLink from '../../components/UI/ButtonLink/ButtonLink';
 
 const ButtonLinks = () => {
-    return (
-        <ButtonLink to="/fundraising-campaigns">
-            Fundraising Campaigns
-        </ButtonLink>
-    );
+    return <ButtonLink to="/fundraising-campaigns">Збори для армії</ButtonLink>;
 };
 
 const SuccessMessage = () => {
@@ -18,7 +14,7 @@ const SuccessMessage = () => {
         <SuccessMessageBlock
             content={
                 <Fragment>
-                    <p>Thank you for your donation!</p>
+                    <p>Дякуюємо за ваш внесок!</p>
                     <ButtonLinks />
                 </Fragment>
             }
@@ -29,7 +25,7 @@ const SuccessMessage = () => {
 const TransactionAlreadyPaidForError = () => {
     return (
         <ErrorMessageBlock
-            message="The transaction has already been paid for."
+            message="Транзакція вже оплачена."
             buttonLinks={<ButtonLinks />}
         />
     );
@@ -38,7 +34,7 @@ const TransactionAlreadyPaidForError = () => {
 const PaymentCancelledError = () => {
     return (
         <ErrorMessageBlock
-            message="The payment has been canceled, resulting in the cancellation of the transaction. Please contribute one more time to retry."
+            message="Платіж було скасовано, що призвело до скасування транзакції. Будь ласка, внесіть кошти ще раз, щоб повторити спробу."
             buttonLinks={<ButtonLinks />}
         />
     );
@@ -47,7 +43,7 @@ const PaymentCancelledError = () => {
 const PaymentFailedError = () => {
     return (
         <ErrorMessageBlock
-            message="An error occurred during the payment process, leading to the cancellation of the transaction. Please initiate a new transaction to try again."
+            message="У процесі оплати виникла помилка, що призвела до скасування транзакції. Будь ласка, ініціюйте нову транзакцію, щоб повторити спробу."
             buttonLinks={<ButtonLinks />}
         />
     );

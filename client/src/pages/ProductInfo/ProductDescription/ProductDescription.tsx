@@ -52,8 +52,8 @@ const ProductDescription: FC<ProductDescriptionProps> = ({
                     }
                 >
                     {!isProductAvailable
-                        ? 'The product has run out'
-                        : 'The product is running out'}
+                        ? 'Товар закінчився'
+                        : 'Товар закінчується'}
                 </span>
             )}
             <p className={classes['product-description__short-description']}>

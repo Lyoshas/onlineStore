@@ -7,8 +7,7 @@ import deriveErrorMessage from '../../util/deriveErrorMessage';
 import classes from './ProductCategoryList.module.css';
 
 const ProductCategoryList = () => {
-    const { data, isLoading, error } =
-        useProductCategoriesQuery();
+    const { data, isLoading, error } = useProductCategoriesQuery();
 
     if (isLoading) return <LoadingScreen />;
 
@@ -17,7 +16,7 @@ const ProductCategoryList = () => {
             <ErrorMessageBlock
                 message={
                     deriveErrorMessage(error) ||
-                    'Something went wrong while loading product categories'
+                    'Щось пішло не так під час завантаження категорій товарів'
                 }
             />
         );
@@ -26,7 +25,7 @@ const ProductCategoryList = () => {
     return (
         <Layout>
             <h1 className={classes['product-category-page__heading']}>
-                Choose a category
+                Оберіть категорію
             </h1>
             <div className={classes['product-category-list']}>
                 {data!.categories.map((category, i) => (

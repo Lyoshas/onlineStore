@@ -17,8 +17,8 @@ import SchemaContext from '../../context/validationSchema';
 
 const schema = Yup.object().shape({
     email: Yup.string()
-        .required('Email must be provided')
-        .email('Email must be correct'),
+        .required('Повинна бути вказана електронна пошта')
+        .email('Електронна пошта повинна бути коректною'),
     recaptchaToken: recaptchaTokenSchema,
 });
 const initialValues = { email: '', recaptchaToken: '' };
@@ -40,7 +40,7 @@ const ForgotPassword: FC = () => {
     useEffect(() => {
         if (!isError || statusCode === null) return;
 
-        const errorMessage = 'There is no user with the corresponding email';
+        const errorMessage = 'Не існує користувача з вказаною електронною поштою';
         if (
             statusCode === 422 &&
             expectedErrorResponse?.serverResponse.errors.some((error) =>
@@ -59,7 +59,7 @@ const ForgotPassword: FC = () => {
             ) : (
                 <Fragment>
                     <h1 className={classes['forgot-password__heading']}>
-                        Forgot Password
+                        Забув пароль
                     </h1>
                     <Formik
                         initialValues={initialValues}
@@ -84,8 +84,8 @@ const ForgotPassword: FC = () => {
                                     <FormInput
                                         type="email"
                                         isRequired={true}
-                                        placeholder="Enter your email"
-                                        label="Email"
+                                        placeholder="Введіть свою електронну пошту"
+                                        label="Електронна пошта"
                                         name="email"
                                     />
                                 </SchemaContext.Provider>
@@ -96,7 +96,7 @@ const ForgotPassword: FC = () => {
                                     </ErrorMessage>
                                 )}
                                 <SubmitButton
-                                    label="Send a link"
+                                    label="Відправити посилання"
                                     isLoading={
                                         formik.isSubmitting || isRequestLoading
                                     }

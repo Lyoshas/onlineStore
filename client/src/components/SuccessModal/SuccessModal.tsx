@@ -11,7 +11,7 @@ interface SuccessModalProps {
 const SuccessModal: FC<SuccessModalProps> = (props) => {
     return (
         <Modal
-            title="Success"
+            title="Успіх"
             message={<p>{props.message}</p>}
             onClose={props.onClose}
             includeCancelButton={false}

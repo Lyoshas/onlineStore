@@ -69,7 +69,8 @@ const SuggestAccountActivation: FC<{ login: string; password: string }> = (
     ] = useResendActivationLinkMutation();
     const expectedErrorResponse = useApiError(isError, error, [409]);
 
-    const statusCode = expectedErrorResponse && expectedErrorResponse.statusCode;
+    const statusCode =
+        expectedErrorResponse && expectedErrorResponse.statusCode;
 
     useEffect(() => {
         if (isSuccess) {
@@ -80,9 +81,7 @@ const SuggestAccountActivation: FC<{ login: string; password: string }> = (
         if (statusCode !== 409) return;
 
         dispatch(
-            errorActions.showNotificationError(
-                'Your account is already activated'
-            )
+            errorActions.showNotificationError('Ваш акаунт вже активований')
         );
     }, [data, isSuccess, statusCode]);
 
@@ -91,7 +90,7 @@ const SuggestAccountActivation: FC<{ login: string; password: string }> = (
             initialValues={{ recaptchaToken: '' }}
             validationSchema={Yup.object().shape({
                 recaptchaToken: Yup.string().required(
-                    'Captcha verification is required'
+                    'Необхідна верифікація за допомогою капчі'
                 ),
             })}
             onSubmit={async (values, { setSubmitting }) => {
@@ -110,15 +109,16 @@ const SuggestAccountActivation: FC<{ login: string; password: string }> = (
                 <Form>
                     {modalState.isModalShown && (
                         <Modal
-                            title="Resend the activation link"
+                            title="Надіслати посилання для активації ще раз"
                             message={
                                 <Fragment>
                                     {modalState.isActivationModalShown && (
                                         <Fragment>
                                             <p>
-                                                Are you sure you want to resend
-                                                the link to the email associated
-                                                with this login:{' '}
+                                                Ви впевнені, що хочете повторно
+                                                надіслати посилання на
+                                                електронну пошту, пов'язану з
+                                                цим логіном?{' '}
                                                 <b>"{props.login}"</b>?
                                             </p>
                                             <ReCAPTCHABlock />
@@ -126,9 +126,9 @@ const SuggestAccountActivation: FC<{ login: string; password: string }> = (
                                     )}
                                     {modalState.isSuccessModalShown && (
                                         <p>
-                                            Please check your email (
-                                            <b>{data!.targetEmail}</b>) for
-                                            further instructions.
+                                            Перевірте вашу пошту (
+                                            <b>{data!.targetEmail}</b>) для
+                                            отримання подальших інструкцій.
                                         </p>
                                     )}
                                 </Fragment>
@@ -136,7 +136,7 @@ const SuggestAccountActivation: FC<{ login: string; password: string }> = (
                             actions={
                                 modalState.isActivationModalShown ? (
                                     <SubmitButton
-                                        label="Send"
+                                        label="Надіслати"
                                         isLoading={isLoading}
                                         onClick={() => formik.submitForm()}
                                     />
@@ -145,13 +145,15 @@ const SuggestAccountActivation: FC<{ login: string; password: string }> = (
                                 )
                             }
                             onClose={() => {
-                                dispatchModal({ type: ModalAction.HIDE_MODALS });
+                                dispatchModal({
+                                    type: ModalAction.HIDE_MODALS,
+                                });
                                 formik.resetForm();
                             }}
                         />
                     )}
                     <p className={classes['suggestion-paragraph']}>
-                        Would you like to{' '}
+                        Чи хотіли б ви{' '}
                         <Button
                             onClick={() =>
                                 dispatchModal({
@@ -159,9 +161,9 @@ const SuggestAccountActivation: FC<{ login: string; password: string }> = (
                                 })
                             }
                         >
-                            resend the link
+                            надіслати посилання
                         </Button>
-                        ?
+                        {' '}ще раз?
                     </p>
                 </Form>
             )}

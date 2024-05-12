@@ -5,7 +5,7 @@ const SignInOrSignUpButton = () => {
     return (
         <ActionButton
             to="/auth/sign-in"
-            content="Sign In / Sign Up"
+            content="Вхід / Реєстрація"
             imageURL={getStaticAssetUrl('user-icon.svg')}
             imageAlt="User icon"
         />

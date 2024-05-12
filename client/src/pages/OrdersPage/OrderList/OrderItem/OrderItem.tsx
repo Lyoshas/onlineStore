@@ -47,7 +47,7 @@ const OrderItem: FC<{
                     />
                     <div className={classes['order-item__summary-text']}>
                         <span className={classes['order-item__identifier']}>
-                            Order №{orderData.orderId}
+                            Замовлення №{orderData.orderId}
                         </span>
                         <span>{orderData.creationTime}</span>
                         <span className={classes['order-item__total-price']}>
@@ -62,7 +62,7 @@ const OrderItem: FC<{
                         <h3
                             className={classes['order-status-history__heading']}
                         >
-                            Order status history:
+                            Історія статусів замовлень:
                         </h3>
                         <StatusHistoryList
                             statusChangeHistory={orderData.statusChangeHistory.map(
@@ -77,7 +77,7 @@ const OrderItem: FC<{
                     <div className={classes['order-item__delivery-data']}>
                         <dl className={classes['delivery-data__term-list']}>
                             <dt className={classes['delivery-data__term']}>
-                                Delivery method:
+                                Спосіб доставки:
                             </dt>
                             <dd
                                 className={classes['delivery-data__definition']}
@@ -90,7 +90,7 @@ const OrderItem: FC<{
                                 )
                             </dd>
                             <dt className={classes['delivery-data__term']}>
-                                Recipient contact data:
+                                Контактні дані одержувача:
                             </dt>
                             <dd
                                 className={classes['delivery-data__definition']}
@@ -98,7 +98,7 @@ const OrderItem: FC<{
                                 {`${orderData.recipient.firstName} ${orderData.recipient.lastName} (${orderData.recipient.phoneNumber})`}
                             </dd>
                             <dt className={classes['delivery-data__term']}>
-                                Payment Method:
+                                Спосіб оплати:
                             </dt>
                             <dd
                                 className={classes['delivery-data__definition']}
@@ -106,12 +106,12 @@ const OrderItem: FC<{
                                 {orderData.paymentMethod}
                             </dd>
                             <dt className={classes['delivery-data__term']}>
-                                Payment status:
+                                Статус оплати:
                             </dt>
                             <dd
                                 className={classes['delivery-data__definition']}
                             >
-                                {orderData.isPaid ? 'paid for' : 'not paid for'}
+                                {orderData.isPaid ? 'оплачено' : 'не оплачено'}
                             </dd>
                         </dl>
                     </div>

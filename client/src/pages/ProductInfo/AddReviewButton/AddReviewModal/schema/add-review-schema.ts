@@ -7,7 +7,7 @@ const validationSchema = Yup.object().shape({
         .max(5)
         .test(
             'is-divisible-by-0.5',
-            'Star rating must be in increments of 0.5',
+            'Зірковий рейтинг має бути з кроком 0,5',
             (value) => {
                 if (!value) return false;
                 return value % 0.5 === 0;
@@ -15,7 +15,7 @@ const validationSchema = Yup.object().shape({
         ),
     reviewMessage: Yup.string().test(
         'is-of-correct-length',
-        'Review text must be between 1 and 2000 characters',
+        'Текст відгуку повинен містити від 1 до 2000 символів',
         (value) => {
             if (!value) return false;
             const valLength = value.length;

@@ -9,8 +9,8 @@ const SuccessMessage = () => {
             className={classes['success-block']}
             content={
                 <Fragment>
-                    <p>The link has been sent to your email.</p>
-                    <b>Please check the "spam" folder as well!</b>
+                    <p>Посилання надіслано на вашу електронну пошту.</p>
+                    <b>Будь ласка, перевірте також папку «спам»!</b>
                 </Fragment>
             }
         />

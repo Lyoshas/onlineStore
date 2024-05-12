@@ -22,7 +22,7 @@ const stringifyRecipient = (recipient: OrderRecipient) => {
     return `${recipient.firstName} ${recipient.lastName} (${recipient.phoneNumber})`;
 };
 
-const ALTERNATIVE_RECIPIENT_NAME = 'Other recipient';
+const ALTERNATIVE_RECIPIENT_NAME = 'Інший одержувач';
 
 const OrderRecipient = () => {
     const isAuthenticated = useSelector(
@@ -106,7 +106,7 @@ const OrderRecipient = () => {
 
     return (
         <section className={classes['checkout__contact-info']}>
-            <h2>Order recipient</h2>
+            <h2>Одержувач замовлення</h2>
             {isLoading && <LoadingScreen />}
             {fetchedRecipients &&
                 fetchedRecipients.orderRecipients.length > 0 &&
@@ -127,9 +127,9 @@ const OrderRecipient = () => {
             <FormInput
                 type="text"
                 isRequired={true}
-                label="First name"
+                label="Ім'я"
                 name="firstName"
-                placeholder="Enter your first name"
+                placeholder="Введіть своє ім'я"
                 value={formikValues.firstName}
                 validateOnChange={true}
                 validateOnBlur={true}
@@ -138,9 +138,9 @@ const OrderRecipient = () => {
             <FormInput
                 type="text"
                 isRequired={true}
-                label="Last name"
+                label="Прізвище"
                 name="lastName"
-                placeholder="Enter your last name"
+                placeholder="Введіть своє прізвище"
                 value={formikValues.lastName}
                 validateOnChange={true}
                 validateOnBlur={true}
@@ -149,9 +149,9 @@ const OrderRecipient = () => {
             <FormInput
                 type="text"
                 isRequired={true}
-                label="Phone number (e.g. +380-12-345-67-89 or +380123456789)"
+                label="Номер телефону (напр. +380-12-345-67-89 або +380123456789)"
                 name="phoneNumber"
-                placeholder="Enter your phone number"
+                placeholder="Введіть свій номер телефону"
                 value={formikValues.phoneNumber}
                 validateOnChange={true}
                 validateOnBlur={true}

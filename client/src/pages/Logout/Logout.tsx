@@ -39,8 +39,8 @@ const Logout = () => {
         render = (
             <CenterBlock className={classes['error-block']}>
                 <ErrorIcon className="icon" />
-                <p>Something went wrong.</p>
-                <ButtonLink to="/">Home</ButtonLink>
+                <p>Щось пішло не так</p>
+                <ButtonLink to="/">На головну</ButtonLink>
             </CenterBlock>
         );
     }

@@ -23,18 +23,18 @@ const CallbackSuccessMessage = () => {
 };
 
 const OrderAlreadyPaidForError = () => {
-    return <ErrorMessageBlock message="The order has already been paid for." />;
+    return <ErrorMessageBlock message="Замовлення вже оплачено." />;
 };
 
 const PaymentCancelled = () => {
     return (
-        <ErrorMessageBlock message="The payment has been canceled, resulting in the cancellation of the order. Please place a new order to retry." />
+        <ErrorMessageBlock message="Платіж було скасовано, що призвело до скасування замовлення. Будь ласка, оформіть нове замовлення для повторної спроби." />
     );
 };
 
 const PaymentFailed = () => {
     return (
-        <ErrorMessageBlock message="Something went wrong while paying for the order, resulting in the cancellation of the order. Please place a new order to retry." />
+        <ErrorMessageBlock message="Щось пішло не так під час оплати замовлення, що призвело до скасування замовлення. Будь ласка, оформіть нове замовлення для повторної спроби." />
     );
 };
 

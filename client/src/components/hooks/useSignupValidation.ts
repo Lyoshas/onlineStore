@@ -8,12 +8,12 @@ import passwordSchema from '../../util/passwordSchema';
 import confirmPasswordSchema from '../../util/confirmPasswordSchema';
 import recaptchaTokenSchema from '../../util/recaptchaTokenSchema';
 
-const returnNameValidation = (field: 'First name' | 'Last name') => {
+const returnNameValidation = (field: "Власне ім'я" | 'Прізвище') => {
     return Yup.string()
-        .required(`${field} is a required field`)
-        .matches(/^[a-z]+$/i, `${field} must only contain letters`)
-        .min(1, `${field} must not be empty`)
-        .max(50, `${field} must not exceed 50 characters`);
+        .required(`${field} є обов'язковим полем`)
+        .matches(/^[a-z]+$/i, `${field} має містити лише літери`)
+        .min(1, `${field} не повинно бути пустим`)
+        .max(50, `${field} не повинно перевищувати 50 символів`);
 };
 
 const isEmailAvailable = async (email: string): Promise<boolean> => {
@@ -36,14 +36,14 @@ const useSignupValidation = () => {
     } = useDebounce(isEmailAvailable, 1000, true);
 
     const validationSchema = Yup.object({
-        firstName: returnNameValidation('First name'),
-        lastName: returnNameValidation('Last name'),
+        firstName: returnNameValidation("Власне ім'я"),
+        lastName: returnNameValidation('Прізвище'),
         email: Yup.string()
-            .required('Email is a required field')
-            .email('Email must be correct')
+            .required('Електронна пошта має бути вказана')
+            .email('Електронна пошта має бути коректною')
             .test(
                 'Email availability check',
-                'Email is already in use',
+                'Електронна пошта вже зайнята',
                 async (value) => {
                     if (value == null || !isEmail(value as string)) {
                         return Promise.resolve(true);
@@ -55,13 +55,16 @@ const useSignupValidation = () => {
                         );
                     } catch (statusCode) {
                         let errorMessage =
-                            'Something went wrong while veryfying the email. Please reload the page.';
+                            'Щось пішло не так під час верифікації електронної пошти. Спробуйте перезавантажити сторінку.';
 
                         if (statusCode === 503) {
-                            errorMessage = 'Wow, slow down! Too many requests!';
+                            errorMessage =
+                                'Ого, повільніше! Занадто багато запитів!';
                         }
 
-                        dispatch(errorActions.showNotificationError(errorMessage));
+                        dispatch(
+                            errorActions.showNotificationError(errorMessage)
+                        );
 
                         return Promise.resolve(false);
                     }

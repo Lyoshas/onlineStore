@@ -48,13 +48,13 @@ const FundraisingCampaignItem: FC<{
             </div>
             <h2 className={classes['campaign__title']}>{props.title}</h2>
             <p className={classes['campaign__money-objective']}>
-                <b>Objective:</b>{' '}
+                <b>Мета:</b>{' '}
                 <span className={classes['campaign__money-objective-value']}>
                     {formatCurrencyUAH(props.financialObjective)}
                 </span>
             </p>
             <p className={classes['campaign__money-raised']}>
-                <b>Raised:</b>{' '}
+                <b>Зібрано:</b>{' '}
                 <span className={classes['campaign__money-raised-value']}>
                     {formatCurrencyUAH(props.raisedMoney)}
                 </span>
@@ -66,7 +66,7 @@ const FundraisingCampaignItem: FC<{
                 }
             />
             {props.fundingProgressPercentage !== 100 && isAuthenticated && (
-                <Button onClick={showContributeModal}>Contribute</Button>
+                <Button onClick={showContributeModal}>Зробити внесок</Button>
             )}
             {showModal && (
                 <DonationModal

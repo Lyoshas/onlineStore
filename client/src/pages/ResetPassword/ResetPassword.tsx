@@ -43,7 +43,7 @@ const ResetPassword = () => {
         if (
             serverErrorResponse.statusCode === 422 &&
             serverErrorResponse.serverResponse.errors[0].message ===
-                'resetToken is either invalid or has expired'
+                'resetToken або недійсний, або термін дії закінчився'
         ) {
             setHasResetTokenExpired(true);
             return;
@@ -64,7 +64,7 @@ const ResetPassword = () => {
         render = (
             <Fragment>
                 <h1 className={classes['change-password__heading']}>
-                    Change Password
+                    Змінити пароль
                 </h1>
                 <Formik
                     initialValues={initialValues}
@@ -92,23 +92,23 @@ const ResetPassword = () => {
                             <SchemaContext.Provider value={validationSchema}>
                                 <FormInput
                                     isRequired={true}
-                                    label="New password"
+                                    label="Новий пароль"
                                     name="password"
                                     type="password"
-                                    placeholder="Enter your new password"
+                                    placeholder="Уведіть новий пароль"
                                 />
                                 <FormInput
                                     isRequired={true}
-                                    label="Confirm password"
+                                    label="Підтвердження паролю"
                                     name="confirmPassword"
                                     type="password"
-                                    placeholder="Enter your new password again"
+                                    placeholder="Уведіть новий пароль ще раз"
                                 />
                             </SchemaContext.Provider>
                             <ReCAPTCHABlock ref={recaptchaRef} />
                             <FormActions>
                                 <SubmitButton
-                                    label="Change password"
+                                    label="Змінити пароль"
                                     isLoading={formik.isSubmitting || isLoading}
                                 />
                             </FormActions>

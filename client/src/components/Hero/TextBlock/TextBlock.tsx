@@ -6,7 +6,10 @@ import classes from './TextBlock.module.css';
 const TextBlock = () => {
     // words to print on the screen
     // useMemo is used to cache the array in order to avoid unnecessary useEffect executions
-    const products = useMemo(() => ['Laptops', 'Smartphones', 'Tablets'], []);
+    const products = useMemo(
+        () => ['Ноутбуків', 'Смартфонів', 'Планшетів'],
+        []
+    );
     // this will be shown on the screen
     const [typedText, setTypedText] = useState<string>('');
     // the index of the word we're trying to type
@@ -47,16 +50,22 @@ const TextBlock = () => {
     return (
         <div className={classes['hero__text-block']}>
             <h1 className={classes['text-block__heading']}>
-                A wide range of{' '}
+                Широкий вибір{' '}
                 <span className={classes['text-block__typed']}>
                     {typedText}
                 </span>
                 <span className={classes['text-block__typed-cursor']}>|</span>
             </h1>
             <p className={classes['text-block__p']}>
-                From smartphones and laptops to cutting-edge gadgets and beyond.
+                Від смартфонів і ноутбуків до найсучасніших гаджетів і не
+                тільки.
             </p>
-            <ButtonLink to="/products">Explore Products</ButtonLink>
+            <ButtonLink
+                className={classes['text-block__explore-products-btn']}
+                to="/products"
+            >
+                Ознайомитися з товарами
+            </ButtonLink>
         </div>
     );
 };

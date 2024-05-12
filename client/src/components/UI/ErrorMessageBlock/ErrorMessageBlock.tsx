@@ -1,10 +1,10 @@
 import React, { FC } from 'react';
+import classNames from 'classnames';
 
 import CenterBlock from '../CenterBlock/CenterBlock';
 import ErrorIcon from '../Icons/ErrorIcon';
 import classes from './ErrorMessageBlock.module.css';
 import ButtonLink from '../ButtonLink/ButtonLink';
-import classNames from 'classnames';
 
 const ErrorMessageBlock: FC<{
     message: string;
@@ -21,7 +21,11 @@ const ErrorMessageBlock: FC<{
         >
             <ErrorIcon className="icon" />
             <p>{message}</p>
-            {buttonLinks ? buttonLinks : <ButtonLink to="/">Home</ButtonLink>}
+            {buttonLinks ? (
+                buttonLinks
+            ) : (
+                <ButtonLink to="/">На головну</ButtonLink>
+            )}
         </CenterBlock>
     );
 };

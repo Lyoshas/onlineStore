@@ -137,7 +137,7 @@ const CartContentsModal: FC<CartContentsModalProps> = (props) => {
 
     return (
         <Modal
-            title="Your Cart"
+            title="Кошик"
             message={
                 getCartErrorViaAPI ? (
                     <div
@@ -146,7 +146,7 @@ const CartContentsModal: FC<CartContentsModalProps> = (props) => {
                         }
                     >
                         <ErrorIcon className="icon" />
-                        <p>Something went wrong while fetching the cart</p>
+                        <p>Щось пішло не так під час завантаження кошику</p>
                     </div>
                 ) : (
                     <Fragment>
@@ -189,7 +189,7 @@ const CartContentsModal: FC<CartContentsModalProps> = (props) => {
                                                 ]
                                             }
                                         >
-                                            You don't have any items in the cart
+                                            У кошику немає жодних товарів
                                         </p>
                                     </Fragment>
                                 )}
@@ -252,7 +252,7 @@ const CartContentsModal: FC<CartContentsModalProps> = (props) => {
                                         ]
                                     }
                                 >
-                                    Total Price
+                                    Загальна сума
                                 </h3>
                                 <b
                                     className={
@@ -282,7 +282,7 @@ const CartContentsModal: FC<CartContentsModalProps> = (props) => {
                                 }
                                 onClick={props.onClose}
                             >
-                                Proceed to checkout
+                                Оформити замовлення
                             </ButtonLink>
                         )}
                 </Fragment>

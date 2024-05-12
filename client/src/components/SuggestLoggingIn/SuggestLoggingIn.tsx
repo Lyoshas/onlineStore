@@ -5,9 +5,9 @@ import classes from './SuggestLoggingIn.module.css';
 const SuggestLoggingIn = () => {
     return (
         <p className={classes['signup-form__signin-paragraph']}>
-            Already have an account?{' '}
+            Уже маєте акаунт?{' '}
             <Link to="/auth/sign-in" className="link">
-                Sign in
+                Увійти
             </Link>
         </p>
     );

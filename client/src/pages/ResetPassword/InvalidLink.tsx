@@ -7,11 +7,11 @@ const InvalidLink = () => {
     return (
         <div className={classes['reset-token-block']}>
             <ErrorIcon className="icon" />
-            <p>The link is either invalid or has expired.</p>
+            <p>Посилання або недійсне, або термін його дії закінчився.</p>
             <p>
-                Please request another one{' '}
+                Будь ласка, запросіть ще одне посилання{' '}
                 <Link to="/auth/forgot-password" className="link">
-                    here
+                    тут
                 </Link>
             </p>
         </div>

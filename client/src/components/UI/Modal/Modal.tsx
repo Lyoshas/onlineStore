@@ -67,7 +67,7 @@ const Modal: FC<ModalProps> = ({ includeCancelButton = true, ...props }) => {
                                 }
                                 onClick={props.onClose}
                             >
-                                Cancel
+                                Скасувати
                             </Button>
                         )}
                         {props.actions}

@@ -3,9 +3,9 @@ import recaptchaTokenSchema from '../../util/recaptchaTokenSchema';
 
 const validationSchema = Yup.object().shape({
     login: Yup.string()
-        .required('Login is a required field')
-        .email('Login must be an email'),
-    password: Yup.string().min(1, 'Password must not be empty'),
+        .required('Логін повинен бути вказаний')
+        .email('Логін має бути коректною поштовою адресою'),
+    password: Yup.string().min(1, 'Пароль повинен бути вказаний'),
     recaptchaToken: recaptchaTokenSchema,
 });
 

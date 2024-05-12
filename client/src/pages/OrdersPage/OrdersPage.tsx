@@ -7,15 +7,15 @@ import WarrantyRequestList from './WarrantyRequestList/WarrantyRequestList';
 import NavigationItems from './NavigationItems/NavigationItems';
 
 const OrderListPage: FC<{
-    activePage: 'Orders' | 'Warranty requests';
+    activePage: 'Замовлення' | 'Гарантійні запити';
 }> = ({ activePage }) => {
     return (
         <Layout className={classes['orders-content-layout']}>
             <NavigationItems activePage={activePage} />
-            {activePage === 'Orders' && (
+            {activePage === 'Замовлення' && (
                 <OrderList className={classes['focus-block_margin-top']} />
             )}
-            {activePage === 'Warranty requests' && (
+            {activePage === 'Гарантійні запити' && (
                 <WarrantyRequestList
                     className={classes['focus-block_margin-top']}
                 />

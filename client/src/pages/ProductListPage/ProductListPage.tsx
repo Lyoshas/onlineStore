@@ -76,7 +76,7 @@ const ProductListPage = () => {
             <ErrorMessageBlock
                 message={
                     productsFetchError.message ||
-                    'Something went wrong while loading products'
+                    'Щось пішло не так під час завантаження товарів'
                 }
             />
         );

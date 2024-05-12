@@ -28,13 +28,13 @@ const DeliveryMethods = () => {
 
     return (
         <section className={classes['checkout__delivery-methods']}>
-            <h2 className={classes['delivery-methods__heading']}>Delivery</h2>
+            <h2 className={classes['delivery-methods__heading']}>Доставка</h2>
             {isLoading && <LoadingScreen />}
             {data !== void 0 && chosenCity !== null && (
                 <Fragment>
                     <FormSelect
                         isRequired={true}
-                        label="City"
+                        label="Місто"
                         name="city"
                         options={data.supportedCities}
                         defaultOption={data.supportedCities[0]}

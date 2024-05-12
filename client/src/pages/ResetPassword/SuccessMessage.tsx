@@ -15,9 +15,9 @@ const SuccessMessage = () => {
             className={classes['success-block']}
             content={
                 <Fragment>
-                    <p>The password has been changed successfully.</p>
+                    <p>Пароль успішно змінено.</p>
                     <ButtonLink to={isAuthenticated ? '/' : '/auth/sign-in'}>
-                        {isAuthenticated ? 'Home Page' : 'Sign In'}
+                        {isAuthenticated ? 'На головну' : 'Увійти'}
                     </ButtonLink>
                 </Fragment>
             }

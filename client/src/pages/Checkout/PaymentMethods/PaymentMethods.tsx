@@ -15,17 +15,17 @@ const PaymentMethods = () => {
     return (
         <section className={classes['checkout__payment-methods']}>
             <h2 className={classes['payment-methods__heading']}>
-                Payment Methods
+                Метод оплати
             </h2>
             <InputRadio
-                value="Payment upon receipt of the goods"
+                value="Оплата при отриманні товару"
                 id="payment-method-upon-receipt"
                 name="payment-method"
                 divClassName={classes['payment-methods__item']}
                 onChange={paymentMethodChangeHandler}
             />
             <InputRadio
-                value="Pay now"
+                value="Оплатити зараз"
                 id="payment-method-pay-now"
                 name="payment-method"
                 divClassName={classes['payment-methods__item']}

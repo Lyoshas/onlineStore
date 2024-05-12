@@ -13,23 +13,28 @@ const SuccessMessage: FC<{
                 <Fragment>
                     <p>
                         {props.mode === 'OrderCreated'
-                            ? 'The order has been successfully created.'
-                            : 'Your payment has been successfully processed.'}
+                            ? 'Замовлення було успішно створено.'
+                            : 'Ваш платіж був успішно оброблений.'}
                         <br />
-                        Please wait for a call from a manager.
+                        Будь ласка, очікуйте дзвінка від менеджера.
                     </p>
                     {props.showEmailNotice && (
                         <p>
-                            Because the order was placed without authentication,
-                            we've emailed you the login details for your newly
-                            created account. The email was sent to the address
-                            you provided during the order process.
+                            Оскільки замовлення було зроблено без
+                            автентифікації, ми надіслали вам на електронну пошту
+                            дані для входу до вашого новоствореного облікового
+                            запису. Лист було надіслано на адресу, яку ви
+                            вказали під час оформлення замовлення.
                         </p>
                     )}
                     {!props.showEmailNotice ? (
-                        <ButtonLink to="/user/orders">Order Tracking</ButtonLink>
+                        <ButtonLink to="/user/orders">
+                            Відстеження замовлення
+                        </ButtonLink>
                     ) : (
-                        <ButtonLink to="/auth/sign-in">Sign In</ButtonLink>
+                        <ButtonLink to="/auth/sign-in">
+                            Увійти в акаунт
+                        </ButtonLink>
                     )}
                 </Fragment>
             }

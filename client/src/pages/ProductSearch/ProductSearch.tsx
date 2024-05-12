@@ -63,7 +63,7 @@ const ProductSearch = () => {
         return (
             <ErrorMessageBlock
                 message={
-                    'Something went wrong while searching for products. Please try reloading the page.'
+                    'Під час пошуку товарів сталася помилка. Спробуйте перезавантажити сторінку.'
                 }
             />
         );
@@ -74,7 +74,7 @@ const ProductSearch = () => {
             <SearchBlock
                 debounceMs={500}
                 validationFn={searchQueryValidationHandler}
-                errorMessageOnValidationFail="The search query must not exceed 1000 characters"
+                errorMessageOnValidationFail="Пошуковий запит не повинен перевищувати 1000 символів"
                 isLoading={isSearching}
                 mainContent={
                     <Fragment>
@@ -87,12 +87,12 @@ const ProductSearch = () => {
                         >
                             {!isSearchCalled && (
                                 <p className={classes['product-search__hint']}>
-                                    Please enter a search query
+                                    Уведіть пошуковий запит
                                 </p>
                             )}
                             {!isSearching && productList?.length === 0 && (
                                 <p className={classes['product-search__hint']}>
-                                    Nothing was found. Please try another query
+                                    Нічого не знайдено. Будь ласка, спробуйте інший запит
                                 </p>
                             )}
                             {productList !== null &&

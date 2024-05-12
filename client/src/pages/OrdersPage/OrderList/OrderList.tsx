@@ -14,7 +14,7 @@ const OrderList: FC<{ className?: string }> = (props) => {
         <div className={classNames(classes['order-list'], props.className)}>
             {isError && !data && (
                 <ErrorMessageBlock
-                    message="Something went wrong while displaying a list of orders. Please try reloading the page."
+                    message="Щось пішло не так під час відображення списку замовлень. Спробуйте перезавантажити сторінку."
                     whiteBackground={false}
                     buttonLinks={<Fragment />}
                 />
@@ -28,7 +28,7 @@ const OrderList: FC<{ className?: string }> = (props) => {
                     ))
                 ) : (
                     <p className={classes['order-list__warning']}>
-                        You don't have any orders yet.
+                        У вас поки немає жодних замовлень.
                     </p>
                 ))}
         </div>

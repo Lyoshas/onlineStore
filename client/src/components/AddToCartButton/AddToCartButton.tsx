@@ -148,7 +148,7 @@ const AddToCartButton: FC<AddToCartButtonProps> = ({
         const serverErrorResponse = upsertErrorResponse.serverResponse;
 
         let errorMessage =
-            'Something went wrong while adding the product to the cart';
+            'Щось пішло не так під час додавання товару до кошика';
 
         const insufficientStockMessage =
             'insufficient stock available for this product';
@@ -159,13 +159,12 @@ const AddToCartButton: FC<AddToCartButtonProps> = ({
         switch (apiError.message) {
             case insufficientStockMessage:
                 errorMessage =
-                    insufficientStockMessage[0].toUpperCase() +
-                    insufficientStockMessage.slice(1);
+                    'Недостатня кількість товару на складі для цього продукту';
                 break;
             case cartLimitExceeded:
-                errorMessage = `You can only add up to ${
+                errorMessage = `До кошика можна додати не більше ${
                     (apiError as any).maxProductsInCart
-                } products to the cart`;
+                } товарів`;
                 break;
         }
 
@@ -223,8 +222,8 @@ const AddToCartButton: FC<AddToCartButtonProps> = ({
                     {cartImg}
                     {addLabels
                         ? props.isInTheCart
-                            ? 'In cart'
-                            : 'Add to cart'
+                            ? 'У кошику'
+                            : 'Додати в кошик'
                         : ''}
                 </Fragment>
             )}

@@ -3,15 +3,15 @@ import { FC } from 'react';
 import classes from './NavigationItems.module.css';
 import SubnavigationItems from '../../../components/SubnavigationItems/SubnavigationItems';
 
-const linksInfo: { name: 'Orders' | 'Warranty requests'; url: string }[] = [
-    { name: 'Orders', url: '/user/orders' },
+const linksInfo: { name: 'Замовлення' | 'Гарантійні запити'; url: string }[] = [
+    { name: 'Замовлення', url: '/user/orders' },
     {
-        name: 'Warranty requests',
+        name: 'Гарантійні запити',
         url: '/user/orders/warranty-requests',
     },
 ];
 
-const NavigationItems: FC<{ activePage: 'Orders' | 'Warranty requests' }> = (
+const NavigationItems: FC<{ activePage: 'Замовлення' | 'Гарантійні запити' }> = (
     props
 ) => {
     return (

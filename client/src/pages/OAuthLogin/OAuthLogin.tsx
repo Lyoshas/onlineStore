@@ -41,11 +41,11 @@ const OAuthLogin = () => {
                     ).errors[0].message.includes(
                         'Invalid authorization server name'
                     ) ? (
-                        <p>Invalid OAuth 2.0 provider.</p>
+                        <p>Недійсний постачальник OAuth 2.0.</p>
                     ) : (
-                        <p>Something went wrong</p>
+                        <p>Щось пішло не так</p>
                     )}
-                    <ButtonLink to="/">Home</ButtonLink>
+                    <ButtonLink to="/">На головну</ButtonLink>
                 </Fragment>
             )}
         </CenterBlock>

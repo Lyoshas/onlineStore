@@ -26,6 +26,10 @@
     border-bottom: 10px solid red;
 }
 
+.text-block__explore-products-btn {
+    text-align: center;
+}
+
 @media screen and (max-width: 1100px) {
     .hero__text-block {
         margin-right: 0;

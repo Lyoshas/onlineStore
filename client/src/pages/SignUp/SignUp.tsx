@@ -22,11 +22,11 @@ const SignUp: FC = () => {
         render = (
             <AuthButtonsGroup>
                 <EmailButton
-                    textContent="Sign up with an email"
+                    textContent="Зареєструватися через email"
                     onClick={() => setShowSignupForm(true)}
                 />
-                <GoogleButton textContent="Sign up with Google" />
-                <FacebookButton textContent="Sign up with Facebook" />
+                <GoogleButton textContent="Зареєструватися через Google" />
+                <FacebookButton textContent="Зареєструватися через Facebook" />
                 <SuggestLoggingIn />
             </AuthButtonsGroup>
         );
@@ -34,7 +34,7 @@ const SignUp: FC = () => {
     else {
         render = (
             <Fragment>
-                <h2 className={classes['auth-container__heading']}>Sign Up</h2>
+                <h2 className={classes['auth-container__heading']}>Реєстрація</h2>
                 <SignUpForm
                     onSuccessfulSignUp={() => setWasSignupSuccessful(true)}
                 />

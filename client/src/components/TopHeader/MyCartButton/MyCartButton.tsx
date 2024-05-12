@@ -96,7 +96,7 @@ const MyCartButton = () => {
         <ActionButton
             content={
                 <Fragment>
-                    My Cart{' '}
+                    Кошик{' '}
                     {cartItemCount !== null &&
                         cartItemCount > 0 &&
                         `(${cartItemCount})`}

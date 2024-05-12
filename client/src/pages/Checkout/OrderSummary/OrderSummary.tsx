@@ -21,7 +21,7 @@ const OrderSummary: FC<{ divClassName?: string }> = (props) => {
         <div
             className={classNames(classes['order-summary'], props.divClassName)}
         >
-            <h2 className={classes['order-summary__heading']}>Summary</h2>
+            <h2 className={classes['order-summary__heading']}>Підсумок</h2>
             <div>
                 <div className={classes['order-summary__delivery']}>
                     <span
@@ -29,21 +29,21 @@ const OrderSummary: FC<{ divClassName?: string }> = (props) => {
                             classes['order-summary__delivery-price-name']
                         }
                     >
-                        Delivery price:
+                        Вартість доставки:
                     </span>
                     <span
                         className={
                             classes['order-summary__delivery-price-value']
                         }
                     >
-                        according to the carrier's tariffs
+                        згідно з тарифами перевізника
                     </span>
                 </div>
                 <div className={classes['order-summary__total-price']}>
                     <span
                         className={classes['order-summary__total-price-name']}
                     >
-                        Total price:
+                        Загальна вартість:
                     </span>
                     <span
                         className={classes['order-summary__total-price-value']}
@@ -58,7 +58,7 @@ const OrderSummary: FC<{ divClassName?: string }> = (props) => {
                 disabled={Object.keys(formikErrors).length > 0}
                 onClick={submitForm}
             >
-                Confirm the order
+                Підтвердити замовлення
             </Button>
         </div>
     );

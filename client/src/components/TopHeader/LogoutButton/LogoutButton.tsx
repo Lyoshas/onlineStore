@@ -5,7 +5,7 @@ const LogoutButton = () => {
     return (
         <ActionButton
             to="/auth/logout"
-            content="Log out"
+            content="Вийти"
             imageURL={getStaticAssetUrl('logout-icon.svg')}
             imageAlt="Log out"
         />

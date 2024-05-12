@@ -42,7 +42,7 @@ const useCartProductDelete = (productId: number) => {
 
         dispatch(
             errorActions.showNotificationError(
-                'Something went wrong while deleting the product from the cart'
+                'Щось пішло не так під час видалення товару з кошика'
             )
         );
     }, [deleteErrorResponse]);

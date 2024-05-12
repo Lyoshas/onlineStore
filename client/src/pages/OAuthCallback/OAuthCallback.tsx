@@ -38,8 +38,8 @@ const OAuthCallback = () => {
     ) : (
         <CenterBlock className={classes['oauth-block']}>
             <ErrorIcon className="icon" />
-            <p>Something went wrong.</p>
-            <ButtonLink to="/">Home</ButtonLink>
+            <p>Щось пішло не так</p>
+            <ButtonLink to="/">На головну</ButtonLink>
         </CenterBlock>
     );
 };

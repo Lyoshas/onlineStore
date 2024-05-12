@@ -31,7 +31,7 @@ const AddReviewModal: FC<{
         >
             {(formik) => (
                 <Modal
-                    title={'Add a new review'}
+                    title={'Додати новий відгук'}
                     message={
                         <div className={classes['product-review']}>
                             <StarRatingForm />
@@ -54,7 +54,7 @@ const AddReviewModal: FC<{
                                 className={
                                     classes['product-review__review-message']
                                 }
-                                placeholder="Enter your review here..."
+                                placeholder="Введіть ваш відгук тут..."
                             />
                             {formik.getFieldMeta('reviewMessage').touched &&
                                 formik.errors.reviewMessage && (
@@ -73,11 +73,12 @@ const AddReviewModal: FC<{
                     onClose={props.hideModal}
                     actions={
                         <SubmitButton
-                            label="Send"
+                            label="Відправити"
                             isLoading={props.isReviewBeingAdded}
                             onClick={formik.submitForm}
                         />
                     }
+                    modalActionsClassName={classes['product-review__actions']}
                 />
             )}
         </Formik>

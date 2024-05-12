@@ -112,7 +112,7 @@ const Checkout = () => {
                 )
             ) : null}
             {isOrderCreationError && (
-                <ErrorMessageBlock message="Something went wrong while creating the order. Please try again." />
+                <ErrorMessageBlock message="Щось пішло не так під час створення замовлення. Будь ласка, спробуйте ще раз." />
             )}
             {isUninitialized && (
                 <Layout>
@@ -132,10 +132,7 @@ const Checkout = () => {
                                 firstName: values.firstName,
                                 lastName: values.lastName,
                                 phoneNumber: values.phoneNumber,
-                                paymentMethod:
-                                    values.paymentMethod === 'Pay now'
-                                        ? 'Оплатити зараз'
-                                        : 'Оплата при отриманні товару',
+                                paymentMethod: values.paymentMethod,
                                 city: values.city,
                                 deliveryWarehouse: values.deliveryMethod.office,
                             };
@@ -169,14 +166,19 @@ const Checkout = () => {
                                                 ]
                                             }
                                         >
-                                            Checkout
+                                            Оформлення замовлення
                                         </h1>
                                         <Button
                                             onClick={
                                                 changeOrderButtonClickHandler
                                             }
+                                            className={
+                                                classes[
+                                                    'checkout-intro__edit-btn'
+                                                ]
+                                            }
                                         >
-                                            Edit
+                                            Редагувати товари
                                         </Button>
                                     </div>
                                     <div className={classes['checkout']}>

@@ -43,18 +43,20 @@ const DonationModal: FC<{
 
     let render = (
         <Modal
-            title="Donation"
+            title="Пожертвування"
             message={
                 <Fragment>
                     {isError && error && (
                         <ErrorMessage>
-                            Error: {deriveErrorMessage(error)}
-                            <br />Please reload the page and try again
+                            Помилка: {deriveErrorMessage(error)}
+                            <br />
+                            Будь ласка, перезавантажте сторінку і спробуйте ще
+                            раз
                         </ErrorMessage>
                     )}
                     {!isError && (
                         <Fragment>
-                            <p>Enter the amount you wish to donate</p>
+                            <p>Введіть суму, яку ви бажаєте внести</p>
                             <input
                                 type="number"
                                 className={classNames(
@@ -63,7 +65,7 @@ const DonationModal: FC<{
                                 )}
                                 min="0"
                                 step="0.01"
-                                placeholder="Amount (UAH)"
+                                placeholder="Грошова сума (UAH)"
                                 onChange={inputChangeHandler}
                                 ref={inputRef}
                             />
@@ -73,7 +75,7 @@ const DonationModal: FC<{
                                         classes['campaign-modal__error-message']
                                     }
                                 >
-                                    The minimum donation is 100 UAH
+                                    Мінімальна сума внеску - 100 грн
                                 </ErrorMessage>
                             )}
                         </Fragment>
@@ -85,7 +87,7 @@ const DonationModal: FC<{
                     {isLoading ? (
                         <Loading width="20px" height="20px" />
                     ) : (
-                        'Proceed'
+                        'Продовжити'
                     )}
                 </Button>
             }

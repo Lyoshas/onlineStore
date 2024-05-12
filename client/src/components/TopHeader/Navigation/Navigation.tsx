@@ -46,7 +46,7 @@ const Navigation: FC<{ className?: string; onNavItemClick: () => void }> = (
     const location = useLocation();
 
     const linksInfo = [
-        ['/products', 'Products', getStaticAssetUrl('product-icon.svg')],
+        ['/products', 'Товари', getStaticAssetUrl('product-icon.svg')],
         [
             // the product search page contains some query parameters that may be set
             // if they are lost, it may cause some bugs, so this logic will preserve
@@ -54,15 +54,15 @@ const Navigation: FC<{ className?: string; onNavItemClick: () => void }> = (
             location.pathname === PRODUCT_SEARCH_URL
                 ? location.pathname + location.search
                 : PRODUCT_SEARCH_URL,
-            'Product search',
+            'Пошук товарів',
             getStaticAssetUrl('search-icon.svg'),
         ],
         isAuthenticated
-            ? ['/user/orders', 'Orders', getStaticAssetUrl('order-icon.svg')]
+            ? ['/user/orders', 'Замовлення', getStaticAssetUrl('order-icon.svg')]
             : null,
         [
             '/fundraising-campaigns',
-            'Helping the army',
+            'Допомога армії',
             getStaticAssetUrl('shield-icon.svg'),
         ],
     ].filter((value) => value !== null) as string[][];

@@ -43,7 +43,7 @@ const EmailInput = () => {
         }
 
         if (emailCheckResult && !emailCheckResult.isEmailAvailable) {
-            setFieldError('email', 'Email is already in use');
+            setFieldError('email', 'Електронна пошта вже зайнята');
             return;
         }
     }, [isCheckingEmail, emailCheckResult, setFieldError]);
@@ -52,7 +52,7 @@ const EmailInput = () => {
         if (serverErrorResponse && serverErrorResponse.statusCode === 503) {
             dispatch(
                 errorActions.showNotificationError(
-                    'Wow, slow down! Too many requests!'
+                    'Ого, повільніше! Занадто багато запитів!'
                 )
             );
         }
@@ -68,7 +68,7 @@ const EmailInput = () => {
             // setting the 'additionalEmailError' field instead of 'email' because the 'email' field errors would be immediately overridden
             setFieldError(
                 'additionalEmailError',
-                "Email's validity hasn't been checked yet. Please wait..."
+                'Валідність адреси ще не перевірена. Будь ласка, зачекайте...'
             );
             debouncedIsEmailAvailable({ email: newValue });
         },
@@ -82,7 +82,7 @@ const EmailInput = () => {
             isRequired={true}
             name="email"
             considerAdditionalErrorFields={['additionalEmailError']}
-            placeholder="Enter your email"
+            placeholder="Введіть свою електронну пошту"
             validateOnChange={true}
             validateOnBlur={false}
             onValueChanged={onValueChanged}

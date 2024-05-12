@@ -42,7 +42,7 @@ const OrderProduct: FC<OrderProductProps> = (props) => {
             <div className={classes['order-product__quantity-and-price']}>
                 <div className={classes['order-product__quantity']}>
                     <span className={classes['order-product__quantity-value']}>
-                        {props.quantity} item{props.quantity > 1 ? 's' : ''}
+                        {props.quantity} од.
                     </span>
                 </div>
                 <div className={classes['order-product__price']}>

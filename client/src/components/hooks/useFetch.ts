@@ -44,7 +44,7 @@ const useFetch = (
         } catch {
             setWasRequestSuccessful(false);
             setUnexpectedRequestError(
-                'Something went wrong while making a request. We are working on solving this problem. Please try reloading the page.'
+                'Щось пішло не так під час створення запиту. Ми працюємо над вирішенням цієї проблеми. Спробуйте перезавантажити сторінку.'
             );
         } finally {
             setIsRequestLoading(false);

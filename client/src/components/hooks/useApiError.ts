@@ -40,7 +40,7 @@ const useApiError = (
 
         dispatch(
             errorActions.showNotificationError(
-                'Something went wrong. Please try reloading the page.'
+                'Щось пішло не так. Спробуйте перезавантажити сторінку.'
             )
         );
     }, [isError, error]);

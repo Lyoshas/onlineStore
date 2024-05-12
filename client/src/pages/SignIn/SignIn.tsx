@@ -23,15 +23,15 @@ const SignIn = () => {
             {showSignInForm ? (
                 <Fragment>
                     <h2 className={classes['auth-container__heading']}>
-                        Sign In
+                        Увійти в акаунт
                     </h2>
                     <SignInForm />
                 </Fragment>
             ) : (
                 <AuthButtonsGroup>
-                    <EmailButton textContent={'Sign in with an email'} onClick={handleClick} />
-                    <GoogleButton textContent={'Sign in with Google'} />
-                    <FacebookButton textContent={'Sign in with Facebook'} />
+                    <EmailButton textContent={'Увійти через email'} onClick={handleClick} />
+                    <GoogleButton textContent={'Увійти через Google'} />
+                    <FacebookButton textContent={'Увійти через Facebook'} />
                     <SuggestAccountCreation />
                 </AuthButtonsGroup>
             )}

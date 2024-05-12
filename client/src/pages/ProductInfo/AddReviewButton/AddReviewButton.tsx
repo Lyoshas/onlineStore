@@ -92,8 +92,8 @@ const AddReviewButton: FC<{
                     userCanAddReview() {
                         return false;
                     },
-                }
-            })
+                },
+            });
         }
     }, [isReviewBeingAdded, addReviewError, data]);
 
@@ -116,7 +116,7 @@ const AddReviewButton: FC<{
     const showDuplicateReviewError = useCallback(() => {
         dispatchModal({
             type: ModalAction.SHOW_ERROR_MODAL,
-            payload: "You've already added a review to this product",
+            payload: 'Ви вже додали відгук до цього товару',
         });
     }, [dispatchModal]);
 
@@ -131,13 +131,13 @@ const AddReviewButton: FC<{
             )}
             {modalState.isSuccessModalShown && (
                 <SuccessModal
-                    message="We've received your review, and it's now undergoing moderation. Rest assured, we strive to maintain a fair and transparent review process. Once approved, your review will be visible for everyone."
+                    message="Ми отримали ваш відгук, і зараз він проходить модерацію. Будьте впевнені, ми прагнемо підтримувати чесний і прозорий процес рецензування. Після схвалення ваш відгук буде видимим для всіх."
                     onClose={hideAllModals}
                 />
             )}
             {modalState.errorModal.isShown && (
                 <ErrorModal
-                    title="Error while adding the review"
+                    title="Виникла помилка під час додавання відгуку"
                     errorMessage={modalState.errorModal.errorMessage!}
                     onClose={hideAllModals}
                 />
@@ -149,7 +149,7 @@ const AddReviewButton: FC<{
                         : showDuplicateReviewError
                 }
             >
-                Add review
+                Додати відгук
             </Button>
         </Fragment>
     );

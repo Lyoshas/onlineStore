@@ -208,7 +208,7 @@ const App: FC = () => {
                         <TopHeader
                             RenderAfter={
                                 <EnsureStatus auth={true} admin={false}>
-                                    <OrdersPage activePage="Orders" />
+                                    <OrdersPage activePage="Замовлення" />
                                 </EnsureStatus>
                             }
                             addOffset={true}
@@ -221,7 +221,7 @@ const App: FC = () => {
                         <TopHeader
                             RenderAfter={
                                 <EnsureStatus auth={true} admin={false}>
-                                    <OrdersPage activePage="Warranty requests" />
+                                    <OrdersPage activePage="Гарантійні запити" />
                                 </EnsureStatus>
                             }
                             addOffset={true}

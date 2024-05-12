@@ -18,7 +18,7 @@ const SearchInput: FC<{
         <input
             type="text"
             name="search-input"
-            placeholder="Search"
+            placeholder="Пошук"
             className={classNames(classes['search-input'], props.className)}
             onChange={inputChangeHandler}
         />

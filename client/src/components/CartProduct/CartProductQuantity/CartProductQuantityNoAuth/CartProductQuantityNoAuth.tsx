@@ -124,8 +124,8 @@ const CartProductQuantityNoAuth: FC<{
                 errorActions.showNotificationError(
                     checkProductAvailabilityData.reason ===
                         'ExceededMaxOrderQuantity'
-                        ? `One user can order only up to ${checkProductAvailabilityData.maxOrderQuantity} instances of this product`
-                        : 'Insufficient stock available for this product'
+                        ? `Один користувач може замовити лише до ${checkProductAvailabilityData.maxOrderQuantity} екземплярів цього товару`
+                        : 'Недостатньо товарів на складі для цього товару'
                 )
             );
         }

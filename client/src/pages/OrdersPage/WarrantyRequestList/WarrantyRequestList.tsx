@@ -20,7 +20,7 @@ const WarrantyRequestList: FC<{ className?: string }> = (props) => {
             {isError && (
                 <ErrorMessageBlock
                     whiteBackground={false}
-                    message="Something went wrong while displaying a list of warranty requests. Please try reloading the page."
+                    message="Щось пішло не так під час відображення списку запитів на гарантійне обслуговування. Спробуйте перезавантажити сторінку."
                     buttonLinks={<Fragment />}
                 />
             )}
@@ -36,7 +36,7 @@ const WarrantyRequestList: FC<{ className?: string }> = (props) => {
                     ))
                 ) : (
                     <p className={classes['order-list__warning']}>
-                        You don't have any orders yet.
+                        У вас поки немає запитів до сервісного центру.
                     </p>
                 ))}
         </div>

@@ -50,7 +50,7 @@ const WarrantyRequestItem: FC<WarrantyRequestInfo> = ({ warrantyRequest }) => {
                         <span
                             className={classes['warranty-request__identifier']}
                         >
-                            Request №{warrantyRequest.id}
+                            Запит №{warrantyRequest.id}
                         </span>
                         <span>
                             {
@@ -62,7 +62,7 @@ const WarrantyRequestItem: FC<WarrantyRequestInfo> = ({ warrantyRequest }) => {
                         <span
                             className={classes['warranty-request__last-status']}
                         >
-                            <b>Last status:</b>{' '}
+                            <b>Останній статус:</b>{' '}
                             {warrantyRequest.statusHistory[0].status}
                         </span>
                     </div>
@@ -76,11 +76,11 @@ const WarrantyRequestItem: FC<WarrantyRequestInfo> = ({ warrantyRequest }) => {
                         }
                     >
                         <h3 className={classes['warranty-request__heading']}>
-                            Related product:
+                            Пов'язаний товар:
                         </h3>
                         <p>{warrantyRequest.repairingProductData.title}</p>
                         <h3 className={classes['warranty-request__heading']}>
-                            Status history:
+                            Історія зміни статусів:
                         </h3>
                         <StatusHistoryList
                             statusChangeHistory={warrantyRequest.statusHistory}
@@ -92,11 +92,11 @@ const WarrantyRequestItem: FC<WarrantyRequestInfo> = ({ warrantyRequest }) => {
                         }
                     >
                         <h3 className={classes['warranty-request__heading']}>
-                            Service center address
+                            Адреса сервісного центру:
                         </h3>
                         <p>{warrantyRequest.serviceCenter}</p>
                         <h3 className={classes['warranty-request__heading']}>
-                            Client contact data
+                            Контактні дані клієнта:
                         </h3>
                         <p
                             className={

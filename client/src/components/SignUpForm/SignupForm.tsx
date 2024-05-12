@@ -37,7 +37,7 @@ const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
         if (expectedErrorResponse!.statusCode === 422) {
             dispatch(
                 errorActions.showNotificationError(
-                    'Invalid input data. Please double-check your inputs or the captcha.'
+                    'Неправильні вхідні дані. Будь ласка, перевірте свої дані або капчу.'
                 )
             );
         }
@@ -72,48 +72,48 @@ const SignUpForm: FC<{ onSuccessfulSignUp: () => void }> = (props) => {
                     <SchemaContext.Provider value={signupValidationSchema}>
                         <FormInput
                             type="text"
-                            label="First name"
+                            label="Власне ім'я"
                             isRequired={true}
                             name="firstName"
-                            placeholder="Enter your first name"
+                            placeholder="Уведіть своє власне ім'я"
                         />
                         <FormInput
                             type="text"
-                            label="Last name"
+                            label="Прізвище"
                             isRequired={true}
                             name="lastName"
-                            placeholder="Enter your last name"
+                            placeholder="Уведіть своє прізвище"
                         />
                         <FormInput
                             type="email"
-                            label="Email"
+                            label="Електронна пошта"
                             isRequired={true}
                             name="email"
-                            placeholder="Enter your email"
+                            placeholder="Уведіть свою електронну пошту"
                             validateOnChange={false}
                             validateOnBlur={true}
                         />
                         <FormInput
                             type="password"
-                            label="Password"
+                            label="Пароль"
                             isRequired={true}
                             name="password"
-                            placeholder="Enter your password"
+                            placeholder="Уведіть свій пароль"
                             TipComponent={<PasswordTips />}
                         />
                         <FormInput
                             type="password"
-                            label="Confirm password"
+                            label="Підтвердження паролю"
                             isRequired={true}
                             name="confirmPassword"
-                            placeholder="Write the password again"
+                            placeholder="Уведіть пароль ще раз"
                         />
                         <ReCAPTCHABlock />
                         <SuggestLoggingIn />
                         <FormActions>
                             <SubmitButton
                                 isLoading={isLoading || isValidatingEmail}
-                                label="Sign Up"
+                                label="Зареєструватися"
                             />
                         </FormActions>
                     </SchemaContext.Provider>

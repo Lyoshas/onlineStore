@@ -19,7 +19,7 @@ const CheckResetToken: FC<{ children: React.ReactNode }> = (props) => {
     let content: React.ReactNode = (
         <div className={classes['reset-token-block']}>
             <ErrorIcon className="icon" />
-            <p>Something went wrong. Please try reloading the page.</p>
+            <p>Щось пішло не так. Спробуйте перезавантажити сторінку.</p>
         </div>
     );
 

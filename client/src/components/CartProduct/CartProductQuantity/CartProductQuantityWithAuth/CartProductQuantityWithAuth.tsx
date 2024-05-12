@@ -102,18 +102,17 @@ const CartProductQuantityWithAuth: FC<{
 
         switch (apiErrorMessage) {
             case 'insufficient stock available for this product':
-                errorMessageToDisplay =
-                    apiErrorMessage[0].toUpperCase() + apiErrorMessage.slice(1);
+                errorMessageToDisplay = 'Недостатня кількість товару на складі';
                 break;
             case 'more products are added to the cart than allowed':
-                errorMessageToDisplay = `Only ${
+                errorMessageToDisplay = `Лише ${
                     (upsertErrorResponse.serverResponse.errors[0] as any)
                         .maximumAllowedProducts
-                } units of this product can be added to the cart`;
+                } екземплярів цього товару можуть бути додані до кошика`;
                 break;
             default:
                 errorMessageToDisplay =
-                    'Something went wrong while changing the product quantity';
+                    'Щось пішло не так під час зміни кількості товару';
                 break;
         }
 

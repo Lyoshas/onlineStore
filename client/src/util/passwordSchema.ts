@@ -1,15 +1,15 @@
 import * as Yup from 'yup';
 
 const passwordSchema = Yup.string()
-    .required('Password is required')
-    .min(8, 'Password must be at least 8 characters long')
-    .max(72, 'Password must not exceed 72 characters')
-    .matches(/[A-Z]/, 'Must have at least 1 uppercase letter')
-    .matches(/[a-z]/, 'Must have at least 1 lowercase letter')
-    .matches(/[0-9]/, 'Must have at least 1 number')
+    .required('Необхідно вказати пароль')
+    .min(8, 'Пароль повинен мати довжину не менше 8 символів')
+    .max(72, 'Пароль не повинен перевищувати 72 символи')
+    .matches(/[A-Z]/, 'Пароль повинен містити принаймні 1 велику літеру')
+    .matches(/[a-z]/, 'Пароль повинен містити принаймні 1 малу літеру')
+    .matches(/[0-9]/, 'Пароль повинен містити принаймні 1 цифру')
     .matches(
         /[-#!$@£%^&*()_+|~=`{}\[\]:";'<>?,.\/ ]/,
-        'Must have at least 1 special character (!, @, #, etc)'
+        'Пароль повинен містити принаймні 1 спеціальний символ (!, @, #, тощо)'
     );
 
 export default passwordSchema;

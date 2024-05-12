@@ -30,7 +30,7 @@ const createErrorBlock = (errorMessage: string) => {
         <div className={classNames('flex-wrapper', classes['error-block'])}>
             <ErrorIcon className="icon" />
             <p className={classes['error-message__title']}>{errorMessage}</p>
-            <ButtonLink to="/">Home</ButtonLink>
+            <ButtonLink to="/">На головну</ButtonLink>
         </div>
     );
 };
@@ -49,7 +49,8 @@ const ProductInfo = () => {
     const isValidId = !Number.isNaN(productId);
 
     // if 'id' is a string
-    if (!isValidId) return createErrorBlock('Invalid product identifier');
+    if (!isValidId)
+        return createErrorBlock('Неправильний ідентифікатор товару');
 
     let [
         getProductByIdNoAuth,
@@ -91,12 +92,12 @@ const ProductInfo = () => {
 
     if (getProductNoAuthError || getProductWithAuthError) {
         const productNotFoundMessage =
-            'A product with the specified id does not exist';
+            'Товару з вказаним ідентифікатором не існує';
         return createErrorBlock(
             getProductNoAuthError?.message === productNotFoundMessage ||
                 getProductWithAuthError?.message === productNotFoundMessage
                 ? productNotFoundMessage
-                : 'Something went wrong while loading the product'
+                : 'Щось пішло не так під час завантаження товару'
         );
     }
 
@@ -147,7 +148,7 @@ const ProductInfo = () => {
     const onSelectImage = (imageIndex: 0 | 1) => setSelectedImage(imageIndex);
 
     const reviewsHeading = (
-        <h3 className={classes['product-reviews__heading']}>Reviews</h3>
+        <h3 className={classes['product-reviews__heading']}>Відгуки</h3>
     );
 
     // <article> - a self-contained piece of content that can be independently distributed or reused
@@ -196,8 +197,8 @@ const ProductInfo = () => {
                                 classes['product-reviews__no-reviews-warning']
                             }
                         >
-                            Currently, there are no reviews. You can be the
-                            first to share your thoughts!
+                            Наразі немає жодного відгуку. Ви можете бути першим,
+                            хто поділиться своїми думками!
                         </p>
                         {!isAuthenticated && (
                             <p
@@ -205,7 +206,7 @@ const ProductInfo = () => {
                                     classes['product-reviews__sign-in-warning']
                                 }
                             >
-                                Please{' '}
+                                Будь ласка,{' '}
                                 <Link
                                     to="/auth/sign-in"
                                     className={classNames(
@@ -213,9 +214,9 @@ const ProductInfo = () => {
                                         classes['sign-in-warning__link']
                                     )}
                                 >
-                                    log in
-                                </Link>{' '}
-                                to create a review
+                                    увійдіть в акаунт
+                                </Link>
+                                , щоб створити відгук
                             </p>
                         )}
                     </Fragment>

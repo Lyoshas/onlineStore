@@ -29,9 +29,9 @@ const ActivateAccount: FC = () => {
     if (expectedErrorResponse !== null) {
         message = expectedErrorResponse.serverResponse.errors[0].message;
     } else if (isError) {
-        message = 'Something went wrong';
+        message = 'Щось пішло не так';
     } else {
-        message = 'The account has been activated';
+        message = 'Акаунт був активований';
     }
 
     return (
@@ -46,7 +46,7 @@ const ActivateAccount: FC = () => {
                     )}
                     <p className={classes.message}>{message}</p>
                     <ButtonLink to={`${isSuccess ? '/auth/sign-in' : '/'}`}>
-                        {isSuccess ? 'Sign In' : 'Home Page'}
+                        {isSuccess ? 'Увійти' : 'На головну'}
                     </ButtonLink>
                 </Fragment>
             )}

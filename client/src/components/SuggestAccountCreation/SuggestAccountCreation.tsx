@@ -5,9 +5,9 @@ import classes from './SuggestAccountCreation.module.css';
 const SuggestAccountCreation = () => {
     return (
         <p className={classes['sign-in__signup-paragraph']}>
-            Don't have an account?{' '}
+            Не маєте акаунта?{' '}
             <Link to="/auth/sign-up" className="link">
-                Sign up
+                Зареєструватися
             </Link>
         </p>
     );

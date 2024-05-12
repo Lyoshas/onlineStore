@@ -8,10 +8,10 @@ const SuccessfulSignupMessage: FC = () => {
         <div className={classes['success-message-block']}>
             <SuccessIcon />
             <p className={classes['success-message__text']}>
-                You've successfully signed up! Please check your email for
-                futher instructions.
+                Ви успішно зареєструвалися! Будь ласка, перевірте свою
+                електронну пошту для отримання подальших інструкцій.
                 <br />
-                <b>Please check your "spam" folder as well!</b>
+                <b>Будь ласка, перевірте також папку «спам»!</b>
             </p>
         </div>
     );

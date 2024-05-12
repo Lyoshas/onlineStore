@@ -34,14 +34,14 @@ const FundraisingCampaignList = () => {
             <NavigationItems
                 activePage={
                     currentStatus === null || currentStatus === 'ongoing'
-                        ? 'Ongoing campaigns'
-                        : 'Finished campaigns'
+                        ? 'Активні збори'
+                        : 'Завершені збори'
                 }
             />
             {(isUninitialized || isFetching) && <LoadingScreen />}
             {isError && (
                 <ErrorMessageBlock
-                    message="Something went wrong while retrieving fundraising campaigns. Please try reloading the page."
+                    message="Щось пішло не так під час отримання кампаній зі збору коштів. Будь ласка, спробуйте перезавантажити сторінку."
                     whiteBackground={false}
                     buttonLinks={<Fragment />}
                 />

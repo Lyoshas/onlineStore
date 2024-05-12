@@ -39,7 +39,7 @@ const CartProductDeleteButton: FC<{
                 }
                 alt="Delete icon"
             />
-            Delete
+            Видалити
         </Button>
     );
 };

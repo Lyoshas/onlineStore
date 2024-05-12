@@ -6,14 +6,14 @@ const PasswordTips: FC = () => {
     return (
         <div className={classes['form__password-requirements']}>
             <p className={classes['password-requirements__intro']}>
-                Password must be:
+                Пароль повинен мати:
             </p>
             <ul className={classes['password-requirements__ul']}>
-                <li>8 characters or longer, not exceeding 72 characters</li>
-                <li>Include at least 1 number</li>
-                <li>Include at least 1 uppercase letter</li>
-                <li>Include at least 1 lowercase letter</li>
-                <li>Include at least 1 special character (!, @, #, etc)</li>
+                <li>8 символів або довше, але не більше 72 символів</li>
+                <li>Містити принаймні 1 цифру</li>
+                <li>Містити принаймні 1 велику літеру</li>
+                <li>Містити принаймні 1 малу літеру</li>
+                <li>Містити принаймні 1 спеціальний символ (!, @, #, тощо)</li>
             </ul>
         </div>
     );

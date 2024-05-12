@@ -58,7 +58,7 @@ const ExploreProductsBlock = () => {
 
         dispatch(
             errorActions.showNotificationError(
-                'Something went wrong while loading the products'
+                'Щось пішло не так під час завантаження товарів'
             )
         );
     }, [featuredProductsError]);
@@ -66,14 +66,14 @@ const ExploreProductsBlock = () => {
     return (
         <section className={classes['explore-products']}>
             <h2 className={classes['explore-products__heading']}>
-                Explore Our Products
+                Ознайомтеся з нашими товарами
             </h2>
             <div className={classes['explore-products__request-status']}>
                 {featuredProductsLoading && <Loading />}
                 {featuredProductsError && (
                     <Fragment>
                         <ErrorIcon className="icon" />
-                        <p>An error occurred while loading products.</p>
+                        <p>Виникла помилка при завантаженні товарів.</p>
                     </Fragment>
                 )}
             </div>
@@ -91,7 +91,7 @@ const ExploreProductsBlock = () => {
                 to="/products"
                 className={classes['explore-products__more-btn']}
             >
-                More Products
+                Більше товарів
             </ButtonLink>
         </section>
     );
