@@ -75,10 +75,10 @@ const SignInForm = () => {
                         <SchemaContext.Provider value={schema}>
                             <FormInput
                                 type="text"
-                                label="Email or phone number (e.g. +380-50-123-45-67)"
+                                label="Email"
                                 isRequired={true}
                                 name="login"
-                                placeholder="Enter your email or phone number"
+                                placeholder="Enter your email address"
                             />
                             <FormInput
                                 type="password"
