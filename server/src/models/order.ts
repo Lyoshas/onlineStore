@@ -474,13 +474,15 @@ class OrderModel {
     public async cancelOrder(orderId: number): Promise<void> {
         await this.dbClient.query(
             formatSqlQuery(`
-                UPDATE orders
-                SET status_id = (
-                    SELECT id
-                    FROM order_statuses
-                    WHERE name = 'Замовлення скасоване'
-                )
-                WHERE id = $1
+                INSERT INTO order_status_history (order_id, status_id)
+                VALUES (
+                    $1,
+                    (
+                        SELECT id
+                        FROM order_statuses
+                        WHERE name = 'Замовлення скасоване'
+                    )
+                );
             `),
             [orderId]
         );
