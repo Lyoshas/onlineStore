@@ -2,7 +2,7 @@ import { RequestHandler } from 'express';
 import asyncHandler from 'express-async-handler';
 
 import UserModel from '../models/user.js';
-import * as signupModel from '../models/signup.js';
+import SignupModel from '../models/signup.js';
 import { generateAccessToken } from '../models/access-token.js';
 import * as refreshTokenModel from '../models/refresh-token.js';
 import CustomValidationError from '../errors/CustomValidationError.js';
@@ -61,6 +61,7 @@ export const OAuthCallback: RequestHandler<
 > = asyncHandler(async (req, res, next) => {
     const { state, code } = req.query;
     const userModel = new UserModel();
+    const signupModel = new SignupModel();
 
     const authServerName = await oauthModel.getAuthorizationServerNameByState(
         state
@@ -107,8 +108,8 @@ export const OAuthCallback: RequestHandler<
             firstName,
             lastName,
             email,
-            hashedPassword: await signupModel.hashPassword(
-                signupModel.generateStrongPassword()
+            hashedPassword: await SignupModel.hashPassword(
+                SignupModel.generateStrongPassword()
             ),
             isActivated: true,
         });

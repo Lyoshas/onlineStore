@@ -1,7 +1,7 @@
 import { Knex } from 'knex';
 import bcryptjs from 'bcryptjs';
 
-import { generateStrongPassword } from '../src/models/signup.js';
+import SignupModel from '../src/models/signup.js';
 
 const hashPassword = (password: string): Promise<string> => {
     return bcryptjs.hash(password, 10);
@@ -24,7 +24,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'olga.kovale@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Ольга',
             last_name: 'Коваленко',
             is_activated: true,
@@ -32,7 +32,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'ivan.petrov@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Іван',
             last_name: 'Петров',
             is_activated: true,
@@ -40,7 +40,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'marina.lysenko@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Марина',
             last_name: 'Лисенко',
             is_activated: true,
@@ -48,7 +48,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'andriy.shevchenko@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Андрій',
             last_name: 'Шевченко',
             is_activated: true,
@@ -56,7 +56,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'nataliya.marchenko@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Наталія',
             last_name: 'Марченко',
             is_activated: true,
@@ -64,7 +64,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'sergey.melnik@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Сергій',
             last_name: 'Мельник',
             is_activated: true,
@@ -72,7 +72,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'anna.lebedeva@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Анна',
             last_name: 'Лебедєва',
             is_activated: true,
@@ -80,7 +80,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'oleksandr.koval@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Олександр',
             last_name: 'Коваль',
             is_activated: true,
@@ -88,7 +88,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'mariya.popova@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Марія',
             last_name: 'Попова',
             is_activated: true,
@@ -96,7 +96,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'oleg.kozlov@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Олег',
             last_name: 'Козлов',
             is_activated: true,
@@ -104,7 +104,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'marina.marchenko@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Марина',
             last_name: 'Марченко',
             is_activated: true,
@@ -112,7 +112,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'volodymyr.sidorov@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Володимир',
             last_name: 'Сидоров',
             is_activated: true,
@@ -120,7 +120,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'oksana.kovalenko@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Оксана',
             last_name: 'Коваленко',
             is_activated: true,
@@ -128,7 +128,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'sergiy.dmytruk@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Сергій',
             last_name: 'Дмитрук',
             is_activated: true,
@@ -136,7 +136,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'nina.karpenko@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Ніна',
             last_name: 'Карпенко',
             is_activated: true,
@@ -144,7 +144,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'pavlo.romanov@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Павло',
             last_name: 'Романов',
             is_activated: true,
@@ -152,7 +152,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'elena.shcherbak@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Олена',
             last_name: 'Щербак',
             is_activated: true,
@@ -160,7 +160,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'mykola.vorobiov@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Микола',
             last_name: 'Воробйов',
             is_activated: true,
@@ -168,7 +168,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'yulia.savchenko@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Юлія',
             last_name: 'Савченко',
             is_activated: true,
@@ -176,7 +176,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'vladimir.maksymov@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Володимир',
             last_name: 'Максимов',
             is_activated: true,
@@ -184,7 +184,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'sergey.ivanov@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Сергій',
             last_name: 'Іванов',
             is_activated: true,
@@ -192,7 +192,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'olga.kuznetsova@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Ольга',
             last_name: 'Кузнецова',
             is_activated: true,
@@ -200,7 +200,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'viktor.semionov@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Віктор',
             last_name: 'Семенов',
             is_activated: true,
@@ -208,7 +208,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'margarita.ivanova@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Маргарита',
             last_name: 'Іванова',
             is_activated: true,
@@ -216,7 +216,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'ivan.kolosov@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Іван',
             last_name: 'Колосов',
             is_activated: true,
@@ -224,7 +224,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'oksana.ponomarenko@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Оксана',
             last_name: 'Пономаренко',
             is_activated: true,
@@ -232,7 +232,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'sergiy.romanenko@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Сергій',
             last_name: 'Романенко',
             is_activated: true,
@@ -240,7 +240,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'nina.kudryavtseva@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Ніна',
             last_name: 'Кудрявцева',
             is_activated: true,
@@ -248,7 +248,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'vadim.titov@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Вадим',
             last_name: 'Титов',
             is_activated: true,
@@ -256,7 +256,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'olena.romanova@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Олена',
             last_name: 'Романова',
             is_activated: true,
@@ -264,7 +264,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'petro.ostapov@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Петро',
             last_name: 'Остапов',
             is_activated: true,
@@ -272,7 +272,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'maria.smirnova@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Марія',
             last_name: 'Смирнова',
             is_activated: true,
@@ -280,7 +280,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'andriy.pavlov@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Андрій',
             last_name: 'Павлов',
             is_activated: true,
@@ -288,7 +288,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'daria.stepanova@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Дарія',
             last_name: 'Степанова',
             is_activated: true,
@@ -296,7 +296,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'oleg.manelenko@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Олег',
             last_name: 'Манеленко',
             is_activated: true,
@@ -304,7 +304,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'tatyana.bogdanova@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Тетяна',
             last_name: 'Богданова',
             is_activated: true,
@@ -312,7 +312,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'sergey.pavlenko@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Сергій',
             last_name: 'Павленко',
             is_activated: true,
@@ -320,7 +320,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'marina.popova@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Марина',
             last_name: 'Попова',
             is_activated: true,
@@ -328,7 +328,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'andriy.kovalenko@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Андрій',
             last_name: 'Коваленко',
             is_activated: true,
@@ -336,7 +336,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'oksana.melnikova@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Оксана',
             last_name: 'Мельникова',
             is_activated: true,
@@ -344,7 +344,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'sergiy.pavlov@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Сергій',
             last_name: 'Павлов',
             is_activated: true,
@@ -352,7 +352,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'nina.sidorova@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Ніна',
             last_name: 'Сидорова',
             is_activated: true,
@@ -360,7 +360,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'volodymyr.karpenko@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Володимир',
             last_name: 'Карпенко',
             is_activated: true,
@@ -368,7 +368,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'anna.dmytruk@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Анна',
             last_name: 'Дмитрук',
             is_activated: true,
@@ -376,7 +376,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'oleksandr.kudryavtsev@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Олександр',
             last_name: 'Кудрявцев',
             is_activated: true,
@@ -384,7 +384,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'mariya.titova@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Марія',
             last_name: 'Титова',
             is_activated: true,
@@ -392,7 +392,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'sergey.savchenko@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Сергій',
             last_name: 'Савченко',
             is_activated: true,
@@ -400,7 +400,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'nina.petrov@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Ніна',
             last_name: 'Петрова',
             is_activated: true,
@@ -408,7 +408,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'mykola.danylyuk@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Микола',
             last_name: 'Данилюк',
             is_activated: true,
@@ -416,7 +416,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'larysa.kovalchuk@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Лариса',
             last_name: 'Ковальчук',
             is_activated: true,
@@ -424,7 +424,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'andriy.kozlovsky@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Андрій',
             last_name: 'Козловський',
             is_activated: true,
@@ -432,7 +432,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'oksana.shevchenko@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Оксана',
             last_name: 'Шевченко',
             is_activated: true,
@@ -440,7 +440,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'mykola.petrov@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Микола',
             last_name: 'Петров',
             is_activated: true,
@@ -448,7 +448,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'olga.kravchenko@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Ольга',
             last_name: 'Кравченко',
             is_activated: true,
@@ -456,7 +456,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'sergey.ivanchuk@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Сергій',
             last_name: 'Іванчук',
             is_activated: true,
@@ -464,7 +464,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'maria.kozlova@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Марія',
             last_name: 'Козлова',
             is_activated: true,
@@ -472,7 +472,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'dmytro.romanov@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Дмитро',
             last_name: 'Романов',
             is_activated: true,
@@ -480,7 +480,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'anna.melnyk@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Анна',
             last_name: 'Мельник',
             is_activated: true,
@@ -488,7 +488,7 @@ export async function seed(knex: Knex): Promise<void> {
         },
         {
             email: 'vadim.shcherbakov@gmail.com',
-            password: await hashPassword(generateStrongPassword()),
+            password: await hashPassword(SignupModel.generateStrongPassword()),
             first_name: 'Вадим',
             last_name: 'Щербаков',
             is_activated: true,

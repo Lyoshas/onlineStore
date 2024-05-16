@@ -4,13 +4,13 @@ import asyncHandler from 'express-async-handler';
 import UserModel from '../models/user.js';
 import * as transactionModel from '../models/pg-transaction.js';
 import * as resetPasswordModel from '../models/reset-password.js';
+import SignupModel from '../models/signup.js';
 import { addTokenToRedis } from '../models/redis-utils.js';
 import CustomValidationError from '../errors/CustomValidationError.js';
 import dbPool from '../services/postgres.service.js';
 import UnexpectedError from '../errors/UnexpectedError.js';
 import { generateRandomString } from '../util/generateRandomString.js';
 import { sendEmail } from '../services/email.service.js';
-import { hashPassword } from '../models/signup.js';
 
 // this route sends a so-called "reset token"
 // it will be used to reset the user's password
@@ -86,7 +86,7 @@ export const changePassword: RequestHandler<
 
         await resetPasswordModel.changePassword(
             userId,
-            await hashPassword(req.body.password),
+            await SignupModel.hashPassword(req.body.password),
             client
         );
 

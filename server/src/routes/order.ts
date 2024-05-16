@@ -3,7 +3,6 @@ import { body, validationResult } from 'express-validator';
 import asyncHandler from 'express-async-handler';
 
 import * as orderController from '../controllers/order.js';
-import OrderModel from '../models/order.js';
 import ensureAuthentication from '../middlewares/ensure-authentication.js';
 import validateRequest from '../middlewares/validate-request.js';
 import ExceededMaxProductsToCheckError from '../errors/ExceededMaxProductsToCheckError.js';
@@ -15,14 +14,13 @@ import { doesPostalServiceWarehouseExist } from '../models/shipping.js';
 import RequestValidationError from '../errors/RequestValidationError.js';
 import firstNameValidation from './util/firstNameValidation.js';
 import lastNameValidation from './util/lastNameValidation.js';
-import { isEmailAvailable } from '../models/signup.js';
 import OrderProduct from '../interfaces/OrderProduct.js';
 import { combinedOutOfStockAndMaxQuantityErrorMessage } from '../errors/CombinedOutOfStockAndMaxQuantityError.js';
-import { base64Decode, base64Encode } from '../util/base64.js';
+import { base64Decode } from '../util/base64.js';
 import camelCaseObject from '../util/camelCaseObject.js';
-import { createLiqPaySignature } from '../models/liqpay.js';
 import liqpayDataValidation from './util/liqpayDataValidation.js';
 import liqpaySignatureValidation from './util/liqpaySignatureValidation.js';
+import SignupModel from '../models/signup.js';
 
 const router = express.Router();
 
@@ -154,7 +152,8 @@ router.get(
                     return Promise.resolve();
                 }
 
-                if (!(await isEmailAvailable(email))) {
+                const signupModel = new SignupModel();
+                if (!(await signupModel.isEmailAvailable(email))) {
                     return Promise.reject('The email is already taken');
                 }
 

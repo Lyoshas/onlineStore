@@ -9,10 +9,10 @@ import * as transactionModel from '../models/pg-transaction.js';
 import * as productModel from '../models/product.js';
 import * as signupModel from '../models/signup.js';
 import * as liqpayModel from '../models/liqpay.js';
+import SignupModel from '../models/signup.js';
 import UnexpectedError from '../errors/UnexpectedError.js';
 import dbPool from '../services/postgres.service.js';
 import CheckOrderFeasabilityReqBody from '../interfaces/CheckOrderFeasabilityReqBody.js';
-import { generateStrongPassword } from '../models/signup.js';
 import CreateOrderReqBodyNoAuth from '../interfaces/CreateOrderReqBodyNoAuth.js';
 import CreateOrderReqBodyWithAuth from '../interfaces/CreateOrderReqBodyWithAuth.js';
 import { sendEmail } from '../services/email.service.js';
@@ -50,6 +50,7 @@ export const createOrder: RequestHandler = asyncHandler(
         res,
         next
     ) => {
+        const signupModel = new SignupModel();
         let userId: number | null = req.user?.id || null;
         const isAuthenticated = userId !== null;
 
@@ -82,15 +83,14 @@ export const createOrder: RequestHandler = asyncHandler(
                 const { email, firstName, lastName } =
                     req.body as CreateOrderReqBodyNoAuth;
 
-                newPassword = generateStrongPassword();
+                newPassword = SignupModel.generateStrongPassword();
                 userId = await signupModel.signUpUser({
                     email,
                     firstName,
                     lastName,
                     // this account will be activated immediately because the user would still need to go the specified email to get the password to this account
                     isActivated: true,
-                    hashedPassword: await signupModel.hashPassword(newPassword),
-                    dbClient,
+                    hashedPassword: await SignupModel.hashPassword(newPassword),
                 });
             }
 

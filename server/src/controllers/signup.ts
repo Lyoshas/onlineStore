@@ -1,10 +1,9 @@
 import { RequestHandler } from 'express';
 import asyncHandler from 'express-async-handler';
-import bcryptjs from 'bcryptjs';
 
 import * as transactionModel from '../models/pg-transaction.js';
-import * as signupModel from '../models/signup.js';
 import * as accountActivationModel from '../models/account-activation.js';
+import SignupModel from '../models/signup.js';
 import { addTokenToRedis } from '../models/redis-utils.js';
 import { generateRandomString } from '../util/generateRandomString.js';
 import { sendEmail } from '../services/email.service.js';
@@ -29,6 +28,7 @@ export const postSignUp: RequestHandler = asyncHandler(
         // more: https://node-postgres.com/features/transactions
         const dbClient = await dbPool.connect();
 
+        const signupModel = new SignupModel(dbClient);
         await transactionModel.beginTransaction(dbClient);
 
         try {
@@ -36,9 +36,8 @@ export const postSignUp: RequestHandler = asyncHandler(
                 firstName,
                 lastName,
                 email,
-                hashedPassword: await signupModel.hashPassword(plainPassword),
+                hashedPassword: await SignupModel.hashPassword(plainPassword),
                 // it's necessary to make the request using this client because transactions should be performed within a single client
-                dbClient,
             });
 
             await addTokenToRedis({
@@ -88,6 +87,7 @@ export const isEmailAvailable: RequestHandler<
     { email: string } // defining req.query
 > = asyncHandler(async (req, res, next) => {
     const email = req.query.email;
+    const signupModel = new SignupModel();
 
     res.json({
         isEmailAvailable: await signupModel.isEmailAvailable(email),
