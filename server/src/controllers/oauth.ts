@@ -4,7 +4,7 @@ import asyncHandler from 'express-async-handler';
 import UserModel from '../models/user.js';
 import SignupModel from '../models/signup.js';
 import { generateAccessToken } from '../models/access-token.js';
-import * as refreshTokenModel from '../models/refresh-token.js';
+import RefreshTokenModel from '../models/refresh-token.js';
 import CustomValidationError from '../errors/CustomValidationError.js';
 import UnexpectedError from '../errors/UnexpectedError.js';
 import OAuthUserData from '../interfaces/OAuthUserData.js';
@@ -62,6 +62,7 @@ export const OAuthCallback: RequestHandler<
     const { state, code } = req.query;
     const userModel = new UserModel();
     const signupModel = new SignupModel();
+    const refreshTokenModel = new RefreshTokenModel();
 
     const authServerName = await oauthModel.getAuthorizationServerNameByState(
         state
@@ -120,7 +121,7 @@ export const OAuthCallback: RequestHandler<
     const { refreshToken, expiresAt } =
         await refreshTokenModel.generateRefreshToken(userId);
 
-    refreshTokenModel.attachRefreshTokenAsCookie(res, refreshToken, expiresAt);
+    RefreshTokenModel.attachRefreshTokenAsCookie(res, refreshToken, expiresAt);
 
     // if we make it here, the user is already signed up, so just sign them in
     res.status(responseStatus).json({
