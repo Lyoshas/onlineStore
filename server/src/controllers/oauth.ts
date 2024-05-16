@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express';
 import asyncHandler from 'express-async-handler';
 
-import * as userModel from '../models/user.js';
+import UserModel from '../models/user.js';
 import * as signupModel from '../models/signup.js';
 import { generateAccessToken } from '../models/access-token.js';
 import * as refreshTokenModel from '../models/refresh-token.js';
@@ -60,6 +60,7 @@ export const OAuthCallback: RequestHandler<
     { state: string; code: string }
 > = asyncHandler(async (req, res, next) => {
     const { state, code } = req.query;
+    const userModel = new UserModel();
 
     const authServerName = await oauthModel.getAuthorizationServerNameByState(
         state

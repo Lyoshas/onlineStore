@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express';
 import asyncHandler from 'express-async-handler';
 
-import * as userModel from '../models/user.js';
+import UserModel from '../models/user.js';
 import * as activationModel from '../models/account-activation.js';
 import * as refreshTokenModel from '../models/refresh-token.js';
 import * as accessTokenModel from '../models/access-token.js';
@@ -14,6 +14,8 @@ export const postSignIn: RequestHandler<
     { accessToken: string },
     { login: string; password: string }
 > = asyncHandler(async (req, res, next) => {
+    const userModel = new UserModel();
+
     const userId = await userModel.getUserIdByCredentials(
         // the login must be an email of the user who is trying to log in
         req.body.login,

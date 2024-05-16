@@ -2,7 +2,7 @@ import { RequestHandler } from 'express';
 import asyncHandler from 'express-async-handler';
 
 import * as activationModel from '../models/account-activation.js';
-import * as userModel from '../models/user.js';
+import UserModel from '../models/user.js';
 import CustomValidationError from '../errors/CustomValidationError.js';
 import InvalidCredentialsError from '../errors/InvalidPasswordError.js';
 import AccountActivatedError from '../errors/AccountActivatedError.js';
@@ -37,6 +37,8 @@ export const resendActivationLink: RequestHandler<
     { targetEmail: string },
     { login: string; password: string }
 > = asyncHandler(async (req, res, next) => {
+    const userModel = new UserModel();
+
     const userId = await userModel.getUserIdByCredentials(
         // the login can be either a mobile phone (+380-XX-XXX-XX-XX) or an email
         req.body.login,

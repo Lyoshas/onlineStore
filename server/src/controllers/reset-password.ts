@@ -1,8 +1,7 @@
 import { RequestHandler } from 'express';
 import asyncHandler from 'express-async-handler';
-import bcryptjs from 'bcryptjs';
 
-import * as userModel from '../models/user.js';
+import UserModel from '../models/user.js';
 import * as transactionModel from '../models/pg-transaction.js';
 import * as resetPasswordModel from '../models/reset-password.js';
 import { addTokenToRedis } from '../models/redis-utils.js';
@@ -21,7 +20,9 @@ export const sendResetTokenToEmail: RequestHandler<
     { msg: string },
     { email: string; recaptchaToken: string }
 > = asyncHandler(async (req, res, next) => {
+    const userModel = new UserModel();
     const { email } = req.body;
+
     const userId = await userModel.getUserIdByEmail(email);
 
     if (userId === null) {
