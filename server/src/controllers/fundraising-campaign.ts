@@ -1,4 +1,4 @@
-import { RequestHandler } from 'express';
+import e, { RequestHandler } from 'express';
 import asyncHandler from 'express-async-handler';
 
 import FundraisingCampaignModel from '../models/fundraising-campaign.js';
@@ -126,8 +126,9 @@ export const donationCallback: RequestHandler<
         await transactionModel.commitTransaction(dbClient);
 
         return redirectToClient('success');
-    } catch {
+    } catch (e) {
         await transactionModel.rollbackTransaction(dbClient);
+        throw e;
     } finally {
         dbClient.release();
     }
