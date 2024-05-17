@@ -7,7 +7,10 @@ import getAccessToken from '../store/util/getAccessToken';
 import isAccessTokenRunningOut from '../util/IsAccessTokenRunningOut';
 
 const httpLink = createHttpLink({
-    uri: '/api/graphql',
+    uri:
+        process.env.NODE_ENV === 'development'
+            ? '/api/graphql'
+            : 'https://api.onlinestore-potapchuk.click/graphql',
 });
 
 const authLink = setContext(async (_: unknown, { headers }) => {

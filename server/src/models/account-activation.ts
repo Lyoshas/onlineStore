@@ -1,6 +1,5 @@
 import redis from '../services/redis.service.js';
 import dbPool from '../services/postgres.service.js';
-import { normalizeHostname } from './hostname.js';
 
 export const getUserIdByActivationToken = async (
     token: string
@@ -25,10 +24,6 @@ export const isAccountActivated = (userId: number): Promise<boolean> => {
         });
 };
 
-export const generateAccountActivationLink = (
-    hostname: string,
-    activationToken: string
-) => {
-    hostname = normalizeHostname(hostname);
-    return `http://${hostname}/auth/activate-account/${activationToken}`;
+export const generateAccountActivationLink = (activationToken: string) => {
+    return `${process.env.REACT_APP_URL}/auth/activate-account/${activationToken}`;
 };

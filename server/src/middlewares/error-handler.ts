@@ -18,7 +18,9 @@ const errorHandler = (
             .status(413)
             .json({ errors: [{ message: 'Request body is too large' }] });
     } else {
-        console.log('An unexpected error occurred');
+        console.log(
+            `An unexpected error occurred: ${req.method} ${req.originalUrl}`
+        );
         console.error(err);
     }
 

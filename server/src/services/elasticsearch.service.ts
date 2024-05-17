@@ -8,15 +8,15 @@ const esClient = new Client({
         username: process.env.ELASTICSEARCH_USERNAME!,
         password: process.env.ELASTICSEARCH_PASSWORD!,
     },
-    tls: {
-        ca: fs.readFileSync(
-            path.join(
-                process.cwd(),
-                'src',
-                'config',
-                'elasticsearch_http_ca.crt'
-            )
-        ),
+    ssl: {
+        // ca: fs.readFileSync(
+        //     path.join(
+        //         process.cwd(),
+        //         'src',
+        //         'config',
+        //         'elasticsearch_http_ca.crt'
+        //     )
+        // ),
         rejectUnauthorized: false
     },
 });

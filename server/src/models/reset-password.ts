@@ -1,15 +1,10 @@
 import { PoolClient } from 'pg';
 
-import { normalizeHostname } from './hostname.js';
 import redis from '../services/redis.service.js';
 import dbPool from '../services/postgres.service.js';
 
-export const generateResetPasswordLink = (
-    hostname: string,
-    resetToken: string
-): string => {
-    hostname = normalizeHostname(hostname);
-    return `http://${hostname}/auth/reset-password/${resetToken}`;
+export const generateResetPasswordLink = (resetToken: string): string => {
+    return `${process.env.REACT_APP_URL}/auth/reset-password/${resetToken}`;
 };
 
 export const getUserIdByResetToken = async (

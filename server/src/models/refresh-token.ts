@@ -7,9 +7,12 @@ import { generateRandomString } from '../util/generateRandomString.js';
 class RefreshTokenModel {
     private dbClient: PoolClient | Pool;
     private static cookieStaticOptions: CookieOptions = {
-        path: '/api/auth',
+        // path: '/api/auth',
+        path: '/auth',
         httpOnly: true,
+        domain: 'onlinestore-potapchuk.click',
         sameSite: 'strict',
+        secure: true
     };
 
     constructor(dbClient?: PoolClient) {

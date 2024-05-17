@@ -69,10 +69,8 @@ export const resendActivationLink: RequestHandler<
             +process.env.ACTIVATION_TOKEN_EXPIRATION_IN_SECONDS!,
     });
 
-    const activationLink = activationModel.generateAccountActivationLink(
-        req.get('host')!,
-        activationToken
-    );
+    const activationLink =
+        activationModel.generateAccountActivationLink(activationToken);
 
     await sendEmail(
         email,

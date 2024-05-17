@@ -13,7 +13,7 @@ const PRODUCTS_INDEX_NAME = 'products';
 // this function inserts new documents to Elasticsearch
 const sendBulkRequest = (body: any[]) => {
     console.log('Sending a Bulk request to Elasticsearch...');
-    return esClient.bulk({ operations: body });
+    return esClient.bulk({ body });
 };
 
 // this function loads products inside PostgreSQL to Elasticsearch
@@ -69,7 +69,7 @@ const loadPgProductsToElasticSearch = async () => {
                 pgStream.pause();
                 sendBulkRequest(bulkRequestBody)
                     .then((result) => {
-                        if (result.errors) return Promise.reject();
+                        // if (result.errors) return Promise.reject();
                         bulkRequestBody = [];
                         pgStream.resume();
                     })

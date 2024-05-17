@@ -10,7 +10,10 @@ export const backendApi = createApi({
         'CheckOrderFeasibility',
     ],
     baseQuery: createBaseQuery({
-        baseUrl: '/api',
+        baseUrl:
+            process.env.NODE_ENV === 'development'
+                ? '/api'
+                : 'https://api.onlinestore-potapchuk.click',
         includeAccessToken: true,
     }),
     endpoints: () => ({}),

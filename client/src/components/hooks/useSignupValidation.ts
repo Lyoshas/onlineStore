@@ -17,8 +17,13 @@ const returnNameValidation = (field: "Власне ім'я" | 'Прізвище'
 };
 
 const isEmailAvailable = async (email: string): Promise<boolean> => {
+    const baseUrl =
+        process.env.NODE_ENV === 'development'
+            ? '/api'
+            : 'https://api.onlinestore-potapchuk.click';
+
     const response = await fetch(
-        `/api/auth/is-email-available?email=${encodeURIComponent(email)}`
+        `${baseUrl}/auth/is-email-available?email=${encodeURIComponent(email)}`
     );
 
     if (!response.ok) {

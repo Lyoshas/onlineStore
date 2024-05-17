@@ -15,6 +15,7 @@ const createBaseQuery = (options: CreateBaseQueryArgs) => {
 
     return fetchBaseQuery({
         baseUrl: baseUrl,
+        credentials: 'include',
         prepareHeaders: async (headers, { getState }) => {
             headers.set('Content-Type', 'application/json');
 

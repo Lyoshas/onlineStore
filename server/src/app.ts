@@ -2,16 +2,19 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
+import { ApolloServerPluginLandingPageDisabled } from '@apollo/server/plugin/disabled';
 import { GraphQLFormattedError } from 'graphql';
 import cookieParser from 'cookie-parser';
 
 const NODE_ENV = process.env.NODE_ENV as string;
 
 if (!['development', 'test', 'production'].includes(NODE_ENV)) {
-    throw new Error(`
+    throw new Error(
+        `
         Environment variable NODE_ENV is neither
              'development', nor 'test', nor 'production'
-    `.replace(/[\n\t]|\s{2}/g, ''));
+    `.replace(/[\n\t]|\s{2}/g, '')
+    );
 }
 
 import signinRoutes from './routes/signin.js';
@@ -33,8 +36,11 @@ import shippingRoutes from './routes/shipping.js';
 import userRoutes from './routes/user.js';
 import warrantyRequestRoutes from './routes/warranty-request.js';
 import fundraisingCampaignRoutes from './routes/fundraising-campaign.js';
+import setupCors from './middlewares/setup-cors.js';
 
 const app = express();
+
+app.use(setupCors);
 
 app.use(bodyParser.json({ limit: '5kb' }));
 
@@ -53,12 +59,7 @@ app.use('/auth', [
     logoutRoutes,
 ]);
 
-app.use('/user', [
-    cartRoutes,
-    orderRoutes,
-    userRoutes,
-    warrantyRequestRoutes,
-]);
+app.use('/user', [cartRoutes, orderRoutes, userRoutes, warrantyRequestRoutes]);
 
 app.use('/', fundraisingCampaignRoutes);
 
@@ -81,13 +82,20 @@ const startGraphQLServer = async () => {
             // if it's dev environment, don't do anything
             return formattedError;
         },
+        plugins:
+            process.env.NODE_ENV === 'development'
+                ? []
+                : [ApolloServerPluginLandingPageDisabled()],
     });
 
     await server.start();
 
-    app.use('/graphql', expressMiddleware(server, {
-        context: async ({ req }) => ({ user: req.user })
-    }));
+    app.use(
+        '/graphql',
+        expressMiddleware(server, {
+            context: async ({ req }) => ({ user: req.user }),
+        })
+    );
 
     app.use(notFoundHandler);
 

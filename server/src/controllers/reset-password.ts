@@ -41,10 +41,7 @@ export const sendResetTokenToEmail: RequestHandler<
             +process.env.RESET_TOKEN_EXPIRATION_IN_SECONDS!,
     });
 
-    const resetLink = resetPasswordModel.generateResetPasswordLink(
-        req.get('host')!,
-        resetToken
-    );
+    const resetLink = resetPasswordModel.generateResetPasswordLink(resetToken);
 
     sendEmail(
         email,

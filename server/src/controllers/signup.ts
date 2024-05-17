@@ -60,7 +60,6 @@ export const postSignUp: RequestHandler = asyncHandler(
 
         const activationLink =
             accountActivationModel.generateAccountActivationLink(
-                req.get('host')!,
                 activationToken
             );
 

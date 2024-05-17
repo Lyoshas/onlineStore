@@ -55,7 +55,7 @@ export const createPendingTransaction: RequestHandler<
         amount: donationAmount,
         description: `Пожертвування коштів на збір №${campaignId} користувачем з ID ${userId}`,
         orderId: transactionId,
-        resultUrl: 'http://localhost/api/fundraising-campaign/callback',
+        resultUrl: `${process.env.API_URL}/fundraising-campaign/callback`,
     });
 
     res.status(201).json({ data, signature });

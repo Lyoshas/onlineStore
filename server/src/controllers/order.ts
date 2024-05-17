@@ -193,7 +193,7 @@ export const createOrder: RequestHandler = asyncHandler(
                       description:
                           `Оплата замовлення №${orderId} користувачем з ID ${userId}\n` +
                           `Отримувач: ${orderRecipient.firstName} ${orderRecipient.lastName}`,
-                      resultUrl: 'http://localhost/api/user/order/callback',
+                      resultUrl: `${process.env.API_URL}/user/order/callback`,
                   })
                 : { orderId };
 
