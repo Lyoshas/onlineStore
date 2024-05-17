@@ -1,16 +1,21 @@
 import jwt from 'jsonwebtoken';
+import { PoolClient } from 'pg';
 
 import { getUserDataForAccessToken } from './authorization.js';
 import VerifiedUserInfo from '../interfaces/VerifiedUserInfo.js';
+import dbPool from '../services/postgres.service.js';
 
 // The access token is generated as a JWT.
 // It's important to make sure that the user exists beforehand,
 // otherwise the token will point to a non-existent user
 export const generateAccessToken = (
-    userId: number
+    userId: number,
+    dbClient?: PoolClient
 ): Promise<string | never> => {
+    const client = dbClient || dbPool;
+
     return new Promise((resolve, reject) => {
-        getUserDataForAccessToken(userId).then((userData) => {
+        getUserDataForAccessToken(userId, client).then((userData) => {
             if (userData === null) {
                 reject(`user with userId ${userId} does not exist`);
             }
