@@ -11,7 +11,7 @@ import recaptchaTokenSchema from '../../util/recaptchaTokenSchema';
 const returnNameValidation = (field: "Власне ім'я" | 'Прізвище') => {
     return Yup.string()
         .required(`${field} є обов'язковим полем`)
-        .matches(/^[a-z]+$/i, `${field} має містити лише літери`)
+        .matches(/^[a-zа-яґєії']+$/i, `${field} має містити лише літери`)
         .min(1, `${field} не повинно бути пустим`)
         .max(50, `${field} не повинно перевищувати 50 символів`);
 };
