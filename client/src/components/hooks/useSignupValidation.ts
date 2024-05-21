@@ -17,7 +17,9 @@ const returnNameValidation = (field: "Власне ім'я" | 'Прізвище'
 };
 
 const isEmailAvailable = async (email: string): Promise<boolean> => {
-    const response = await fetch(`/api/auth/is-email-available?email=${email}`);
+    const response = await fetch(
+        `/api/auth/is-email-available?email=${encodeURIComponent(email)}`
+    );
 
     if (!response.ok) {
         return Promise.reject(response.status);
