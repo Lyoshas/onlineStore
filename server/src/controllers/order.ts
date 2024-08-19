@@ -175,9 +175,7 @@ export const createOrder: RequestHandler = asyncHandler(
                         <li>Логін: ${email}</li> 
                         <li>Пароль: ${newPassword}</li>
                     </ul>
-                    <p>Якщо Ви бажаєте змінити пароль, перейдіть, будь ласка, за наступним <a href="http://${req.get(
-                        'host'
-                    )}/auth/forgot-password">посиланням</a>.</p>
+                    <p>Якщо Ви бажаєте змінити пароль, перейдіть, будь ласка, за наступним <a href="${process.env.REACT_APP_URL}/auth/forgot-password">посиланням</a>.</p>
                     `
                 );
             }

@@ -43,7 +43,7 @@ const CartContentsModal: FC<CartContentsModalProps> = (props) => {
         getCartViaAPI,
         {
             isFetching: isFetchingCartViaAPI,
-            isLoading: isFetchingCartFirstTimeViaAPI, // isLoading returns true when you're fetching data for the first time
+            isLoading: isFetchingCartFirstTimeViaAPI,
             error: getCartErrorViaAPI,
             data: cartDataViaAPI,
         },
@@ -67,7 +67,6 @@ const CartContentsModal: FC<CartContentsModalProps> = (props) => {
     useApiError(isOrderFeasibilityCheckError, orderFeasibilityCheckError, []);
 
     useEffect(() => {
-        // 'isAuthenticated' can be null
         if (
             isAuthenticated === false &&
             Object.values(localCartData.products).length > 0

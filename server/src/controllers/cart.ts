@@ -10,9 +10,6 @@ import TooManyProductsInCartError from '../errors/TooManyProductsInCartError.js'
 import arrayDifference from '../util/arrayDifference.js';
 import UnexpectedError from '../errors/UnexpectedError.js';
 
-// if the user made it to any of these middlewares,
-// it means he/she is authenticated, so req.user is prepopulated
-
 export const getUserCart: RequestHandler<
     unknown,
     { products: CartEntry[]; totalPrice: number }
@@ -47,7 +44,6 @@ export const upsertProductToCart: RequestHandler<
     const userId = req.user!.id;
     const uniqueCartProductIDs = await cartModel.getCartProductIDs(userId);
 
-    // if the user is trying to add a new product to the cart AND the user is trying to exceed the maximum limit of cart products
     if (
         !uniqueCartProductIDs.includes(req.body.productId) &&
         uniqueCartProductIDs.length >= +process.env.MAX_PRODUCTS_IN_CART!

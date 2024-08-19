@@ -40,15 +40,11 @@ router.put(
                 return Promise.resolve();
             })
             .withMessage('productId must point to a valid product'),
-        // if the product id is invalid, return the error and don't check any other field
         validateRequest,
         body('quantity')
             .isInt({ gt: 0 })
             .withMessage('quantity must be an integer and greater than zero'),
         validateRequest,
-        // we need to check whether we have this many products in stock
-        // and whether the user is trying to order more products than it's allowed
-        // we're doing it separately from the initial validation, because these checks may return the 409 status code
         asyncHandler(async (req, res, next) => {
             const { quantity: requestedQuantity, productId } = req.body;
 

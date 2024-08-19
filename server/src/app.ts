@@ -75,11 +75,9 @@ const startGraphQLServer = async () => {
         resolvers,
         formatError(formattedError: GraphQLFormattedError) {
             if (process.env.NODE_ENV === 'production') {
-                // don't include anything that might expose the server code
                 return { message: formattedError.message };
             }
 
-            // if it's dev environment, don't do anything
             return formattedError;
         },
         plugins:
