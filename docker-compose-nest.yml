@@ -1,0 +1,55 @@
+version: '3'
+services:
+  api:
+    build:
+      context: ./server-nest
+      dockerfile: Dockerfile.dev
+    volumes:
+      - "./server-nest:/app"
+  nginx:
+    restart: always
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports:
+      - '80:80'
+  client:
+    restart: on-failure
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./client
+    volumes:
+      - "./client:/app"
+  redis:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./redis
+    ports:
+      - '6379:6379'
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - 5000:80
+    env_file:
+      - ./pg-admin/dev.env
+  postgres:
+    image: postgres:15.4
+    command: ["postgres", "-c", "log_statement=all"]
+    ports:
+      - 5432:5432
+    env_file:
+      - ./postgres/dev.env
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
+    ports:
+      - 9200:9200
+    environment:
+      - cluster.name=online-store
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    env_file:
+      - ./elasticsearch/dev.env
