@@ -24,7 +24,7 @@ const ReCAPTCHA = forwardRef<NpmRecaptcha>((props, ref) => {
     return (
         <NpmRecaptcha
             ref={ref}
-            sitekey="6LciTjkkAAAAAFMcYF8Tu68clGCWGKrEy83GrsPz"
+            sitekey="6LdJTSsqAAAAAKf8tWjpuWXdFqt1O_PUSnuKhLmW"
             onChange={onCaptchaVerify}
             onExpired={onCaptchaExpired}
             className={classes.recaptcha}
