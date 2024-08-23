@@ -279,7 +279,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
       ```
 #### Endpoint #4. Checking email availability
 - **URL:** /api/auth/is-email-available
-- **Method:** POST
+- **Method:** GET
 - **Description:** signs the user up
 - **Who can access:** everyone
 - **Rate limiting:** 1 request per second per IP address
