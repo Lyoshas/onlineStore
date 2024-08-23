@@ -1,6 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { z } from 'zod';
-import { RECAPTCHA_TOKEN_NAME } from 'src/common/common.constants';
+import {
+    RECAPTCHA_TOKEN_NAME,
+    USER_EMAIL_MAX_LENGTH,
+    USER_EMAIL_MIN_LENGTH,
+} from 'src/common/common.constants';
+import { emailSchema } from 'src/common/zod-schemas/email.schema';
 
 export const signUpSchema = z.object({
     firstName: z
@@ -15,13 +20,7 @@ export const signUpSchema = z.object({
             (lastName) => lastName.length >= 1 && lastName.length <= 50,
             'must be 1 to 50 characters long'
         ),
-    email: z
-        .string({ message: 'must be a string' })
-        .email({ message: 'must be a valid email' })
-        .refine(
-            (email) => email.length >= 1 && email.length <= 254,
-            'must be 1 to 254 characters long'
-        ),
+    email: emailSchema,
     password: z.string({ message: 'must be a string' }).refine(
         (password) => {
             const rules: RegExp[] = [
@@ -65,9 +64,9 @@ export class SignUpDto implements SignUpSchema {
 
     @ApiProperty({
         description:
-            'Email address of the user. Must be unique, meaning no two users can have the same email.',
-        minLength: 1,
-        maxLength: 254,
+            'Email address of the user. must be unique, meaning no two users can have the same email.',
+        minLength: USER_EMAIL_MIN_LENGTH,
+        maxLength: USER_EMAIL_MAX_LENGTH,
         format: 'email',
     })
     email: string;

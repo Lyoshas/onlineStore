@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { ChainableCommander } from 'ioredis';
+import { InjectRepository } from '@nestjs/typeorm';
 import { AuthTokenService } from './auth-token/auth-token.service';
 import { EnvironmentVariables } from 'src/env-schema';
 import { UnexpectedException } from 'src/common/exceptions/unexpected.exception';
@@ -19,7 +20,9 @@ export class AuthService {
         private readonly authTokenService: AuthTokenService,
         private readonly configService: ConfigService<EnvironmentVariables>,
         private readonly emailService: EmailService,
-        private readonly redisService: RedisService
+        private readonly redisService: RedisService,
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>
     ) {}
 
     async signUp(signupData: {
@@ -93,5 +96,10 @@ export class AuthService {
                 <a href="${activationLink}">${activationLink}</a>
             `
         );
+    }
+
+    async isEmailAvailable(email: string): Promise<boolean> {
+        const exists = await this.userRepository.exists({ where: { email } });
+        return !exists;
     }
 }
