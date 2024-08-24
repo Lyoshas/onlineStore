@@ -4,9 +4,12 @@ import {
     Get,
     HttpCode,
     HttpStatus,
+    Param,
+    Patch,
     Post,
     Query,
     UseGuards,
+    UsePipes,
 } from '@nestjs/common';
 import {
     ApiCreatedResponse,
@@ -30,10 +33,19 @@ import {
     CheckEmailAvailabilityDto,
     checkEmailAvailabilitySchema,
 } from './dto/check-email-availability.dto';
+import {
+    ActivateAccountDto,
+    activateAccountSchema,
+} from './dto/activate-account.dto';
+import { AuthTokenService } from './auth-token/auth-token.service';
+import { ValidationException } from 'src/common/exceptions/validation.exception';
 
 @Controller(AUTH_ENDPOINTS_PREFIX)
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+    constructor(
+        private readonly authService: AuthService,
+        private readonly authTokenService: AuthTokenService
+    ) {}
 
     @ApiOperation({
         description:
@@ -98,5 +110,40 @@ export class AuthController {
         return {
             isEmailAvailable: await this.authService.isEmailAvailable(email),
         };
+    }
+
+    @ApiOperation({
+        description:
+            'Allows users to activate their account. This endpoint is typically used when the user follows the activation link that is sent after the user signs up.',
+    })
+    @ApiTags(SWAGGER_AUTH_TAG)
+    @ApiOkResponse({
+        description: 'The user has been successfully activated',
+        example: { msg: 'The account has been activated' },
+    })
+    @ApiUnprocessableEntityResponse({
+        description: SWAGGER_VALIDATION_ERROR_TEXT,
+    })
+    @Patch('activate-account/:activationToken')
+    @UsePipes(new ZodValidationPipe(activateAccountSchema))
+    async activateAccount(@Param() { activationToken }: ActivateAccountDto) {
+        const userId =
+            await this.authTokenService.getUserIdByActivationToken(
+                activationToken
+            );
+
+        if (userId === null) {
+            throw new ValidationException([
+                {
+                    message:
+                        'the activation token is either invalid or expired',
+                    field: 'activationToken',
+                },
+            ]);
+        }
+
+        await this.authService.activateAccount(userId);
+
+        return { msg: 'The account has been activated' };
     }
 }

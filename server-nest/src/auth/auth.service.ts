@@ -11,6 +11,7 @@ import { AUTH_ENDPOINTS_PREFIX } from './auth.constants';
 import { User } from './entities/user.entity';
 import { HashingService } from './hashing/hashing.service';
 import { RedisService } from 'src/common/services/redis.service';
+import { TokenType } from './enums/token-type.enum';
 
 @Injectable()
 export class AuthService {
@@ -54,7 +55,7 @@ export class AuthService {
                 await this.authTokenService.generateUnregisteredToken();
 
             redisTransaction = this.authTokenService.registerToken({
-                tokenType: 'activationToken',
+                tokenType: TokenType.ACTIVATION_TOKEN,
                 token: activationToken,
                 userId: savedUser.id,
                 expirationTimeInSeconds: this.configService.get<number>(
@@ -101,5 +102,13 @@ export class AuthService {
     async isEmailAvailable(email: string): Promise<boolean> {
         const exists = await this.userRepository.exists({ where: { email } });
         return !exists;
+    }
+
+    async activateAccount(userId: number): Promise<void> {
+        const existingUser = await this.userRepository.findOneByOrFail({
+            id: userId,
+        });
+        existingUser.isActivated = true;
+        await this.userRepository.save(existingUser);
     }
 }

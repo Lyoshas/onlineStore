@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { randomBytes } from 'crypto';
 import { ChainableCommander } from 'ioredis';
 import { RedisService } from 'src/common/services/redis.service';
+import { TokenType } from '../enums/token-type.enum';
 
 @Injectable()
 export class AuthTokenService {
@@ -9,7 +10,7 @@ export class AuthTokenService {
 
     // this method doesn't send anything to the Redis server until the outer method calls "exec()" on the result of this method
     registerToken(tokenData: {
-        tokenType: 'activationToken' | 'resetToken';
+        tokenType: TokenType.ACTIVATION_TOKEN | TokenType.RESET_TOKEN;
         token: string;
         userId: number;
         expirationTimeInSeconds: number;
@@ -32,5 +33,18 @@ export class AuthTokenService {
                 resolve(buf.toString('hex'));
             });
         });
+    }
+
+    async getUserIdByActivationToken(
+        activationToken: string
+    ): Promise<number | null> {
+        const [type, userId] = await this.redisService.client.hmget(
+            activationToken,
+            'type',
+            'userId'
+        );
+
+        if (type !== TokenType.ACTIVATION_TOKEN || userId === null) return null;
+        return +userId;
     }
 }
