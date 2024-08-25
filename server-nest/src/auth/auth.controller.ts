@@ -12,12 +12,15 @@ import {
     UsePipes,
 } from '@nestjs/common';
 import {
+    ApiConflictResponse,
     ApiCreatedResponse,
     ApiOkResponse,
     ApiOperation,
     ApiTags,
+    ApiUnauthorizedResponse,
     ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 import { AUTH_ENDPOINTS_PREFIX } from './auth.constants';
 import { AuthService } from './auth.service';
 import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
@@ -39,12 +42,21 @@ import {
 } from './dto/activate-account.dto';
 import { AuthTokenService } from './auth-token/auth-token.service';
 import { ValidationException } from 'src/common/exceptions/validation.exception';
+import {
+    ResendActivationLinkDto,
+    resendActivationLinkSchema,
+} from './dto/resend-activation-link.dto';
+import { InvalidCredentialsException } from 'src/common/exceptions/invalid-credentials.exception';
+import { AccountActivatedException } from 'src/common/exceptions/account-activated.exception';
+import { TokenType } from './enums/token-type.enum';
+import { EnvironmentVariables } from 'src/env-schema';
 
 @Controller(AUTH_ENDPOINTS_PREFIX)
 export class AuthController {
     constructor(
         private readonly authService: AuthService,
-        private readonly authTokenService: AuthTokenService
+        private readonly authTokenService: AuthTokenService,
+        private readonly configService: ConfigService<EnvironmentVariables>
     ) {}
 
     @ApiOperation({
@@ -145,5 +157,73 @@ export class AuthController {
         await this.authService.activateAccount(userId);
 
         return { msg: 'The account has been activated' };
+    }
+
+    @ApiOperation({
+        description:
+            "Resends the activation link to the user. If a user tries to sign in with an account that is not activated, they won't be able to sign in, but they will be presented with an option to resend the activation link. This endpoint is used when the user agrees to resend the link.",
+    })
+    @ApiTags(SWAGGER_AUTH_TAG)
+    @ApiOkResponse({
+        description: 'The link has been resent successfully.',
+        example: { targetEmail: 'example@example.com' },
+    })
+    @ApiUnauthorizedResponse({
+        description: 'The provided login and/or password is incorrect.',
+        example: { errors: [{ message: 'invalid credentials' }] },
+    })
+    @ApiConflictResponse({
+        description: 'The account is already activated.',
+        example: { errors: [{ message: 'account is already activated' }] },
+    })
+    @ApiUnprocessableEntityResponse({
+        description: SWAGGER_VALIDATION_ERROR_TEXT,
+    })
+    @Post('resend-activation-link')
+    @HttpCode(HttpStatus.OK)
+    @UseGuards(RecaptchaGuard)
+    async resendActivationLink(
+        @Body(new ZodValidationPipe(resendActivationLinkSchema))
+        body: ResendActivationLinkDto,
+        @Host() httpHost: string
+    ) {
+        const { login, password } = body;
+        const existingUser = await this.authService.getUserByCredentials(
+            login,
+            password
+        );
+
+        if (existingUser === null) {
+            throw new InvalidCredentialsException();
+        }
+
+        if (existingUser.isActivated) {
+            throw new AccountActivatedException();
+        }
+
+        const activationToken =
+            await this.authTokenService.generateUnregisteredToken();
+        await this.authTokenService
+            .registerToken({
+                tokenType: TokenType.ACTIVATION_TOKEN,
+                token: activationToken,
+                userId: existingUser.id,
+                expirationTimeInSeconds: this.configService.get<number>(
+                    'ACTIVATION_TOKEN_EXPIRATION_IN_SECONDS'
+                )!,
+            })
+            .exec();
+
+        const activationLink = this.authService.generateActivationLink(
+            httpHost,
+            activationToken
+        );
+
+        await this.authService.resendActivationLink(
+            existingUser.email,
+            activationLink
+        );
+
+        return { targetEmail: existingUser.email };
     }
 }

@@ -111,4 +111,32 @@ export class AuthService {
         existingUser.isActivated = true;
         await this.userRepository.save(existingUser);
     }
+
+    async getUserByCredentials(
+        email: string,
+        plaintextPassword: string
+    ): Promise<User | null> {
+        const existingUser = await this.userRepository.findOneBy({
+            email,
+        });
+        if (existingUser === null) return null;
+        const passwordsMatch = await this.hashingService.compare(
+            plaintextPassword,
+            existingUser.password
+        );
+        if (!passwordsMatch) return null;
+        return existingUser;
+    }
+
+    resendActivationLink(email: string, activationLink: string) {
+        return this.emailService.sendEmail(
+            email,
+            '[onlineStore] Підтвердження email',
+            `
+                <p>Ви надіслали запит на повторну активацію акаунту.</p>
+                <p>Будь ласка, перейдіть за посиланням для підтвердження електронної пошти:</p>
+                <a href="${activationLink}">${activationLink}</a>
+            `
+        );
+    }
 }

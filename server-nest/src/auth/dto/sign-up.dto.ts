@@ -6,6 +6,7 @@ import {
     USER_EMAIL_MIN_LENGTH,
 } from 'src/common/common.constants';
 import { emailSchema } from 'src/common/zod-schemas/email.schema';
+import { recaptchaTokenSchema } from 'src/common/zod-schemas/recaptcha-token.schema';
 
 export const signUpSchema = z.object({
     firstName: z
@@ -40,9 +41,7 @@ export const signUpSchema = z.object({
             'including at least 1 uppercase letter, 1 lowercase letter, ' +
             '1 number and 1 special character'
     ),
-    [RECAPTCHA_TOKEN_NAME]: z
-        .string({ message: 'must be a string' })
-        .min(1, 'must be specified'),
+    [RECAPTCHA_TOKEN_NAME]: recaptchaTokenSchema,
 });
 
 type SignUpSchema = z.infer<typeof signUpSchema>;

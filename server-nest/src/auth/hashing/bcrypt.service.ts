@@ -16,4 +16,8 @@ export class BcryptService implements HashingService {
             this.configService.get<number>('HASHING_NUMBER_OF_SALT_ROUNDS')!
         );
     }
+
+    compare(plaintext: string, encrypted: string): Promise<boolean> {
+        return bcryptjs.compare(plaintext, encrypted);
+    }
 }
