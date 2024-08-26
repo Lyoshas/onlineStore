@@ -50,6 +50,10 @@ import { InvalidCredentialsException } from 'src/common/exceptions/invalid-crede
 import { AccountActivatedException } from 'src/common/exceptions/account-activated.exception';
 import { TokenType } from './enums/token-type.enum';
 import { EnvironmentVariables } from 'src/env-schema';
+import {
+    SendResetTokenDto,
+    sendResetTokenSchema,
+} from './dto/send-reset-token.dto';
 
 @Controller(AUTH_ENDPOINTS_PREFIX)
 export class AuthController {
@@ -225,5 +229,61 @@ export class AuthController {
         );
 
         return { targetEmail: existingUser.email };
+    }
+
+    @ApiOperation({
+        description:
+            'If a user wants to change their password, this endpoint will be used to send a reset link to their email.',
+    })
+    @ApiTags(SWAGGER_AUTH_TAG)
+    @ApiOkResponse({
+        description:
+            'The link has been sent successfully to the specified email',
+        example: { msg: 'The link has been sent to the corresponding email' },
+    })
+    @ApiUnprocessableEntityResponse({
+        description: SWAGGER_VALIDATION_ERROR_TEXT,
+    })
+    @Post('send-reset-token')
+    @HttpCode(HttpStatus.OK)
+    @UseGuards(RecaptchaGuard)
+    async sendResetTokenToEmail(
+        @Body(new ZodValidationPipe(sendResetTokenSchema))
+        body: SendResetTokenDto,
+        @Host() httpHost: string
+    ) {
+        const email = body.email;
+        const userId = await this.authService.getUserIdByEmail(email);
+
+        if (userId === null) {
+            throw new ValidationException([
+                {
+                    message: 'there is no user with the corresponding email',
+                    field: 'email',
+                },
+            ]);
+        }
+
+        const resetToken =
+            await this.authTokenService.generateUnregisteredToken();
+        await this.authTokenService
+            .registerToken({
+                tokenType: TokenType.RESET_TOKEN,
+                token: resetToken,
+                userId,
+                expirationTimeInSeconds: this.configService.get<number>(
+                    'RESET_TOKEN_EXPIRATION_IN_SECONDS'
+                )!,
+            })
+            .exec();
+
+        await this.authService.sendResetPasswordEmailMessage(
+            this.authService.generateResetPasswordLink(httpHost, resetToken),
+            email
+        );
+
+        return {
+            msg: 'The link has been sent to the corresponding email',
+        };
     }
 }

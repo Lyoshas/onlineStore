@@ -139,4 +139,33 @@ export class AuthService {
             `
         );
     }
+
+    async getUserIdByEmail(email: string): Promise<number | null> {
+        const existingUser = await this.userRepository.findOneBy({ email });
+        return existingUser === null ? null : existingUser.id;
+    }
+
+    generateResetPasswordLink(httpHost: string, resetToken: string): string {
+        const protocol: 'http' | 'https' =
+            this.configService.get<string>('NODE_ENV') === 'development'
+                ? 'http'
+                : 'https';
+        return `${protocol}://${httpHost}/${AUTH_ENDPOINTS_PREFIX}/reset-password/${resetToken}`;
+    }
+
+    async sendResetPasswordEmailMessage(
+        resetPasswordLink: string,
+        email: string
+    ) {
+        return this.emailService.sendEmail(
+            email,
+            '[onlineStore] Змінення пароля',
+            `
+                <p>Ви запросили посилання для змінення пароля.</p>
+                <p>Будь ласка, перейдіть за посиланням:</p>
+                <a href="${resetPasswordLink}">${resetPasswordLink}</a>
+                <p>Це посилання дійсне лише протягом 1 години.</p>
+            `
+        );
+    }
 }
