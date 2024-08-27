@@ -286,4 +286,21 @@ export class AuthController {
             msg: 'The link has been sent to the corresponding email',
         };
     }
+
+    @ApiOperation({
+        description:
+            "After the reset link is sent to the user's email and they follow it, the client (React.js or a mobile app) should make a request to this endpoint to verify whether the reset token is valid. This step is important because if the user followed the link and the link had actually expired, the user would find out about this only after they filled in the form, solved the captcha challenge and sent the form. This would be very frustrating for users. Thus it's important to notify the user about reset token expiration ahead of time by using this endpoint.",
+    })
+    @ApiTags(SWAGGER_AUTH_TAG)
+    @ApiOkResponse({
+        description: 'The reset token validity has been successfully verified.',
+        example: { isValid: true },
+    })
+    @Get('is-reset-token-valid/:resetToken')
+    async isResetTokenValid(@Param('resetToken') resetToken: string) {
+        const userId =
+            await this.authTokenService.getUserIdByResetToken(resetToken);
+
+        return { isValid: userId !== null };
+    }
 }

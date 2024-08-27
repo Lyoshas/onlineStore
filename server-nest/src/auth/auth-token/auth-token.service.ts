@@ -47,4 +47,15 @@ export class AuthTokenService {
         if (type !== TokenType.ACTIVATION_TOKEN || userId === null) return null;
         return +userId;
     }
+
+    async getUserIdByResetToken(resetToken: string): Promise<number | null> {
+        const [type, userId] = await this.redisService.client.hmget(
+            resetToken,
+            'type',
+            'userId'
+        );
+
+        if (type !== TokenType.RESET_TOKEN || userId === null) return null;
+        return +userId;
+    }
 }
