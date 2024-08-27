@@ -524,7 +524,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
       ```
 #### Endpoint #8. Verify if a reset token is valid
 - **URL:** /api/auth/is-reset-token-valid/:resetToken
-- **Method:** PATCH
+- **Method:** GET
 - **Description:** if a user tries to change their password, they would first use [this endpoint](#endpoint-7-sending-a-link-to-reset-the-password). After the reset link is sent to their email and they follow it, the client (React.js or a mobile app) should make a request to this endpoint to verify whether the reset token is valid. This step is important because if the user followed the link and the link had actually expired, the user would find out about this only after they filled in the form, solved the captcha challenge and sent the form. This would be very frustrating for users. Thus it's important to notify the user about reset token expiration ahead of time by using this endpoint.
 - **Who can access:** everyone
 - **Rate limiting:** 1 request per second per IP address
