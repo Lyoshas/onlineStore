@@ -58,4 +58,11 @@ export class AuthTokenService {
         if (type !== TokenType.RESET_TOKEN || userId === null) return null;
         return +userId;
     }
+
+    revokeToken(
+        tokenType: TokenType.ACTIVATION_TOKEN | TokenType.RESET_TOKEN,
+        token: string
+    ) {
+        return this.redisService.client.del(token);
+    }
 }

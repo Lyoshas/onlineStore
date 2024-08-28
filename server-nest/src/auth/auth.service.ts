@@ -168,4 +168,37 @@ export class AuthService {
             `
         );
     }
+
+    async changePassword(
+        userId: number,
+        newPlaintextPassword: string,
+        resetToken: string
+    ) {
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+            const existingUser = await queryRunner.manager.findOneByOrFail(
+                User,
+                {
+                    id: userId,
+                }
+            );
+            existingUser.password =
+                await this.hashingService.hash(newPlaintextPassword);
+            await queryRunner.manager.save(existingUser);
+            await this.authTokenService.revokeToken(
+                TokenType.RESET_TOKEN,
+                resetToken
+            );
+
+            await queryRunner.commitTransaction();
+        } catch (err) {
+            await queryRunner.rollbackTransaction();
+            throw err;
+        } finally {
+            await queryRunner.release();
+        }
+    }
 }

@@ -7,6 +7,7 @@ import {
 } from 'src/common/common.constants';
 import { emailSchema } from 'src/common/zod-schemas/email.schema';
 import { recaptchaTokenSchema } from 'src/common/zod-schemas/recaptcha-token.schema';
+import { passwordSchema } from 'src/common/zod-schemas/password.schema';
 
 export const signUpSchema = z.object({
     firstName: z
@@ -22,25 +23,7 @@ export const signUpSchema = z.object({
             'must be 1 to 50 characters long'
         ),
     email: emailSchema,
-    password: z.string({ message: 'must be a string' }).refine(
-        (password) => {
-            const rules: RegExp[] = [
-                /[a-z]/,
-                /[A-Z]/,
-                /[0-9]/,
-                /[!@#$%^&*()\-=_\+`~;':\/\\.,<>?}{}|]/,
-            ];
-            return (
-                rules.every((regex) => regex.test(password)) &&
-                password.length >= 8 &&
-                password.length <= 72
-            );
-        },
-        'must consist of at least 8 characters, ' +
-            'not exceeding 72 characters, ' +
-            'including at least 1 uppercase letter, 1 lowercase letter, ' +
-            '1 number and 1 special character'
-    ),
+    password: passwordSchema,
     [RECAPTCHA_TOKEN_NAME]: recaptchaTokenSchema,
 });
 

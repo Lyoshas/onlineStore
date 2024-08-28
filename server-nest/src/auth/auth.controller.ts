@@ -54,6 +54,7 @@ import {
     SendResetTokenDto,
     sendResetTokenSchema,
 } from './dto/send-reset-token.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Controller(AUTH_ENDPOINTS_PREFIX)
 export class AuthController {
@@ -302,5 +303,39 @@ export class AuthController {
             await this.authTokenService.getUserIdByResetToken(resetToken);
 
         return { isValid: userId !== null };
+    }
+
+    @ApiOperation({
+        description:
+            "Changes a user's password. This endpoint revokes the reset token after the password is changed.",
+    })
+    @ApiTags(SWAGGER_AUTH_TAG)
+    @ApiOkResponse({
+        description: 'The password has been changed successfully.',
+        example: { msg: 'The password has been changed.' },
+    })
+    @ApiUnprocessableEntityResponse({
+        description: SWAGGER_VALIDATION_ERROR_TEXT,
+    })
+    @Patch('change-password')
+    @UseGuards(RecaptchaGuard)
+    async changePassword(@Body() changePasswordData: ChangePasswordDto) {
+        const { resetToken, password } = changePasswordData;
+
+        const userId =
+            await this.authTokenService.getUserIdByResetToken(resetToken);
+
+        if (userId === null) {
+            throw new ValidationException([
+                {
+                    message: 'resetToken is either invalid or has expired',
+                    field: 'resetToken',
+                },
+            ]);
+        }
+
+        await this.authService.changePassword(userId, password, resetToken);
+
+        return { msg: 'The password has been changed.' };
     }
 }
