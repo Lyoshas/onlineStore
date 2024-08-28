@@ -40,14 +40,17 @@ const ForgotPassword: FC = () => {
     useEffect(() => {
         if (!isError || statusCode === null) return;
 
-        const errorMessage = 'Не існує користувача з вказаною електронною поштою';
         if (
             statusCode === 422 &&
             expectedErrorResponse?.serverResponse.errors.some((error) =>
-                error.message.includes(errorMessage)
+                error.message
+                    .toLowerCase()
+                    .includes('there is no user with the corresponding email')
             )
         ) {
-            setServerErrorResponse(errorMessage);
+            setServerErrorResponse(
+                'Не існує користувача з вказаною електронною поштою'
+            );
             return;
         }
     }, [statusCode, isError]);
