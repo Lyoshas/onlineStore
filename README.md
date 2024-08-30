@@ -158,7 +158,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
       {
           "errors": [
               {
-                  "message": "Invalid credentials"
+                  "message": "The account is not activated"
               }
           ]
       }
