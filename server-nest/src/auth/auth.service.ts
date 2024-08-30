@@ -12,6 +12,8 @@ import { User } from './entities/user.entity';
 import { HashingService } from './hashing/hashing.service';
 import { RedisService } from 'src/common/services/redis.service';
 import { TokenType } from './enums/token-type.enum';
+import { UserRole } from './entities/user-role.entity';
+import { UserRole as UserRoleEnum } from './enums/user-role.enum';
 
 @Injectable()
 export class AuthService {
@@ -49,6 +51,9 @@ export class AuthService {
             user.lastName = lastName;
             user.password = await this.hashingService.hash(plaintextPassword);
             user.isActivated = isActivated;
+            user.role = await queryRunner.manager.findOneByOrFail(UserRole, {
+                role: UserRoleEnum.BASIC_USER,
+            });
 
             const savedUser = await queryRunner.manager.save(user);
             const activationToken =

@@ -6,9 +6,10 @@ import { AuthService } from './auth.service';
 import { HashingService } from './hashing/hashing.service';
 import { BcryptService } from './hashing/bcrypt.service';
 import { AuthTokenService } from './auth-token/auth-token.service';
+import { UserRole } from './entities/user-role.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([User])],
+    imports: [TypeOrmModule.forFeature([User, UserRole])],
     controllers: [AuthController],
     providers: [
         AuthService,
