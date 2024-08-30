@@ -13,6 +13,7 @@ import { User } from '../entities/user.entity';
 import { AccessTokenPayload } from '../interfaces/access-token-payload.interface';
 import { EnvironmentVariables } from 'src/env-schema';
 import { UserRole as UserRoleEnum } from '../enums/user-role.enum';
+import { NodeEnv } from 'src/common/enums/node-env.enum';
 
 @Injectable()
 export class AuthTokenService {
@@ -157,7 +158,9 @@ export class AuthTokenService {
                         MILLISECONDS
             ),
             httpOnly: true,
-            secure: this.configService.get<string>('NODE_ENV') === 'production',
+            secure:
+                this.configService.get<NodeEnv>('NODE_ENV') ===
+                NodeEnv.PRODUCTION,
             path: '/api/auth',
             sameSite: 'strict',
         });

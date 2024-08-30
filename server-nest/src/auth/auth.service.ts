@@ -14,6 +14,7 @@ import { RedisService } from 'src/common/services/redis.service';
 import { TokenType } from './enums/token-type.enum';
 import { UserRole } from './entities/user-role.entity';
 import { UserRole as UserRoleEnum } from './enums/user-role.enum';
+import { NodeEnv } from 'src/common/enums/node-env.enum';
 
 @Injectable()
 export class AuthService {
@@ -86,7 +87,7 @@ export class AuthService {
 
     generateActivationLink(httpHost: string, activationToken: string) {
         const protocol: 'http' | 'https' =
-            this.configService.get<string>('NODE_ENV') === 'development'
+            this.configService.get<NodeEnv>('NODE_ENV') === NodeEnv.DEVELOPMENT
                 ? 'http'
                 : 'https';
         return `${protocol}://${httpHost}/${AUTH_ENDPOINTS_PREFIX}/activate-account/${activationToken}`;
@@ -157,7 +158,7 @@ export class AuthService {
 
     generateResetPasswordLink(httpHost: string, resetToken: string): string {
         const protocol: 'http' | 'https' =
-            this.configService.get<string>('NODE_ENV') === 'development'
+            this.configService.get<NodeEnv>('NODE_ENV') === NodeEnv.DEVELOPMENT
                 ? 'http'
                 : 'https';
         return `${protocol}://${httpHost}/${AUTH_ENDPOINTS_PREFIX}/reset-password/${resetToken}`;

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { NodeEnv } from './common/enums/node-env.enum';
 
 const numericString = z
     .string()
@@ -7,7 +8,7 @@ const numericString = z
 const string = z.string();
 
 export const environmentVariablesSchema = z.object({
-    NODE_ENV: z.enum(['development', 'production']),
+    NODE_ENV: z.enum([NodeEnv.DEVELOPMENT, NodeEnv.PRODUCTION]),
     POSTGRES_HOST: string,
     POSTGRES_PORT: numericString,
     POSTGRES_USERNAME: string,

@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EnvironmentVariables, environmentVariablesSchema } from './env-schema';
 import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
+import { NodeEnv } from './common/enums/node-env.enum';
 
 @Module({
     imports: [
@@ -44,7 +45,8 @@ import { CommonModule } from './common/common.module';
                 // entities will be loaded automatically
                 autoLoadEntities: true,
                 // if set to 'true', the database schema will be auto created on every application launch
-                synchronize: configService.get('NODE_ENV') === 'development',
+                synchronize:
+                    configService.get('NODE_ENV') === NodeEnv.DEVELOPMENT,
             }),
             inject: [ConfigService],
         }),
