@@ -3,8 +3,10 @@ import {
     CreateDateColumn,
     Entity,
     ManyToOne,
+    OneToMany,
     PrimaryGeneratedColumn,
 } from 'typeorm';
+import { RefreshToken } from './refresh-token.entity';
 import { UserRole } from './user-role.entity';
 
 @Entity('users')
@@ -33,6 +35,9 @@ export class User {
         onDelete: 'CASCADE',
     })
     role: UserRole;
+
+    @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
+    refreshTokens: RefreshToken[];
 
     @CreateDateColumn()
     createdAt: Date;

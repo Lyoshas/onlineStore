@@ -121,8 +121,13 @@ export class AuthService {
         email: string,
         plaintextPassword: string
     ): Promise<User | null> {
-        const existingUser = await this.userRepository.findOneBy({
-            email,
+        const existingUser = await this.userRepository.findOne({
+            where: {
+                email,
+            },
+            relations: {
+                role: true,
+            },
         });
         if (existingUser === null) return null;
         const passwordsMatch = await this.hashingService.compare(

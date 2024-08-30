@@ -24,6 +24,10 @@ export const environmentVariablesSchema = z.object({
     SENDGRID_API_KEY: string,
     SENDGRID_FROM_EMAIL: string,
     RESET_TOKEN_EXPIRATION_IN_SECONDS: numericString,
+    REFRESH_TOKEN_EXPIRATION_IN_SECONDS: numericString,
+    ACCESS_TOKEN_SECRET: string,
+    ACCESS_TOKEN_EXPIRES_IN: string,
+    COOKIE_SECRET: string,
 });
 
 export type EnvironmentVariables = z.infer<typeof environmentVariablesSchema>;

@@ -8,12 +8,14 @@ import {
     Patch,
     Post,
     Query,
+    Res,
     UseGuards,
     UsePipes,
 } from '@nestjs/common';
 import {
     ApiConflictResponse,
     ApiCreatedResponse,
+    ApiForbiddenResponse,
     ApiOkResponse,
     ApiOperation,
     ApiTags,
@@ -55,6 +57,9 @@ import {
     sendResetTokenSchema,
 } from './dto/send-reset-token.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { SignInDto, signInSchema } from './dto/sign-in.dto';
+import { AccountNotActivatedException } from 'src/common/exceptions/account-not-activated.exception';
+import { Response } from 'express';
 
 @Controller(AUTH_ENDPOINTS_PREFIX)
 export class AuthController {
@@ -337,5 +342,86 @@ export class AuthController {
         await this.authService.changePassword(userId, password, resetToken);
 
         return { msg: 'The password has been changed.' };
+    }
+
+    @ApiOperation({
+        description:
+            "Signs the user in. The user's account must be activated before signing in.",
+    })
+    @ApiTags(SWAGGER_AUTH_TAG)
+    @ApiOkResponse({
+        description: 'The user has been logged in successfully',
+        example: { accessToken: 'JWT_value' },
+        headers: {
+            'Set-Cookie': {
+                description: 'Contains the refresh token',
+                schema: {
+                    type: 'string',
+                    example:
+                        'refreshToken=8fbda9857cebcbbcde10047867631e283ff9f91d8222e16f5d95e5d27b83a1a9; Expires=Sun, 29 Sep 2024 10:54:12 GMT; Path=/api/auth; HttpOnly; SameSite=Strict; Domain=localhost',
+                },
+            },
+        },
+    })
+    @ApiUnauthorizedResponse({
+        description: 'Invalid login and/or password',
+        example: {
+            errors: [
+                {
+                    message: 'invalid credentials',
+                },
+            ],
+        },
+    })
+    @ApiForbiddenResponse({
+        description: 'Account is not activated',
+        example: {
+            errors: [
+                {
+                    message: 'the account is not activated',
+                },
+            ],
+        },
+    })
+    @ApiUnprocessableEntityResponse({
+        description: SWAGGER_VALIDATION_ERROR_TEXT,
+    })
+    @Post('sign-in')
+    @UseGuards(RecaptchaGuard)
+    async signIn(
+        @Body(new ZodValidationPipe(signInSchema)) signInData: SignInDto,
+        @Res({
+            // with "passthrough: true" we are leaving the response handling logic to the framework
+            passthrough: true,
+        })
+        response: Response
+    ) {
+        const { login, password } = signInData;
+
+        const existingUser = await this.authService.getUserByCredentials(
+            login,
+            password
+        );
+
+        if (!existingUser) throw new InvalidCredentialsException();
+        if (!existingUser.isActivated) throw new AccountNotActivatedException();
+
+        const refreshToken =
+            await this.authTokenService.generateUnregisteredToken();
+        await this.authTokenService.registerToken({
+            tokenType: TokenType.REFRESH_TOKEN,
+            token: refreshToken,
+            user: existingUser,
+        });
+
+        this.authTokenService.attachRefreshTokenAsCookie(
+            response,
+            refreshToken
+        );
+
+        return {
+            accessToken:
+                await this.authTokenService.generateAccessToken(existingUser),
+        };
     }
 }
