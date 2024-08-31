@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { randomBytes } from 'crypto';
 import { ChainableCommander } from 'ioredis';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
@@ -164,5 +164,20 @@ export class AuthTokenService {
             path: '/api/auth',
             sameSite: 'strict',
         });
+    }
+
+    async getUserByRefreshToken(token: string): Promise<User | null> {
+        const refreshToken = await this.refreshTokenRepository.findOne({
+            where: {
+                token,
+                expiresAt: MoreThan(new Date()),
+            },
+            relations: {
+                user: {
+                    role: true,
+                },
+            },
+        });
+        return refreshToken === null ? null : refreshToken.user;
     }
 }

@@ -16,6 +16,7 @@ import {
     ApiConflictResponse,
     ApiCreatedResponse,
     ApiForbiddenResponse,
+    ApiHeader,
     ApiOkResponse,
     ApiOperation,
     ApiTags,
@@ -60,6 +61,11 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { SignInDto, signInSchema } from './dto/sign-in.dto';
 import { AccountNotActivatedException } from 'src/common/exceptions/account-not-activated.exception';
 import { Response } from 'express';
+import { Cookie } from 'src/common/decorators/cookie.decorator';
+import {
+    GetNewAccessTokenDto,
+    getNewAccessTokenSchema,
+} from './dto/get-new-access-token.dto';
 
 @Controller(AUTH_ENDPOINTS_PREFIX)
 export class AuthController {
@@ -422,6 +428,74 @@ export class AuthController {
         return {
             accessToken:
                 await this.authTokenService.generateAccessToken(existingUser),
+        };
+    }
+
+    @ApiOperation({
+        description:
+            'Uses the provided refresh token in the cookie to refresh the access token.',
+        summary: 'Requests a new access token',
+    })
+    @ApiTags(SWAGGER_AUTH_TAG)
+    @ApiHeader({
+        name: 'Set-Cookie',
+        description:
+            'A valid "refreshToken" must be must be specified as a cookie',
+        schema: {
+            type: 'string',
+            example:
+                'refreshToken=8fbda9857cebcbbcde10047867631e283ff9f91d8222e16f5d95e5d27b83a1a9; Expires=Sun, 29 Sep 2024 10:54:12 GMT; Path=/api/auth; HttpOnly; SameSite=Strict; Domain=localhost',
+        },
+    })
+    @ApiOkResponse({
+        description:
+            'The refresh token is correct, so the renewed access token is provided in the response body',
+        example: { accessToken: 'JWT_value' },
+    })
+    @ApiUnprocessableEntityResponse({
+        description:
+            'The refresh token is either not specified, invalid, or expired',
+        content: {
+            'application/json': {
+                examples: {
+                    TokenNotSpecifiedError: {
+                        description: 'The refresh token was not specified',
+                        value: {
+                            message: 'must be specified',
+                            field: 'refreshToken',
+                        },
+                    },
+                    TokenInvalidError: {
+                        description:
+                            'The refresh token is specified, but is invalid',
+                        value: {
+                            message: 'invalid refresh token',
+                            field: 'refreshToken',
+                        },
+                    },
+                },
+            },
+        },
+    })
+    @Get('refresh')
+    async getNewAccessToken(
+        @Cookie(new ZodValidationPipe(getNewAccessTokenSchema))
+        { refreshToken }: GetNewAccessTokenDto
+    ) {
+        const user =
+            await this.authTokenService.getUserByRefreshToken(refreshToken);
+
+        if (user === null) {
+            throw new ValidationException([
+                {
+                    message: 'invalid refresh token',
+                    field: 'refreshToken',
+                },
+            ]);
+        }
+
+        return {
+            accessToken: await this.authTokenService.generateAccessToken(user),
         };
     }
 }
