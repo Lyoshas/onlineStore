@@ -24,6 +24,7 @@ import {
     ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import { Response } from 'express';
 import { AUTH_ENDPOINTS_PREFIX } from './auth.constants';
 import { AuthService } from './auth.service';
 import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
@@ -33,6 +34,7 @@ import { RecaptchaGuard } from 'src/common/guards/recaptcha.guard';
 import { Host } from 'src/common/decorators/host.decorator';
 import {
     SWAGGER_AUTH_TAG,
+    SWAGGER_OAUTH_TAG,
     SWAGGER_VALIDATION_ERROR_TEXT,
 } from 'src/common/common.constants';
 import {
@@ -60,12 +62,16 @@ import {
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { SignInDto, signInSchema } from './dto/sign-in.dto';
 import { AccountNotActivatedException } from 'src/common/exceptions/account-not-activated.exception';
-import { Response } from 'express';
 import { Cookie } from 'src/common/decorators/cookie.decorator';
 import {
     GetNewAccessTokenDto,
     getNewAccessTokenSchema,
 } from './dto/get-new-access-token.dto';
+import {
+    GetLinkToOAuthAuthorizationServerDto,
+    getLinkToOAuthAuthorizationServerSchema,
+} from './dto/get-link-to-oauth-authorization-server.dto';
+import { OAuthProvider } from './enums/oauth-provider.enum';
 
 @Controller(AUTH_ENDPOINTS_PREFIX)
 export class AuthController {
@@ -496,6 +502,57 @@ export class AuthController {
 
         return {
             accessToken: await this.authTokenService.generateAccessToken(user),
+        };
+    }
+
+    @ApiOperation({
+        description:
+            'Generates and returns a link to the Google/Facebook authorization server. This link is for one-time use only; once it has been used, it cannot be used again. Used for OAuth 2.0 purposes.',
+        summary: 'Generates a URL to an OAuth 2.0 authorization server',
+    })
+    @ApiTags(SWAGGER_OAUTH_TAG)
+    @ApiOkResponse({
+        description: 'The link has been generated successfully',
+        example: { URL: 'http://link-to-the-authorization-server.example' },
+    })
+    @ApiUnprocessableEntityResponse({
+        description: "Invalid 'authorizationServerName' parameter",
+        example: {
+            errors: [
+                {
+                    message:
+                        'Invalid authorization server name: it can be either "google" or "facebook"',
+                    field: 'authorizationServerName',
+                },
+            ],
+        },
+    })
+    @Get('oauth-link/:authorizationServerName')
+    async getLinkToOAuthAuthorizationServer(
+        @Param(new ZodValidationPipe(getLinkToOAuthAuthorizationServerSchema))
+        { authorizationServerName }: GetLinkToOAuthAuthorizationServerDto
+    ) {
+        // The "state" parameter is a unique string used to prevent CSRF attacks.
+        // It is generated when creating a link to the OAuth 2.0 authorization
+        // server and is stored in the database. When the user is redirected back to
+        // our application after consenting, the returned "state" parameter is
+        // checked against the stored value to ensure the request is valid and it
+        // indeed came from the relevant authorization server.
+        const stateParameter = await this.authService.generateStateParameter();
+        await this.authService.addOAuthStateToDB(
+            stateParameter,
+            authorizationServerName
+        );
+
+        return {
+            URL:
+                authorizationServerName === OAuthProvider.GOOGLE
+                    ? this.authService.getUrlToGoogleAuthorizationServer(
+                          stateParameter
+                      )
+                    : this.authService.getUrlToFacebookAuthorizationServer(
+                          stateParameter
+                      ),
         };
     }
 }

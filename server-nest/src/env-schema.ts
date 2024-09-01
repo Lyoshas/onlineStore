@@ -29,6 +29,9 @@ export const environmentVariablesSchema = z.object({
     ACCESS_TOKEN_SECRET: string,
     ACCESS_TOKEN_EXPIRES_IN: string,
     COOKIE_SECRET: string,
+    GOOGLE_CLIENT_ID: string,
+    FACEBOOK_CLIENT_ID: string,
+    OAUTH_REDIRECT_URI: string,
 });
 
 export type EnvironmentVariables = z.infer<typeof environmentVariablesSchema>;

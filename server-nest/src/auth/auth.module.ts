@@ -11,10 +11,18 @@ import { AuthTokenService } from './auth-token/auth-token.service';
 import { UserRole } from './entities/user-role.entity';
 import { RefreshToken } from './entities/refresh-token.entity';
 import { EnvironmentVariables } from 'src/env-schema';
+import { OAuthProvider } from './entities/oauth-provider.entity';
+import { OAuthState } from './entities/oauth-state.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([User, UserRole, RefreshToken]),
+        TypeOrmModule.forFeature([
+            User,
+            UserRole,
+            RefreshToken,
+            OAuthProvider,
+            OAuthState,
+        ]),
         JwtModule.registerAsync({
             imports: [ConfigModule],
             useFactory: (
