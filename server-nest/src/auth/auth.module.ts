@@ -13,6 +13,7 @@ import { RefreshToken } from './entities/refresh-token.entity';
 import { EnvironmentVariables } from 'src/env-schema';
 import { OAuthProvider } from './entities/oauth-provider.entity';
 import { OAuthState } from './entities/oauth-state.entity';
+import { PasswordService } from './password/password.service';
 
 @Module({
     imports: [
@@ -48,6 +49,7 @@ import { OAuthState } from './entities/oauth-state.entity';
             useClass: BcryptService,
         },
         AuthTokenService,
+        PasswordService,
     ],
 })
 export class AuthModule {}

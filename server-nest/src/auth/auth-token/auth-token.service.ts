@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { randomBytes } from 'crypto';
 import { ChainableCommander } from 'ioredis';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MoreThan, Repository } from 'typeorm';
+import { MoreThan, QueryRunner, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
@@ -37,7 +37,7 @@ export class AuthTokenService {
         tokenType: TokenType.REFRESH_TOKEN;
         token: string;
         user: User;
-    }): Promise<void>;
+    }, existingQueryRunner?: QueryRunner): Promise<void>;
     registerToken(tokenData: {
         tokenType:
             | TokenType.ACTIVATION_TOKEN
@@ -47,7 +47,7 @@ export class AuthTokenService {
         user?: User;
         userId?: number;
         expirationTimeInSeconds?: number;
-    }): ChainableCommander | Promise<void> {
+    }, existingQueryRunner?: QueryRunner): ChainableCommander | Promise<void> {
         const { tokenType, token, userId, user, expirationTimeInSeconds } =
             tokenData;
 
@@ -72,7 +72,13 @@ export class AuthTokenService {
                 )!
             );
             refreshToken.user = user!;
-            await this.refreshTokenRepository.save(refreshToken);
+
+            // if the queryRunner is provided, it means a transaction is currently taking place
+            if (existingQueryRunner) {
+                await existingQueryRunner.manager.save(refreshToken);
+            } else {
+                await this.refreshTokenRepository.save(refreshToken);
+            }
         };
 
         return registerRefreshToken();

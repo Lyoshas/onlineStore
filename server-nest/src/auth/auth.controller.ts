@@ -72,6 +72,10 @@ import {
     getLinkToOAuthAuthorizationServerSchema,
 } from './dto/get-link-to-oauth-authorization-server.dto';
 import { OAuthProvider } from './enums/oauth-provider.enum';
+import {
+    OAuthCallbackDto,
+    oauthCallbackSchema,
+} from './dto/oauth-callback.dto';
 
 @Controller(AUTH_ENDPOINTS_PREFIX)
 export class AuthController {
@@ -554,5 +558,92 @@ export class AuthController {
                           stateParameter
                       ),
         };
+    }
+
+    @ApiOperation({
+        description:
+            'A user is redirected to the OAuth 2.0 callback page once they have consented to log in via their Google/Facebook account. They will be redirected to the client (React or mobile app) and the client will then make an API request to this endpoint to get the access token. If the user makes a request here for the first time, the API server will sign the user up, otherwise the user will be logged in.',
+        summary: 'OAuth 2.0 callback endpoint (logging in/signing up)',
+    })
+    @ApiTags(SWAGGER_OAUTH_TAG)
+    @ApiOkResponse({
+        description:
+            'The user was logged in (the corresponding account already exists)',
+        example: { accessToken: 'JWT_ACCESS_TOKEN' },
+        headers: {
+            'Set-Cookie': {
+                description: 'Contains the refresh token',
+                schema: {
+                    type: 'string',
+                    example:
+                        'refreshToken=8fbda9857cebcbbcde10047867631e283ff9f91d8222e16f5d95e5d27b83a1a9; Expires=Sun, 29 Sep 2024 10:54:12 GMT; Path=/api/auth; HttpOnly; SameSite=Strict; Domain=localhost',
+                },
+            },
+        },
+    })
+    @ApiCreatedResponse({
+        description:
+            'The user was signed up (the corresponding account does not exist yet)',
+        example: { accessToken: 'JWT_ACCESS_TOKEN' },
+        headers: {
+            'Set-Cookie': {
+                description: 'Contains the refresh token',
+                schema: {
+                    type: 'string',
+                    example:
+                        'refreshToken=8fbda9857cebcbbcde10047867631e283ff9f91d8222e16f5d95e5d27b83a1a9; Expires=Sun, 29 Sep 2024 10:54:12 GMT; Path=/api/auth; HttpOnly; SameSite=Strict; Domain=localhost',
+                },
+            },
+        },
+    })
+    @ApiUnprocessableEntityResponse({
+        description: SWAGGER_VALIDATION_ERROR_TEXT,
+        content: {
+            'application/json': {
+                examples: {
+                    InvalidStateParameterError: {
+                        description:
+                            "Invalid 'state' parameter (unauthentic request)",
+                        value: {
+                            errors: [
+                                {
+                                    message: 'invalid "state" paremeter',
+                                    field: 'state',
+                                },
+                            ],
+                        },
+                    },
+                    InvalidCodeParameterError: {
+                        description:
+                            "Invalid 'code' (authorization code) parameter",
+                        value: {
+                            errors: [
+                                {
+                                    message: 'invalid authorization code',
+                                    field: 'code',
+                                },
+                            ],
+                        },
+                    },
+                },
+            },
+        },
+    })
+    @Post('oauth-callback')
+    async oauthCallback(
+        @Query(new ZodValidationPipe(oauthCallbackSchema))
+        oauthData: OAuthCallbackDto,
+        @Res() res: Response
+    ) {
+        const { accessToken, refreshToken, isSignedUp } =
+            await this.authService.oauthCallback(
+                oauthData.state,
+                oauthData.code
+            );
+        this.authTokenService.attachRefreshTokenAsCookie(res, refreshToken);
+
+        res.status(isSignedUp ? HttpStatus.CREATED : HttpStatus.OK).json({
+            accessToken,
+        });
     }
 }
