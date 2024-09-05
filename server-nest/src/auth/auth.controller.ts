@@ -17,6 +17,7 @@ import {
     ApiCreatedResponse,
     ApiForbiddenResponse,
     ApiHeader,
+    ApiNoContentResponse,
     ApiOkResponse,
     ApiOperation,
     ApiTags,
@@ -76,6 +77,7 @@ import {
     OAuthCallbackDto,
     oauthCallbackSchema,
 } from './dto/oauth-callback.dto';
+import { logOutSchema, LogOutDto } from './dto/log-out.dto';
 
 @Controller(AUTH_ENDPOINTS_PREFIX)
 export class AuthController {
@@ -645,5 +647,47 @@ export class AuthController {
         res.status(isSignedUp ? HttpStatus.CREATED : HttpStatus.OK).json({
             accessToken,
         });
+    }
+
+    @ApiOperation({
+        description:
+            'Deletes the provided refresh token from the DB and removes it as a cookie.',
+    })
+    @ApiTags(SWAGGER_AUTH_TAG)
+    @ApiHeader({
+        name: 'Set-Cookie',
+        description:
+            'A valid "refreshToken" must be must be specified as a cookie',
+        schema: {
+            type: 'string',
+            example:
+                'refreshToken=8fbda9857cebcbbcde10047867631e283ff9f91d8222e16f5d95e5d27b83a1a9; Expires=Sun, 29 Sep 2024 10:54:12 GMT; Path=/api/auth; HttpOnly; SameSite=Strict; Domain=localhost',
+        },
+    })
+    @ApiNoContentResponse({
+        description:
+            'Indicates that the request was successful and the refresh token, if it existed in the database, has been deleted. If the provided refresh token was not found in the database, this response will also be returned to indicate that no changes were made.',
+    })
+    @ApiUnprocessableEntityResponse({
+        description: 'Refresh token was not provided',
+        example: {
+            errors: [
+                {
+                    message: 'must be a string',
+                    field: 'refreshToken',
+                },
+            ],
+        },
+    })
+    @Post('logout')
+    async handleLogout(
+        @Cookie(new ZodValidationPipe(logOutSchema))
+        { refreshToken }: LogOutDto,
+        @Res() response: Response
+    ) {
+        // we're not waiting for the execution because there's no point in it
+        this.authTokenService.deleteRefreshToken(refreshToken);
+        this.authTokenService.detachRefreshTokenAsCookie(response);
+        response.sendStatus(HttpStatus.NO_CONTENT);
     }
 }

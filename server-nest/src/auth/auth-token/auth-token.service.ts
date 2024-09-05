@@ -4,7 +4,7 @@ import { ChainableCommander } from 'ioredis';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThan, QueryRunner, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { Response } from 'express';
+import { CookieOptions, Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { RedisService } from 'src/common/services/redis.service';
 import { TokenType } from '../enums/token-type.enum';
@@ -17,15 +17,24 @@ import { NodeEnv } from 'src/common/enums/node-env.enum';
 
 @Injectable()
 export class AuthTokenService {
+    private cookieStaticOptions: CookieOptions;
+
     constructor(
         private readonly redisService: RedisService,
         @InjectRepository(RefreshToken)
         private readonly refreshTokenRepository: Repository<RefreshToken>,
-        @InjectRepository(User)
-        private readonly userRepository: Repository<User>,
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService<EnvironmentVariables>
-    ) {}
+    ) {
+        this.cookieStaticOptions = {
+            httpOnly: true,
+            secure:
+                this.configService.get<NodeEnv>('NODE_ENV') ===
+                NodeEnv.PRODUCTION,
+            path: '/api/auth',
+            sameSite: 'strict',
+        };
+    }
 
     registerToken(tokenData: {
         tokenType: TokenType.ACTIVATION_TOKEN | TokenType.RESET_TOKEN;
@@ -33,21 +42,27 @@ export class AuthTokenService {
         userId: number;
         expirationTimeInSeconds: number;
     }): ChainableCommander;
-    registerToken(tokenData: {
-        tokenType: TokenType.REFRESH_TOKEN;
-        token: string;
-        user: User;
-    }, existingQueryRunner?: QueryRunner): Promise<void>;
-    registerToken(tokenData: {
-        tokenType:
-            | TokenType.ACTIVATION_TOKEN
-            | TokenType.RESET_TOKEN
-            | TokenType.REFRESH_TOKEN;
-        token: string;
-        user?: User;
-        userId?: number;
-        expirationTimeInSeconds?: number;
-    }, existingQueryRunner?: QueryRunner): ChainableCommander | Promise<void> {
+    registerToken(
+        tokenData: {
+            tokenType: TokenType.REFRESH_TOKEN;
+            token: string;
+            user: User;
+        },
+        existingQueryRunner?: QueryRunner
+    ): Promise<void>;
+    registerToken(
+        tokenData: {
+            tokenType:
+                | TokenType.ACTIVATION_TOKEN
+                | TokenType.RESET_TOKEN
+                | TokenType.REFRESH_TOKEN;
+            token: string;
+            user?: User;
+            userId?: number;
+            expirationTimeInSeconds?: number;
+        },
+        existingQueryRunner?: QueryRunner
+    ): ChainableCommander | Promise<void> {
         const { tokenType, token, userId, user, expirationTimeInSeconds } =
             tokenData;
 
@@ -163,13 +178,15 @@ export class AuthTokenService {
                     )! *
                         MILLISECONDS
             ),
-            httpOnly: true,
-            secure:
-                this.configService.get<NodeEnv>('NODE_ENV') ===
-                NodeEnv.PRODUCTION,
-            path: '/api/auth',
-            sameSite: 'strict',
+            ...this.cookieStaticOptions,
         });
+    }
+
+    detachRefreshTokenAsCookie(response: Response) {
+        // web browsers and other compliant clients will only clear the cookie
+        // if the given options are identical to those given to res.cookie(),
+        // excluding expires and maxAge
+        response.clearCookie('refreshToken', this.cookieStaticOptions);
     }
 
     async getUserByRefreshToken(token: string): Promise<User | null> {
@@ -185,5 +202,13 @@ export class AuthTokenService {
             },
         });
         return refreshToken === null ? null : refreshToken.user;
+    }
+
+    async deleteRefreshToken(token: string): Promise<void> {
+        const refreshToken = await this.refreshTokenRepository.findOneBy({
+            token,
+        });
+        if (refreshToken === null) return;
+        this.refreshTokenRepository.remove(refreshToken);
     }
 }
