@@ -6,6 +6,7 @@ import { EnvironmentVariables, environmentVariablesSchema } from './env-schema';
 import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
 import { NodeEnv } from './common/enums/node-env.enum';
+import { ProductsModule } from './products/products.module';
 
 @Module({
     imports: [
@@ -52,6 +53,7 @@ import { NodeEnv } from './common/enums/node-env.enum';
         }),
         CommonModule,
         AuthModule,
+        ProductsModule,
     ],
     controllers: [],
     providers: [],
