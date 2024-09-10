@@ -73,7 +73,7 @@ export class ProductCategorySeeder implements Seedable {
     ];
 
     async seed(manager: EntityManager): Promise<void> {
-        await manager.clear(ProductCategory);
+        await manager.delete(ProductCategory, {});
         await manager.insert(
             ProductCategory,
             ProductCategorySeeder.productCategories
