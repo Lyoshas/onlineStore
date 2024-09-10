@@ -1,12 +1,16 @@
 import dataSource from '../../ormconfig';
 import { ProductCategorySeeder } from './seed-files/01-product-categories';
 import { Seedable } from './interfaces/seedable.interface';
+import { ProductSeeder } from './seed-files/02-products';
 
 async function seedDatabase() {
     await dataSource.initialize();
 
     const queryRunner = dataSource.createQueryRunner();
-    const seeders: Seedable[] = [new ProductCategorySeeder()];
+    const seeders: Seedable[] = [
+        new ProductCategorySeeder(),
+        new ProductSeeder(),
+    ];
 
     await queryRunner.connect();
     await queryRunner.startTransaction();
