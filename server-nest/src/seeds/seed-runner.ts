@@ -2,6 +2,7 @@ import dataSource from '../../ormconfig';
 import { ProductCategorySeeder } from './seed-files/01-product-categories';
 import { Seedable } from './interfaces/seedable.interface';
 import { ProductSeeder } from './seed-files/02-products';
+import { UserRoleSeeder } from './seed-files/03-user-roles';
 
 async function seedDatabase() {
     await dataSource.initialize();
@@ -10,6 +11,7 @@ async function seedDatabase() {
     const seeders: Seedable[] = [
         new ProductCategorySeeder(),
         new ProductSeeder(),
+        new UserRoleSeeder(),
     ];
 
     await queryRunner.connect();
