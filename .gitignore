@@ -14,6 +14,6 @@ postgres/dev.env
 elasticsearch/dev.env
 server-nest/node_modules/
 server-nest/dist/
-server-nest/.env
+server-nest/**/*.env
 server-nest/ormconfig.js
 server-nest/ormconfig.ts

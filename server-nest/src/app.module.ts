@@ -1,36 +1,17 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { fromError } from 'zod-validation-error';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { EnvironmentVariables, environmentVariablesSchema } from './env-schema';
+import { EnvironmentVariables } from './env-schema';
 import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
 import { NodeEnv } from './common/enums/node-env.enum';
 import { ProductsModule } from './products/products.module';
+import { configModuleOptions } from './config-service-options';
 
 @Module({
     imports: [
         // initializing ConfigModule, which loads ConfigService, which, in turn, loads environment variables
-        ConfigModule.forRoot({
-            // validating environment variables using Zod
-            validate(config: Record<string, unknown>) {
-                const validationResult =
-                    environmentVariablesSchema.safeParse(config);
-                if (validationResult.success) {
-                    // returning validated data (data may be changed because of how Zod works)
-                    return validationResult.data;
-                }
-                throw fromError(validationResult.error);
-            },
-            validationOptions: {
-                // forbids unknown keys in the environment variables
-                allowUnknown: false,
-                // returns all validation errors
-                abortEarly: false,
-            },
-            // with 'isGlobal' we can use this module across the entire application without importing it
-            isGlobal: true,
-        }),
+        ConfigModule.forRoot(configModuleOptions),
         // TypeORM configuration
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],

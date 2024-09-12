@@ -34,6 +34,10 @@ export const environmentVariablesSchema = z.object({
     FACEBOOK_CLIENT_ID: string,
     FACEBOOK_CLIENT_SECRET: string,
     OAUTH_REDIRECT_URI: string,
+    DB_SEEDING_ADMIN_EMAIL: string,
+    DB_SEEDING_ADMIN_FIRST_NAME: string,
+    DB_SEEDING_ADMIN_LAST_NAME: string,
+    DB_SEEDING_ADMIN_PASSWORD: string,
 });
 
 export type EnvironmentVariables = z.infer<typeof environmentVariablesSchema>;
