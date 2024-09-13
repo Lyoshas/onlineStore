@@ -3,9 +3,11 @@ import {
     Column,
     Entity,
     ManyToOne,
+    OneToMany,
     PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ProductCategory } from './product-category.entity';
+import { ProductReview } from './product-review.entity';
 
 @Entity('products')
 @Check('"maxOrderQuantity" > 0')
@@ -45,5 +47,8 @@ export class Product {
             onDelete: 'CASCADE',
         }
     )
-    category: ProductCategory[];
+    category: ProductCategory;
+
+    @OneToMany(() => ProductReview, (productReview) => productReview.product)
+    productReviews: ProductReview[];
 }

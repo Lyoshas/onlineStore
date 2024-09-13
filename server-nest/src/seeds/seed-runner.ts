@@ -11,6 +11,8 @@ import { PasswordService } from 'src/auth/password/password.service';
 import { RandomService } from 'src/common/services/random.service';
 import { BcryptService } from 'src/auth/hashing/bcrypt.service';
 import { configModuleOptions } from 'src/config-service-options';
+import { ProductReviewSeeder } from './seed-files/06-product-reviews';
+import { ProductReviewModerationStatusSeeder } from './seed-files/05-product-review-moderation-statuses';
 
 async function seedDatabase() {
     await dataSource.initialize();
@@ -41,6 +43,8 @@ async function seedDatabase() {
         new ProductSeeder(),
         new UserRoleSeeder(),
         new UserSeeder(passwordService, configService, bcryptService),
+        new ProductReviewModerationStatusSeeder(),
+        new ProductReviewSeeder(),
     ];
 
     await queryRunner.connect();
