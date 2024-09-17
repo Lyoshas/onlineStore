@@ -6,6 +6,7 @@ import { ProductsService } from './products.service';
 import { Product } from './entities/product.entity';
 import { ProductReviewModerationStatus } from './entities/product-review-moderation-status.entity';
 import { ProductReview } from './entities/product-review.entity';
+import { ProductsResolver } from './products.resolver';
 
 @Module({
     imports: [
@@ -17,6 +18,6 @@ import { ProductReview } from './entities/product-review.entity';
         ]),
     ],
     controllers: [ProductsController],
-    providers: [ProductsService],
+    providers: [ProductsService, ProductsResolver],
 })
 export class ProductsModule {}

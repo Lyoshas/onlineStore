@@ -1,0 +1,29 @@
+type Query {
+    "Get featured products"
+    featuredProducts: [ProductInfoWithoutReviews!]!
+}
+
+type ProductInfoWithoutReviews {
+    id: ID!
+    title: String!
+    price: Float!
+    category: String!
+    initialImageUrl: String!
+    additionalImageUrl: String!
+    shortDescription: String!
+    isAvailable: Boolean!
+    isRunningOut: Boolean!
+    """
+    If userRating is null, there are no reviews
+    """
+    userRating: Float
+}
+
+type ProductReview {
+    userId: ID!
+    fullName: String!
+    reviewMessage: String!
+    starRating: Float!
+    "createdAt specifies the review creation date (DD.MM.YYYY)"
+    createdAt: String!
+}

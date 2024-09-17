@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { EnvironmentVariables } from './env-schema';
 import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
@@ -35,6 +37,11 @@ import { configModuleOptions } from './config-service-options';
         CommonModule,
         AuthModule,
         ProductsModule,
+        GraphQLModule.forRoot<ApolloDriverConfig>({
+            driver: ApolloDriver,
+            // "typePaths" specifies paths to files that contain GraphQL definitions
+            typePaths: ['./**/*.graphql'],
+        }),
     ],
     controllers: [],
     providers: [],
