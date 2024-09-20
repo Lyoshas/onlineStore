@@ -13,6 +13,7 @@ import { BcryptService } from 'src/auth/hashing/bcrypt.service';
 import { configModuleOptions } from 'src/config-service-options';
 import { ProductReviewSeeder } from './seed-files/06-product-reviews';
 import { ProductReviewModerationStatusSeeder } from './seed-files/05-product-review-moderation-statuses';
+import { OAuthProviderSeeder } from './seed-files/07-oauth-providers';
 
 async function seedDatabase() {
     await dataSource.initialize();
@@ -45,6 +46,7 @@ async function seedDatabase() {
         new UserSeeder(passwordService, configService, bcryptService),
         new ProductReviewModerationStatusSeeder(),
         new ProductReviewSeeder(),
+        new OAuthProviderSeeder(),
     ];
 
     await queryRunner.connect();
