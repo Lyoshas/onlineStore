@@ -1,6 +1,8 @@
 type Query {
     "Get featured products"
     featuredProducts: [ProductInfoWithoutReviews!]!
+    "Get a single product by its id"
+    product(id: Int!): ProductInfoWithReviews!
 }
 
 type ProductInfoWithoutReviews {
@@ -17,6 +19,24 @@ type ProductInfoWithoutReviews {
     If userRating is null, there are no reviews
     """
     userRating: Float
+}
+
+type ProductInfoWithReviews {
+    id: ID!
+    title: String!
+    price: Float!
+    category: String!
+    initialImageUrl: String!
+    additionalImageUrl: String!
+    shortDescription: String!
+    userCanAddReview: Boolean!
+    isAvailable: Boolean!
+    isRunningOut: Boolean!
+    """
+    If userRating is null, there are no reviews
+    """
+    userRating: Float
+    reviews: [ProductReview!]!
 }
 
 type ProductReview {

@@ -37,10 +37,27 @@ import { configModuleOptions } from './config-service-options';
         CommonModule,
         AuthModule,
         ProductsModule,
-        GraphQLModule.forRoot<ApolloDriverConfig>({
+        GraphQLModule.forRootAsync<ApolloDriverConfig>({
             driver: ApolloDriver,
-            // "typePaths" specifies paths to files that contain GraphQL definitions
-            typePaths: ['./**/*.graphql'],
+            useFactory: (
+                configService: ConfigService<EnvironmentVariables>
+            ) => ({
+                // "typePaths" specifies paths to files that contain GraphQL definitions
+                typePaths: ['./**/*.graphql'],
+                context: ({ req }) => ({ user: req.user }),
+                formatError(formattedError) {
+                    // if the environment is dev, leave the error as is
+                    // otherwise only keep the 'message' so that nothing else is exposed to the user
+                    if (
+                        configService.get<NodeEnv>('NODE_ENV') ===
+                        NodeEnv.DEVELOPMENT
+                    ) {
+                        return formattedError;
+                    }
+                    return { message: formattedError.message };
+                },
+            }),
+            inject: [ConfigService],
         }),
     ],
     controllers: [],

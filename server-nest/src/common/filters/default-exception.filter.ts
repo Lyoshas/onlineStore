@@ -6,6 +6,7 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { GraphQLError } from 'graphql';
 import { ApplicationError } from '../interfaces/application-error.interface';
 import { CustomException } from '../exceptions/custom.exception';
 
@@ -24,6 +25,9 @@ export class DefaultExceptionFilter implements ExceptionFilter {
         } else if (exception instanceof CustomException) {
             status = exception.getStatus();
             errors = exception.errors;
+        } else if (exception instanceof GraphQLError) {
+            // don't handle the error, pass it on so that Apollo Server can handle it
+            throw exception;
         } else {
             console.error(exception);
             status = HttpStatus.INTERNAL_SERVER_ERROR;

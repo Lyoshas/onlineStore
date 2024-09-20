@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -14,6 +14,7 @@ import { EnvironmentVariables } from 'src/env-schema';
 import { OAuthProvider } from './entities/oauth-provider.entity';
 import { OAuthState } from './entities/oauth-state.entity';
 import { PasswordService } from './password/password.service';
+import { IdentifyUserMiddleware } from './middlewares/identify-user.middleware';
 
 @Module({
     imports: [
@@ -52,4 +53,8 @@ import { PasswordService } from './password/password.service';
         PasswordService,
     ],
 })
-export class AuthModule {}
+export class AuthModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(IdentifyUserMiddleware).forRoutes('*');
+    }
+}

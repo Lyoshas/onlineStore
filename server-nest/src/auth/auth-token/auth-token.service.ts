@@ -211,4 +211,18 @@ export class AuthTokenService {
         if (refreshToken === null) return;
         this.refreshTokenRepository.remove(refreshToken);
     }
+
+    async getUserByAccessToken(
+        accessToken: string
+    ): Promise<AccessTokenPayload | null> {
+        try {
+            const payload =
+                await this.jwtService.verifyAsync<AccessTokenPayload>(
+                    accessToken
+                );
+            return payload;
+        } catch (err) {
+            return null;
+        }
+    }
 }
