@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import {
+    DataSource,
+    EntityManager,
+    Repository,
+    SelectQueryBuilder,
+} from 'typeorm';
 import { GraphQLError } from 'graphql';
 import { ProductCategory } from './entities/product-category.entity';
 import {
@@ -11,6 +16,28 @@ import { ProductReview } from './entities/product-review.entity';
 import { ProductReviewModerationStatus } from './entities/product-review-moderation-status.entity';
 import { Product } from './entities/product.entity';
 import { User } from 'src/auth/entities/user.entity';
+import { ConfigService } from '@nestjs/config';
+import { EnvironmentVariables } from 'src/env-schema';
+
+const userRatingSubquery = (qb: SelectQueryBuilder<any>) => {
+    return (
+        qb
+            .subQuery()
+            // rounding "starRating" to the nearest 0.5
+            // e.g. 3, 3.5, 4, 4.5, 5
+            .select('(ROUND(AVG(review.starRating) * 2) / 2)::DECIMAL(3, 2)')
+            .from(ProductReview, 'review')
+            .innerJoin(
+                ProductReviewModerationStatus,
+                'moderationStatus',
+                'moderationStatus.id = review.moderationStatusId'
+            )
+            .where('review.productId = product.id')
+            .andWhere('moderationStatus.name = :moderationStatus', {
+                moderationStatus: 'approved',
+            })
+    );
+};
 
 @Injectable()
 export class ProductsService {
@@ -20,7 +47,9 @@ export class ProductsService {
         @InjectRepository(ProductCategory)
         private readonly productCategoryRepository: Repository<ProductCategory>,
         @InjectRepository(Product)
-        private readonly productRepository: Repository<Product>
+        private readonly productRepository: Repository<Product>,
+        private readonly configService: ConfigService<EnvironmentVariables>,
+        private readonly dataSource: DataSource
     ) {}
 
     async getProductCategories(): Promise<
@@ -200,27 +229,7 @@ export class ProductsService {
             }, 'userCanAddReview');
         }
         productQueryBuilder = productQueryBuilder
-            .addSelect((qb) => {
-                return (
-                    qb
-                        .subQuery()
-                        // rounding "starRating" to the nearest 0.5
-                        // e.g. 3, 3.5, 4, 4.5, 5
-                        .select(
-                            '(ROUND(AVG(review.starRating) * 2) / 2)::DECIMAL(3, 2)'
-                        )
-                        .from(ProductReview, 'review')
-                        .innerJoin(
-                            ProductReviewModerationStatus,
-                            'moderationStatus',
-                            'moderationStatus.id = review.moderationStatusId'
-                        )
-                        .where('review.productId = product.id')
-                        .andWhere('moderationStatus.name = :moderationStatus', {
-                            moderationStatus: 'approved',
-                        })
-                );
-            }, 'userRating')
+            .addSelect(userRatingSubquery, 'userRating')
             .addSelect((qb) => {
                 return qb
                     .subQuery()
@@ -308,5 +317,159 @@ export class ProductsService {
                 ),
             })),
         };
+    }
+
+    async getProductsByPage(
+        category: string,
+        page: number
+    ): Promise<{
+        productList: ProductInfoWithoutReviews[];
+        totalPages: number;
+    }> {
+        let productList: ProductInfoWithoutReviews[] = [];
+        let totalPages: number = 0;
+
+        await this.dataSource.manager.transaction(
+            async (transactionalEntityManager) => {
+                productList = await this.getProducts({
+                    category,
+                    page,
+                    entityManager: transactionalEntityManager,
+                });
+                totalPages = await this.getTotalNumberOfPages({
+                    category,
+                    entityManager: transactionalEntityManager,
+                });
+            }
+        );
+
+        return { productList, totalPages };
+    }
+
+    private async getProducts({
+        category,
+        page,
+        entityManager,
+    }: {
+        category: string;
+        page: number;
+        entityManager: EntityManager;
+    }): Promise<ProductInfoWithoutReviews[]> {
+        /*
+        Example of a SQL query that will be produced by TypeORM:
+        SELECT
+            "product"."id",
+            "product"."title",
+            "product"."price",
+            "product"."initialImageUrl",
+            "product"."additionalImageUrl",
+            "product"."quantityInStock",
+            "product"."shortDescription",
+            "productCategory"."category",
+            (
+                SELECT (ROUND(AVG("review"."starRating") * 2) / 2)::DECIMAL(3, 2)
+                FROM "product_reviews" "review"
+                INNER JOIN "review_moderation_statuses" "moderationStatus"
+                    ON "moderationStatus"."id" = "review"."moderationStatusId"
+                WHERE "review"."productId" = "product"."id"
+                    AND "moderationStatus"."name" = 'approved'
+            ) AS "userRating"
+        FROM "products" AS "product"
+        INNER JOIN "product_categories" AS "productCategory"
+            ON "productCategory"."id" = "product"."categoryId"
+        WHERE "productCategory"."category" = 'Ноутбуки'
+        ORDER BY "product"."id"
+        OFFSET (2 - 1) * 3
+        LIMIT 3;
+        */
+        const PRODUCTS_PER_PAGE =
+            this.configService.get<number>('PRODUCTS_PER_PAGE')!;
+        const products = await entityManager
+            .createQueryBuilder()
+            .select([
+                'product.id',
+                'product.title',
+                'product.price',
+                'product.initialImageUrl',
+                'product.additionalImageUrl',
+                'product.quantityInStock',
+                'product.shortDescription',
+                'productCategory.category',
+            ])
+            .addSelect(userRatingSubquery, 'userRating')
+            .from(Product, 'product')
+            .innerJoin(
+                ProductCategory,
+                'productCategory',
+                'productCategory.id = product.categoryId'
+            )
+            .where('productCategory.category = :productCategory', {
+                productCategory: category,
+            })
+            .orderBy('product.id')
+            .offset((page - 1) * PRODUCTS_PER_PAGE)
+            .limit(PRODUCTS_PER_PAGE)
+            .getRawMany<{
+                product_id: number;
+                product_title: string;
+                product_price: string;
+                product_initialImageUrl: string;
+                product_additionalImageUrl: string;
+                product_quantityInStock: number;
+                product_shortDescription: string;
+                productCategory_category: string;
+                userRating: string;
+            }>();
+
+        return products.map((product) => ({
+            id: product.product_id,
+            title: product.product_title,
+            price: +product.product_price,
+            category: product.productCategory_category,
+            initialImageUrl: product.product_initialImageUrl,
+            additionalImageUrl: product.product_additionalImageUrl,
+            shortDescription: product.product_shortDescription,
+            isAvailable: this.isProductAvailable(
+                product.product_quantityInStock
+            ),
+            isRunningOut: this.isProductRunningOut(
+                product.product_quantityInStock
+            ),
+            userRating: +product.userRating,
+        }));
+    }
+
+    private async getTotalNumberOfPages({
+        category,
+        entityManager,
+    }: {
+        category: string;
+        entityManager: EntityManager;
+    }): Promise<number> {
+        /*
+        Example of a SQL query that will be produced by TypeORM
+        SELECT CEIL(COUNT(*)::FLOAT / 3)
+        FROM "products" AS "product"
+        INNER JOIN "product_categories" AS "productCategory"
+            ON "productCategory"."id" = "product"."categoryId"
+        WHERE "productCategory"."category" = 'Ноутбуки';
+        */
+        const query = await entityManager
+            .createQueryBuilder()
+            .select('CEIL(COUNT(*)::FLOAT / :productsPerPage)', 'totalPages')
+            .setParameter(
+                'productsPerPage',
+                this.configService.get<number>('PRODUCTS_PER_PAGE')
+            )
+            .from(Product, 'product')
+            .innerJoin(
+                ProductCategory,
+                'productCategory',
+                'productCategory.id = product.categoryId'
+            )
+            .where('productCategory.category = :category', { category })
+            .getRawOne<{ totalPages: number }>();
+
+        return query!.totalPages;
     }
 }

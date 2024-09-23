@@ -3,6 +3,8 @@ type Query {
     featuredProducts: [ProductInfoWithoutReviews!]!
     "Get a single product by its id"
     product(id: Int!): ProductInfoWithReviews!
+    "Get a list of products by specifying a category and a page"
+    products(category: String!, page: Int!): GetProductsByPage!
 }
 
 type ProductInfoWithoutReviews {
@@ -46,4 +48,9 @@ type ProductReview {
     starRating: Float!
     "createdAt specifies the review creation date (DD.MM.YYYY)"
     createdAt: String!
+}
+
+type GetProductsByPage {
+    productList: [ProductInfoWithoutReviews!]!
+    totalPages: Int!
 }

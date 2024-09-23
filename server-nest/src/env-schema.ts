@@ -38,6 +38,7 @@ export const environmentVariablesSchema = z.object({
     DB_SEEDING_ADMIN_FIRST_NAME: string,
     DB_SEEDING_ADMIN_LAST_NAME: string,
     DB_SEEDING_ADMIN_PASSWORD: string,
+    PRODUCTS_PER_PAGE: numericString,
 });
 
 export type EnvironmentVariables = z.infer<typeof environmentVariablesSchema>;
