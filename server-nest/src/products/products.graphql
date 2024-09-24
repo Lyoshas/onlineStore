@@ -54,3 +54,17 @@ type GetProductsByPage {
     productList: [ProductInfoWithoutReviews!]!
     totalPages: Int!
 }
+
+type Mutation {
+    addProductReview(
+        productId: Int!,
+        reviewMessage: String!,
+        starRating: Float!
+    ): AddProductReviewReturnValue!
+}
+
+type AddProductReviewReturnValue {
+    "returning a composite primary key of the recently added product review"
+    productId: Int!
+    userId: Int!
+}

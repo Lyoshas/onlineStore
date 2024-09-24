@@ -7,6 +7,7 @@ import {
     SelectQueryBuilder,
 } from 'typeorm';
 import { GraphQLError } from 'graphql';
+import { ConfigService } from '@nestjs/config';
 import { ProductCategory } from './entities/product-category.entity';
 import {
     ProductInfoWithoutReviews,
@@ -16,8 +17,8 @@ import { ProductReview } from './entities/product-review.entity';
 import { ProductReviewModerationStatus } from './entities/product-review-moderation-status.entity';
 import { Product } from './entities/product.entity';
 import { User } from 'src/auth/entities/user.entity';
-import { ConfigService } from '@nestjs/config';
 import { EnvironmentVariables } from 'src/env-schema';
+import { ProductReviewModerationStatusEnum } from './enums/product-review-moderation-status.enum';
 
 const userRatingSubquery = (qb: SelectQueryBuilder<any>) => {
     return (
@@ -48,6 +49,10 @@ export class ProductsService {
         private readonly productCategoryRepository: Repository<ProductCategory>,
         @InjectRepository(Product)
         private readonly productRepository: Repository<Product>,
+        @InjectRepository(ProductReview)
+        private readonly productReviewRepository: Repository<ProductReview>,
+        @InjectRepository(ProductReviewModerationStatus)
+        private readonly reviewModerationStatusRepository: Repository<ProductReviewModerationStatus>,
         private readonly configService: ConfigService<EnvironmentVariables>,
         private readonly dataSource: DataSource
     ) {}
@@ -471,5 +476,34 @@ export class ProductsService {
             .getRawOne<{ totalPages: number }>();
 
         return query!.totalPages;
+    }
+
+    async addReview({
+        productId,
+        userId,
+        reviewMessage,
+        starRating,
+    }: {
+        productId: number;
+        userId: number;
+        reviewMessage: string;
+        starRating: number;
+    }): Promise<void> {
+        const review = new ProductReview();
+        review.productId = productId;
+        review.userId = userId;
+        review.reviewMessage = reviewMessage;
+        review.starRating = starRating;
+        review.moderationStatus =
+            await this.reviewModerationStatusRepository.findOneByOrFail({
+                name: ProductReviewModerationStatusEnum.PENDING,
+            });
+
+        await this.productReviewRepository
+            .createQueryBuilder('review')
+            .insert()
+            .into(ProductReview)
+            .values(review)
+            .execute();
     }
 }

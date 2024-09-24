@@ -1,4 +1,11 @@
-import { Args, Context, Info, Query, Resolver } from '@nestjs/graphql';
+import {
+    Args,
+    Context,
+    Info,
+    Mutation,
+    Query,
+    Resolver,
+} from '@nestjs/graphql';
 import { GraphQLError, GraphQLResolveInfo } from 'graphql';
 import * as graphqlFields from 'graphql-fields';
 import {
@@ -10,6 +17,10 @@ import { REQUEST_USER_AUTH_FIELD } from 'src/common/common.constants';
 import { AccessTokenPayload } from 'src/auth/interfaces/access-token-payload.interface';
 import { ProductCategoryPipe } from './pipes/product-category.pipe';
 import { ProductPagePipe } from './pipes/product-page.pipe';
+import { ProductIdPipe } from './pipes/product-id.pipe';
+import { ProductReviewPipe } from './pipes/product-review.pipe';
+import { StarRatingPipe } from './pipes/star-rating.pipe';
+import { TypeORMError } from 'typeorm';
 
 @Resolver()
 export class ProductsResolver {
@@ -50,5 +61,41 @@ export class ProductsResolver {
         totalPages: number;
     }> {
         return this.productsService.getProductsByPage(category, page);
+    }
+
+    @Mutation('addProductReview')
+    async addProductReview(
+        @Args('productId', ProductIdPipe) productId: number,
+        @Args('reviewMessage', ProductReviewPipe) reviewMessage: string,
+        @Args('starRating', StarRatingPipe) starRating: number,
+        @Context(REQUEST_USER_AUTH_FIELD) user: AccessTokenPayload | null
+    ) {
+        if (user === null) {
+            throw new GraphQLError(
+                'User must be authenticated to perform this action'
+            );
+        }
+
+        try {
+            await this.productsService.addReview({
+                productId,
+                reviewMessage,
+                starRating,
+                userId: user.id,
+            });
+            return { productId, userId: user.id };
+        } catch (e) {
+            if (
+                e instanceof TypeORMError &&
+                e.message.includes(
+                    'duplicate key value violates unique constraint'
+                )
+            ) {
+                throw new GraphQLError(
+                    'Only one review per user is allowed for each product'
+                );
+            }
+            throw e;
+        }
     }
 }
