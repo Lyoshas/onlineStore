@@ -36,7 +36,7 @@ async function getProductsBySearchQuery(
         throw new IsInTheCartAuthError();
     }
 
-    const { productIDs, totalElasticsearchHits } =
+    const { productIDs, totalHits } =
         await productModel.getProductIDsBySearchQuery(
             args.searchQuery,
             args.page
@@ -47,7 +47,7 @@ async function getProductsBySearchQuery(
     return {
         productList: products,
         totalPages: Math.ceil(
-            totalElasticsearchHits / +process.env.PRODUCTS_PER_PAGE!
+            totalHits / +process.env.PRODUCTS_PER_PAGE!
         ),
     };
 }

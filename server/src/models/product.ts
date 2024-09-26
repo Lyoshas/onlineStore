@@ -1,10 +1,5 @@
 import { PoolClient } from 'pg';
-import {
-    QueryDslQueryContainer,
-    SearchResponse,
-    SearchTotalHits,
-} from '@elastic/elasticsearch/lib/api/typesWithBodyKey.js';
-import { errors as elasticsearchErrors } from '@elastic/elasticsearch';
+import { Knex } from 'knex';
 
 import AnyObject from '../interfaces/AnyObject.js';
 import ArrayElement from '../interfaces/ArrayElement.js';
@@ -17,12 +12,19 @@ import formatSqlQuery from '../util/formatSqlQuery.js';
 import CartProductSummary from '../interfaces/CartProductSummary.js';
 import CheckOrderFeasabilityReqBody from '../interfaces/CheckOrderFeasabilityReqBody.js';
 import serializeSqlParameters from '../util/serializeSqlParameters.js';
-import esClient from '../services/elasticsearch.service.js';
-import { Knex } from 'knex';
+import osearchClient from '../services/opensearch.service.js';
 import getUserRatingSubquery from '../graphql/helpers/getUserRatingSubquery.js';
 import camelCaseObject from '../util/camelCaseObject.js';
 import isProductAvailable from '../graphql/helpers/isProductAvailable.js';
 import isProductRunningOut from '../graphql/helpers/isProductRunningOut.js';
+import {
+    QueryDslQueryContainer,
+    SearchHitsMetadata,
+    SearchTemplateResponse,
+    SearchTotalHits,
+} from '@opensearch-project/opensearch/api/types.js';
+import { ResponseError } from '@opensearch-project/opensearch/lib/errors.js';
+import { ApiResponse } from '@opensearch-project/opensearch/.';
 
 export type PossibleProductFields = (keyof DBProduct)[];
 
@@ -284,49 +286,68 @@ export const restoreProductStocks = async (
 export const getProductIDsBySearchQuery = async (
     searchQuery: string,
     page: number
-): Promise<{ productIDs: number[]; totalElasticsearchHits: number }> => {
+): Promise<{ productIDs: number[]; totalHits: number }> => {
     const productsPerPage: number = +process.env.PRODUCTS_PER_PAGE!;
-    let result: SearchResponse;
-    const queryOptions: QueryDslQueryContainer = {
-        multi_match: {
-            query: searchQuery,
-            fields: ['title^3', 'category^2', 'shortDescription'],
-            fuzziness: 2, // edit distance of 2 (2 typos are allowed)
+    const queryOptions: { query: QueryDslQueryContainer } = {
+        query: {
+            multi_match: {
+                query: searchQuery,
+                fields: ['title^3', 'category^2', 'shortDescription'],
+                fuzziness: 2, // edit distance of 2 (2 typos are allowed)
+            },
         },
     };
 
     try {
-        result = await esClient.search({
+        const response = await osearchClient.search<
+            SearchTemplateResponse<{
+                productId: number;
+                title: string;
+                category: string;
+                shortDescription: string;
+            }>
+        >({
             index: 'products',
-            _source: false,
-            query: queryOptions,
+            body: queryOptions,
             from: productsPerPage * (page - 1),
             size: productsPerPage,
         });
+
+        if (response.statusCode !== 200) {
+            throw new Error(
+                'OpenSearch replied with the status code other than 200'
+            );
+        }
+
+        return {
+            productIDs: response.body.hits.hits.map(
+                (searchHit) => searchHit._source!.productId
+            ),
+            totalHits: (response.body.hits.total as SearchTotalHits).value,
+        };
     } catch (e) {
         if (
-            e instanceof elasticsearchErrors.ResponseError &&
-            (e.message.includes('Result window is too large') ||
-                e.message.includes('out of range of int'))
+            e instanceof ResponseError &&
+            e.message.includes('Result window is too large')
         ) {
-            // by default, Elasticsearch allows (offset + limit) to be up to 10,000
+            // by default, OpenSearch allows (from + size) to be up to 10,000
             // if the user specifies more than that, we will return an empty product array and return the total number of pages
             // this is suitable for this application because it will probably never have that many products
-            result = await esClient.search({
-                index: 'products',
-                // we don't want to return any documents, we just want to count them
-                size: 0,
-                query: queryOptions,
-            });
-        } else {
-            throw e;
+            const response = await osearchClient.search<SearchTemplateResponse>(
+                {
+                    index: 'products',
+                    // we don't want to return any documents, we just want to count them
+                    size: 0,
+                    body: queryOptions,
+                }
+            );
+            return {
+                productIDs: [],
+                totalHits: (response.body.hits.total as SearchTotalHits).value,
+            };
         }
+        throw e;
     }
-
-    return {
-        productIDs: result.hits.hits.map((hit) => +hit._id),
-        totalElasticsearchHits: (result.hits.total as SearchTotalHits).value,
-    };
 };
 
 export const getProductsByIDs = async (
