@@ -2666,7 +2666,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
     - **Content (example):**
       ```JSON
       {
-        "orderId": 5
+        "orderId": "d3a969f2-2613-43ed-bf3e-a4d1bb2125b6"
       }
       ```
 - **Error responses**:
@@ -2847,7 +2847,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
     {
       "orders": [
         {
-          "orderId": 4,
+          "orderId": "b22a5678-b8c9-4a96-b589-ced18c362635",
           "previewURL": "https://onlinestore-product-images.s3.amazonaws.com/c7d3bf2a-8a81-4201-81ed-f20cb7912ac8.png",
           "paymentMethod": "Оплата при отриманні товару",
           "totalPrice": 31499,
@@ -2870,7 +2870,7 @@ Some API endpoints require authentication using access tokens and refresh tokens
           ]
         },
         {
-          "orderId": 1,
+          "orderId": "51a36ccd-1ab2-4308-8f11-b8e8a4816a72",
           "previewURL": "https://onlinestore-product-images.s3.amazonaws.com/55b36dd7-30d7-48d3-808c-f8becc060917.png",
           "paymentMethod": "Оплатити зараз",
           "totalPrice": 971085,

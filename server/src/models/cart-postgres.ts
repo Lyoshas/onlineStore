@@ -195,7 +195,7 @@ export const canAtLeastOneCartProductBeOrdered = async (
     This user will NOT be included, because this user doesn't have any products that the order ID 2 has
 */
 export const getUserIdsWithProductInOrder = async (
-    orderId: number,
+    orderId: string,
     dbClient?: PoolClient
 ): Promise<number[]> => {
     const client = dbClient || dbPool;

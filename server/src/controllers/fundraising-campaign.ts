@@ -1,4 +1,4 @@
-import e, { RequestHandler } from 'express';
+import { RequestHandler } from 'express';
 import asyncHandler from 'express-async-handler';
 
 import FundraisingCampaignModel from '../models/fundraising-campaign.js';
@@ -54,7 +54,7 @@ export const createPendingTransaction: RequestHandler<
         action: 'pay',
         amount: donationAmount,
         description: `Пожертвування коштів на збір №${campaignId} користувачем з ID ${userId}`,
-        orderId: transactionId,
+        orderId: String(transactionId),
         resultUrl: 'http://localhost/api/fundraising-campaign/callback',
     });
 
@@ -82,7 +82,7 @@ export const donationCallback: RequestHandler<
     };
 
     const paymentInfo = req.body.data;
-    const transactionId = paymentInfo.orderId;
+    const transactionId: number = +paymentInfo.orderId;
 
     // if the transaction was cancelled, redirect to the appropriate page
     if (paymentInfo.errCode === 'cancel') {

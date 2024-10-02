@@ -1,5 +1,11 @@
 import { PoolClient } from 'pg';
 import { Knex } from 'knex';
+import {
+    QueryDslQueryContainer,
+    SearchTemplateResponse,
+    SearchTotalHits,
+} from '@opensearch-project/opensearch/api/types.js';
+import { ResponseError } from '@opensearch-project/opensearch/lib/errors.js';
 
 import AnyObject from '../interfaces/AnyObject.js';
 import ArrayElement from '../interfaces/ArrayElement.js';
@@ -17,14 +23,6 @@ import getUserRatingSubquery from '../graphql/helpers/getUserRatingSubquery.js';
 import camelCaseObject from '../util/camelCaseObject.js';
 import isProductAvailable from '../graphql/helpers/isProductAvailable.js';
 import isProductRunningOut from '../graphql/helpers/isProductRunningOut.js';
-import {
-    QueryDslQueryContainer,
-    SearchHitsMetadata,
-    SearchTemplateResponse,
-    SearchTotalHits,
-} from '@opensearch-project/opensearch/api/types.js';
-import { ResponseError } from '@opensearch-project/opensearch/lib/errors.js';
-import { ApiResponse } from '@opensearch-project/opensearch/.';
 
 export type PossibleProductFields = (keyof DBProduct)[];
 
@@ -263,7 +261,7 @@ export const decreaseProductsStock = async (
 // occurs to ensure that the product stocks are returned to their original
 // quantities, maintaining accurate inventory levels
 export const restoreProductStocks = async (
-    orderId: number,
+    orderId: string,
     dbClient?: PoolClient
 ): Promise<void> => {
     const client = dbClient || dbPool;

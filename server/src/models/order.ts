@@ -97,8 +97,8 @@ class OrderModel {
         paymentMethodName: string,
         cityName: string,
         warehouseDescription: string
-    ): Promise<number> {
-        const { rows } = await this.dbClient.query<{ id: number }>(
+    ): Promise<string> {
+        const { rows } = await this.dbClient.query<{ id: string }>(
             `
                 INSERT INTO orders (
                     recipient_id,
@@ -122,7 +122,7 @@ class OrderModel {
             [recipientId, paymentMethodName, cityName, warehouseDescription]
         );
 
-        const orderId: number = rows[0].id;
+        const orderId: string = rows[0].id;
 
         await this.dbClient.query(
             `
@@ -145,7 +145,7 @@ class OrderModel {
     // use this only for anonymous users
     // this function doesn't check if the provided products are available
     public async associateProductsWithOrder(
-        orderId: number,
+        orderId: string,
         products: { productId: number; quantity: number }[]
     ): Promise<void> {
         const sqlQuery = knex('orders_products')
@@ -164,7 +164,7 @@ class OrderModel {
     // use this for authenticated users when creating an order
     public async copyCartProductsToOrderProducts(
         userId: number,
-        orderId: number
+        orderId: string
     ) {
         return this.dbClient.query(
             formatSqlQuery(
@@ -172,7 +172,7 @@ class OrderModel {
                     INSERT INTO orders_products (order_id, product_id, quantity)
                     (
                         SELECT
-                            $1::INTEGER as order_id,
+                            $1::UUID as order_id,
                             product_id,
                             quantity AS cart_quantity
                         FROM carts
@@ -188,7 +188,7 @@ class OrderModel {
         );
     }
 
-    public async getOrderSummary(orderId: number): Promise<OrderSummary> {
+    public async getOrderSummary(orderId: string): Promise<OrderSummary> {
         let {
             rows: [orderInfo],
         } = await this.dbClient.query<{
@@ -228,7 +228,7 @@ class OrderModel {
         return camelCaseObject(orderInfo);
     }
 
-    public async stringifyOrderSummary(orderId: number): Promise<string> {
+    public async stringifyOrderSummary(orderId: string): Promise<string> {
         const { rows } = await this.dbClient.query<{
             user_id: number;
             account_first_name: string;
@@ -339,7 +339,7 @@ class OrderModel {
         return summary;
     }
 
-    public async notifyAboutOrderByTelegram(orderId: number) {
+    public async notifyAboutOrderByTelegram(orderId: string) {
         const text = await this.stringifyOrderSummary(orderId);
         const telegramResponse = await fetch(
             'https://api.telegram.org/bot' +
@@ -358,7 +358,7 @@ class OrderModel {
         return Promise.resolve(telegramResponse);
     }
 
-    public async markOrderAsPaid(orderId: number) {
+    public async markOrderAsPaid(orderId: string) {
         return this.dbClient.query(
             'UPDATE orders SET is_paid = true WHERE id = $1',
             [orderId]
@@ -369,7 +369,7 @@ class OrderModel {
         // you can either pass all the needed data directly to avoid fetching from the DB
         // or provide the orderId and the function will make a DB call
         orderDetails:
-            | { orderId: number }
+            | { orderId: string }
             | { email: string; phoneNumber: string; orderSummary: OrderSummary }
     ): Promise<void> {
         let email: string, phoneNumber: string, orderSummary: OrderSummary;
@@ -462,7 +462,7 @@ class OrderModel {
     }
 
     // this function returns 'null' if the provided order ID doesn't exist
-    public async isOrderPaidFor(orderId: number): Promise<boolean | null> {
+    public async isOrderPaidFor(orderId: string): Promise<boolean | null> {
         const { rows, rowCount } = await this.dbClient.query<{
             is_paid: boolean;
         }>(formatSqlQuery(`SELECT is_paid FROM orders WHERE id = $1`), [
@@ -471,7 +471,7 @@ class OrderModel {
         return rowCount === 0 ? null : camelCaseObject(rows[0]).isPaid;
     }
 
-    public async cancelOrder(orderId: number): Promise<void> {
+    public async cancelOrder(orderId: string): Promise<void> {
         await this.dbClient.query(
             formatSqlQuery(`
                 INSERT INTO order_status_history (order_id, status_id)
@@ -490,7 +490,7 @@ class OrderModel {
 
     public async getOrderListByUserId(userId: number): Promise<
         {
-            orderId: number;
+            orderId: string;
             previewURL: string;
             paymentMethod: string;
             totalPrice: number;
@@ -512,7 +512,7 @@ class OrderModel {
         }[]
     > {
         const { rows: orders } = await this.dbClient.query<{
-            order_id: number;
+            order_id: string;
             payment_method: string;
             preview_url: string;
             total_price: string;

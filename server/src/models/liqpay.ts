@@ -9,7 +9,7 @@ export const createLiqPayFormData = (args: {
     action: LiqpayDecodedData['action'];
     amount: number;
     description: string;
-    orderId: number;
+    orderId: string;
     resultUrl: string;
 }): { data: string; signature: string } => {
     const { action, amount, description, orderId, resultUrl } = args;

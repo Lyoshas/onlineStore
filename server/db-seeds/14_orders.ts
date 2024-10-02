@@ -2,7 +2,7 @@ import { Knex } from 'knex';
 import { SeedOrderRecipient } from './13_order_recipients';
 
 interface Order {
-    id: number;
+    id: string;
     paymentMethod: 'Оплата при отриманні товару' | 'Оплатити зараз';
     isPaid: boolean;
     statusHistory: {
@@ -29,7 +29,7 @@ export async function seed(knex: Knex): Promise<void> {
 
     const orders: Order[] = [
         {
-            id: 1,
+            id: 'ae7e52a9-23bd-40cd-9ab4-32bc7046e342',
             paymentMethod: 'Оплатити зараз',
             isPaid: true,
             recipient: {
@@ -106,7 +106,7 @@ export async function seed(knex: Knex): Promise<void> {
             ],
         },
         {
-            id: 2,
+            id: '3e629ffd-c2fb-4ea9-a4a0-2d725c15e84a',
             paymentMethod: 'Оплата при отриманні товару',
             isPaid: false,
             recipient: {
@@ -134,7 +134,7 @@ export async function seed(knex: Knex): Promise<void> {
             ],
         },
         {
-            id: 3,
+            id: '59adaa4a-cbc3-49a6-b356-85a3cba9b39d',
             paymentMethod: 'Оплатити зараз',
             isPaid: false,
             recipient: {
@@ -158,7 +158,7 @@ export async function seed(knex: Knex): Promise<void> {
             ],
         },
         {
-            id: 4,
+            id: '54b001d4-e388-43e2-86d2-e10640141ded',
             paymentMethod: 'Оплата при отриманні товару',
             isPaid: false,
             recipient: {
@@ -206,15 +206,6 @@ export async function seed(knex: Knex): Promise<void> {
                     phone_number: order.recipient.phoneNumber,
                 }),
         }))
-    );
-
-    await knex.raw(
-        `
-            SELECT setval(
-                pg_get_serial_sequence('orders', 'id'),
-                (SELECT MAX(id) FROM orders) + 1
-            );
-        `
     );
 
     for (let order of orders) {

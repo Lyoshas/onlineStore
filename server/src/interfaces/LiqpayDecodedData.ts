@@ -38,7 +38,7 @@ export default interface LiqpayDecodedData {
         | 'wait_lc'
         | 'wait_reserve'
         | 'wait_secure';
-    order_id: number;
+    order_id: string;
     err_code?: string;
     [key: string]: any;
 }

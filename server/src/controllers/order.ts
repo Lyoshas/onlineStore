@@ -7,7 +7,6 @@ import * as redisCartModel from '../models/cart-redis.js';
 import * as postgresCartModel from '../models/cart-postgres.js';
 import * as transactionModel from '../models/pg-transaction.js';
 import * as productModel from '../models/product.js';
-import * as signupModel from '../models/signup.js';
 import * as liqpayModel from '../models/liqpay.js';
 import SignupModel from '../models/signup.js';
 import UnexpectedError from '../errors/UnexpectedError.js';
@@ -255,11 +254,11 @@ export const postPaymentCallback: RequestHandler<
     const dbClient = await dbPool.connect();
     await transactionModel.beginTransaction(dbClient);
     const orderModel = new OrderModel(dbClient);
-    const orderId: number = paymentInfo.orderId;
+    const orderId: string = paymentInfo.orderId;
 
     // this function cancels the order and returns the stock levels to the original state
     // use it only in appropriate circumstances
-    const orderCancellationCleanup = async (orderId: number) => {
+    const orderCancellationCleanup = async (orderId: string) => {
         await orderModel.cancelOrder(orderId);
         await productModel.restoreProductStocks(orderId, dbClient);
         await transactionModel.commitTransaction(dbClient);

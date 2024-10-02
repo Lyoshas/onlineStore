@@ -282,10 +282,8 @@ router.post(
         return camelCaseObject(JSON.parse(base64Decode(data)));
     }),
     body('data.orderId')
-        .isNumeric()
-        // LiqPay returns 'orderId' as a string, so we need to transform it to a number
-        .customSanitizer((orderId: string) => +orderId)
-        .withMessage('must be a numeric value'),
+        .isUUID(4)
+        .withMessage('must be a UUIDv4'),
     body('data.action').isString().withMessage('must be a string'),
     body('data.status').isString().withMessage('must be a string'),
     body('data.errCode').optional().isString().withMessage('must be a string'),
