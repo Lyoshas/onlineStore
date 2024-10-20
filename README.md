@@ -61,6 +61,8 @@
       - [1. Get a list of fundraising campaigns](#1-get-a-list-of-fundraising-campaigns)
       - [2. Create a new pending transaction](#2-create-a-new-pending-transaction)
       - [3. Process a donation (LiqPay callback)](#3-process-a-donation-liqpay-callback)
+    - [Health Endpoints](#health-endpoints)
+      - [1. Health check](#1-health-check)
 
 ## Prerequisites
 - Install Docker and Docker Compose
@@ -3231,3 +3233,25 @@ Some API endpoints require authentication using access tokens and refresh tokens
         ]
       }
       ```
+
+### Health Endpoints
+#### 1. Health check
+- **URL:** /api/health
+- **Method:** GET
+- **Description:** returns the status indicating that the application is working properly. Useful for load balancers and other applications that rely of health checks.
+- **Who can access:** everyone
+- **Rate limiting:** none
+- **Request body:** none
+- **Request params:** none
+- **Query string parameters:** none
+- **Required cookies:** none
+- **Success response:**
+  - **Status code:** 200
+  - **Description:** the application is working correctly
+  - **Content:**
+    ```JSON
+    {
+      "status": "healthy"
+    }
+    ```
+- **Error responses**: none
