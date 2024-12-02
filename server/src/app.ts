@@ -77,8 +77,8 @@ app.use('/shipping', shippingRoutes);
 
 app.use('/', healthRoutes);
 
-app.use('/test', (req, res, next) => {
-	res.json({ message: 'Повідомлення' });
+app.get('/test', (req, res, next) => {
+	res.json({ message: 'Новий ендпоінт! (пуш в прод успішний)' });
 });
 
 // ендпоінт, який блокує Event Loop та нагружає процесор
