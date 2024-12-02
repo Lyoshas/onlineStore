@@ -24,6 +24,25 @@ const config: { [key: string]: Knex.Config } = {
             directory: path.join(process.cwd(), 'db-seeds'),
         },
     },
+    production: {
+        client: 'postgresql',
+        connection: {
+            host: process.env.PGHOST,
+            database: process.env.PGDATABASE,
+            user: process.env.PGUSER,
+            password: process.env.PGPASSWORD,
+        },
+        pool: {
+            min: 2,
+            max: 10,
+        },
+        migrations: {
+            directory: path.join(process.cwd(), 'db-migrations'),
+        },
+        seeds: {
+            directory: path.join(process.cwd(), 'db-seeds'),
+        },
+    },
 };
 
 export default config;

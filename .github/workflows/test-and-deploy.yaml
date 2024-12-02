@@ -1,0 +1,66 @@
+name: Node.js CI/CD
+
+on:
+  push:
+    branches:
+      - feat/deployment-2
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Налаштування AWS-креденцій
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.17.0
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Створюємо необхідні для тестування директорії, у яких будуть зберігатися dev env-змінні
+        run: mkdir -p {./server/src/config,./postgres,./redis,./opensearch}
+      - name: Копіюємо тестові env-змінні до API-застосунку
+        working-directory: server/src/config
+        run: echo "${{ secrets.DEV_API_ENV_FILE_CONTENTS }}" > ./dev.env
+      - name: Копіюємо параметри, необхідні для тестування, до PostgreSQL-серверу
+        working-directory: postgres
+        run: echo "${{ secrets.DEV_POSTGRES_ENV_FILE_CONTENTS }}" > ./dev.env
+      - name: Копіюємо параметри, необхідні для тестування, до Redis-серверу
+        working-directory: redis
+        run: echo "${{ secrets.DEV_REDIS_CONF_FILE_CONTENTS }}" > ./redis.conf
+      - name: Копіюємо параметри, необхідні для тестування, до Opensearch-кластеру
+        working-directory: opensearch
+        run: echo "${{ secrets.DEV_OPENSEARCH_ENV_FILE_CONTENTS }}" > ./dev.env
+      - name: Запуск скрипта, який тестує та розгортає додаток у випадку успішності тестів
+        working-directory: ./.github/workflows
+        run: ./test-and-deploy.sh
+
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   needs: test
+  #   if: success()  # Only run this job if the test job succeeds
+    
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
+
+  #     - name: Set up AWS CLI
+  #       uses: aws-actions/configure-aws-credentials@v1
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws-region: 'us-east-1'  # Change this to your AWS region
+
+  #     - name: Deploy to AWS
+  #       run: |
+  #         # Replace this with your actual deploy commands, for example:
+  #         # aws s3 cp ./build s3://your-bucket-name --recursive
+  #         # or
+  #         # aws ecs update-service --cluster your-cluster --service your-service
+  #         echo "Deploying to AWS..."
+  #         # Example: if you're deploying an S3 static site
+  #         aws s3 sync ./build s3://your-bucket-name --delete

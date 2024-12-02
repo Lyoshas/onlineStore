@@ -14,16 +14,14 @@ export function createUserAndReturnId(
             first_name,
             last_name,
             is_activated,
-            avatar_url,
             is_admin
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id
+        ) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id
     `, [
         `${randomString(15)}@test.com`,
         'test_password',
         randomString(15),
         randomString(15),
         isActivated,
-        '/images/default-avatar.png',
         isAdmin
     ]).then(({ rows }) => rows[0].id);
 };

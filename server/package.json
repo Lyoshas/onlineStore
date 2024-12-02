@@ -5,7 +5,7 @@
   "main": "./src/app.ts",
   "type": "module",
   "scripts": {
-    "start": "ts-node --esm --transpileOnly ./src/server.ts",
+    "start": "tsc && node ./dist/src/server.js",
     "dev": "nodemon --ext ts --exec \"NODE_NO_WARNINGS=1 node --loader ts-node/esm ./src/server.ts\"",
     "test": "vitest --reporter verbose",
     "test:ci": "vitest run --watch false",
@@ -73,6 +73,7 @@
     "pg-query-stream": "^4.5.3",
     "stream-chain": "^2.2.5",
     "stream-json": "^1.8.0",
+    "winston": "^3.17.0",
     "yup": "^1.4.0"
   }
 }

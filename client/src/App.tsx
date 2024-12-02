@@ -22,8 +22,6 @@ import Logout from './pages/Logout/Logout';
 import useApiError from './components/hooks/useApiError';
 import LandingPage from './pages/LandingPage/LandingPage';
 import ProductInfo from './pages/ProductInfo/ProductInfo';
-import EditProduct from './pages/EditProduct/EditProduct';
-import AddProduct from './pages/AddProduct/AddProduct';
 import CartContentsModal from './components/CartContentsModal/CartContentsModal';
 import { cartModalActions } from './store/slices/cartModal';
 import ProductCategoryList from './pages/ProductCategoryList/ProductCategoryList';
@@ -244,30 +242,6 @@ const App: FC = () => {
                             RenderAfter={<FundraisingCampaignCallback />}
                             addOffset={true}
                         />
-                    }
-                />
-                <Route
-                    path="/edit-product/:productId"
-                    element={
-                        // ensure the user is logged in and is an admin
-                        <EnsureStatus auth={true} admin={true}>
-                            <TopHeader
-                                RenderAfter={<EditProduct />}
-                                addOffset={true}
-                            />
-                        </EnsureStatus>
-                    }
-                />
-                <Route
-                    path="/add-product"
-                    element={
-                        // ensure the user is logged in and is an admin
-                        <EnsureStatus auth={true} admin={true}>
-                            <TopHeader
-                                RenderAfter={<AddProduct />}
-                                addOffset={true}
-                            />
-                        </EnsureStatus>
                     }
                 />
             </Routes>

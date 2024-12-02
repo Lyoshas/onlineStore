@@ -141,8 +141,6 @@ async function getProductsByCategoryAndPage(
 
         const sqlQuery: string = formatSqlQuery(queryBuilder.toString());
 
-        console.log(sqlQuery);
-
         const { rows: products } = await dbPool.query(sqlQuery);
 
         resultProductList.push(

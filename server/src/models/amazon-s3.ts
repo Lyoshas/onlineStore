@@ -10,6 +10,7 @@ import { Readable } from 'stream';
 import { fileTypeFromStream } from 'file-type';
 
 import s3Client from '../services/s3.service.js';
+import { logger } from '../loggers/logger.js';
 
 const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME!;
 
@@ -103,15 +104,16 @@ export const getMagicNumberMimeType = async (
 
         return fileTypeResult?.mime;
     } catch (error) {
-        console.log(error);
-        let message =
-            'An unexpected error occurred while checking a MIME type of an S3 object';
-
+        if (error instanceof Error) {
+            logger.error(error.message);
+        }
+        let message = 'An unexpected error occurred while checking a MIME type of an S3 object';
+        
         // in order for AWS SDK to return the "NoSuchKey" error, the bucket must have the "ListBucket" permission attached
         if (error instanceof S3ServiceException && error.name === 'NoSuchKey') {
             message = objectNotFoundErrorMessage;
         }
-
+        
         throw new Error(message);
     }
 };

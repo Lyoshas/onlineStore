@@ -7,11 +7,15 @@ import cookieParser from 'cookie-parser';
 
 const NODE_ENV = process.env.NODE_ENV as string;
 
+console.log(NODE_ENV);
+
 if (!['development', 'test', 'production'].includes(NODE_ENV)) {
-    throw new Error(`
+	throw new Error(
+		`
         Environment variable NODE_ENV is neither
              'development', nor 'test', nor 'production'
-    `.replace(/[\n\t]|\s{2}/g, ''));
+    `.replace(/[\n\t]|\s{2}/g, '')
+	);
 }
 
 import signinRoutes from './routes/signin.js';
@@ -34,8 +38,15 @@ import userRoutes from './routes/user.js';
 import warrantyRequestRoutes from './routes/warranty-request.js';
 import fundraisingCampaignRoutes from './routes/fundraising-campaign.js';
 import healthRoutes from './routes/health.js';
+import corsHandler from './middlewares/cors-handler.js';
+import { requestLogger } from './middlewares/request-logger.js';
+import { logger } from './loggers/logger.js';
 
 const app = express();
+
+app.use(requestLogger);
+
+app.use(corsHandler);
 
 app.use(bodyParser.json({ limit: '5kb' }));
 
@@ -46,20 +57,15 @@ app.use(bodyParser.urlencoded({ extended: false, limit: '5kb' }));
 app.use(identifyUser);
 
 app.use('/auth', [
-    signinRoutes,
-    signupRoutes,
-    accountActivationRoutes,
-    resetPasswordRoutes,
-    oauthRoutes,
-    logoutRoutes,
+	signinRoutes,
+	signupRoutes,
+	accountActivationRoutes,
+	resetPasswordRoutes,
+	oauthRoutes,
+	logoutRoutes,
 ]);
 
-app.use('/user', [
-    cartRoutes,
-    orderRoutes,
-    userRoutes,
-    warrantyRequestRoutes,
-]);
+app.use('/user', [cartRoutes, orderRoutes, userRoutes, warrantyRequestRoutes]);
 
 app.use('/', fundraisingCampaignRoutes);
 
@@ -71,30 +77,62 @@ app.use('/shipping', shippingRoutes);
 
 app.use('/', healthRoutes);
 
+app.use('/test', (req, res, next) => {
+	res.json({ message: 'Повідомлення' });
+});
+
+// ендпоінт, який блокує Event Loop та нагружає процесор
+app.post('/block-event-loop', (req, res, next) => {
+	const durationSeconds = +req.body.durationSeconds;
+	if (
+		!Number.isInteger(durationSeconds) ||
+		durationSeconds < 0 ||
+		durationSeconds > 300
+	) {
+		return res.json({
+			message: 'durationSeconds має бути числом від 1 до 300 включно',
+		});
+	}
+
+	logger.info(`Блокую event loop на ${durationSeconds} с.`);
+
+	const startTime = Date.now() / 1000;
+	while (true) {
+		if (Date.now() / 1000 - startTime > durationSeconds) break;
+	}
+
+	res.json({ message: 'Кінець блокування Event Loop' });
+});
+
 const startGraphQLServer = async () => {
-    const server = new ApolloServer<ApolloServerContext>({
-        typeDefs,
-        resolvers,
-        formatError(formattedError: GraphQLFormattedError) {
-            if (process.env.NODE_ENV === 'production') {
-                // don't include anything that might expose the server code
-                return { message: formattedError.message };
-            }
+	const server = new ApolloServer<ApolloServerContext>({
+		typeDefs,
+		resolvers,
+		formatError(formattedError: GraphQLFormattedError) {
+			logger.error(formattedError.message);
 
-            // if it's dev environment, don't do anything
-            return formattedError;
-        },
-    });
+			if (process.env.NODE_ENV === 'production') {
+				// don't include anything that might expose the server code
+				return { message: formattedError.message };
+			}
 
-    await server.start();
+			// if it's dev environment, don't do anything
+			return formattedError;
+		},
+	});
 
-    app.use('/graphql', expressMiddleware(server, {
-        context: async ({ req }) => ({ user: req.user })
-    }));
+	await server.start();
 
-    app.use(notFoundHandler);
+	app.use(
+		'/graphql',
+		expressMiddleware(server, {
+			context: async ({ req }) => ({ user: req.user }),
+		})
+	);
 
-    app.use(errorHandler);
+	app.use(notFoundHandler);
+
+	app.use(errorHandler);
 };
 
 startGraphQLServer();

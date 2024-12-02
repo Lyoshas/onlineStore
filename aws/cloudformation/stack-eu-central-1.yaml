@@ -1,0 +1,659 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+    OnlineStoreVPC:
+        Type: AWS::EC2::VPC
+        Properties:
+            CidrBlock: 10.0.0.0/16
+            EnableDnsHostnames: true
+            EnableDnsSupport: true
+            Tags:
+                - Key: Name
+                  Value: onlinestore-vpc
+    InternetGateway:
+        Type: AWS::EC2::InternetGateway
+        Properties:
+            Tags:
+                - Key: Name
+                  Value: onlinestore-igw
+    AttachInternetGateway:
+        Type: AWS::EC2::VPCGatewayAttachment
+        Properties:
+            VpcId: !Ref OnlineStoreVPC
+            InternetGatewayId: !Ref InternetGateway
+    RdsSubnet1:
+        Type: AWS::EC2::Subnet
+        Properties:
+            VpcId: !Ref OnlineStoreVPC
+            CidrBlock: 10.0.0.0/24
+            MapPublicIpOnLaunch: false
+            AvailabilityZone: !Select [0, !GetAZs '']
+            Tags:
+                - Key: Name
+                  Value: rds-subnet-1
+    RdsSubnet2:
+        Type: AWS::EC2::Subnet
+        Properties:
+            VpcId: !Ref OnlineStoreVPC
+            CidrBlock: 10.0.1.0/24
+            MapPublicIpOnLaunch: false
+            AvailabilityZone: !Select [1, !GetAZs '']
+            Tags:
+                - Key: Name
+                  Value: rds-subnet-2
+    RdsSubnetRouteTable:
+        Type: AWS::EC2::RouteTable
+        Properties:
+            VpcId: !Ref OnlineStoreVPC
+    # RdsSubnetRouteTableRoute:
+    #     Type: AWS::EC2::Route
+    #     Properties:
+    #         RouteTableId: !Ref RdsSubnetRouteTable
+    #         DestinationCidrBlock: 0.0.0.0/0
+    #         GatewayId: !Ref InternetGateway
+    RdsSubnet1RouteTableAssociation:
+        Type: AWS::EC2::SubnetRouteTableAssociation
+        Properties:
+            RouteTableId: !Ref RdsSubnetRouteTable
+            SubnetId: !Ref RdsSubnet1
+    RdsSubnet2RouteTableAssociation:
+        Type: AWS::EC2::SubnetRouteTableAssociation
+        Properties:
+            RouteTableId: !Ref RdsSubnetRouteTable
+            SubnetId: !Ref RdsSubnet2
+    RedisSubnet1:
+        Type: AWS::EC2::Subnet
+        Properties:
+            VpcId: !Ref OnlineStoreVPC
+            CidrBlock: 10.0.2.0/24
+            MapPublicIpOnLaunch: false
+            AvailabilityZone: !Select [2, !GetAZs '']
+            Tags:
+                - Key: Name
+                  Value: redis-subnet-1
+    OpenSearchSubnet1:
+        Type: AWS::EC2::Subnet
+        Properties:
+            VpcId: !Ref OnlineStoreVPC
+            CidrBlock: 10.0.3.0/24
+            MapPublicIpOnLaunch: false
+            AvailabilityZone: !Select [0, !GetAZs '']
+            Tags:
+                - Key: Name
+                  Value: opensearch-subnet-1
+    OpenSearchSubnetRouteTable:
+        Type: AWS::EC2::RouteTable
+        Properties:
+            VpcId: !Ref OnlineStoreVPC
+    OpenSearchSubnetRouteTableRoute:
+        Type: AWS::EC2::Route
+        Properties:
+            RouteTableId: !Ref OpenSearchSubnetRouteTable
+            DestinationCidrBlock: 0.0.0.0/0
+            GatewayId: !Ref InternetGateway
+    OpenSearchSubnet1RouteTableAssociation:
+        Type: AWS::EC2::SubnetRouteTableAssociation
+        Properties:
+            RouteTableId: !Ref OpenSearchSubnetRouteTable
+            SubnetId: !Ref OpenSearchSubnet1
+    EcsSubnet1:
+        Type: AWS::EC2::Subnet
+        Properties:
+            VpcId: !Ref OnlineStoreVPC
+            CidrBlock: 10.0.4.0/24
+            MapPublicIpOnLaunch: false
+            AvailabilityZone: !Select [1, !GetAZs '']
+            Tags:
+                - Key: Name
+                  Value: ecs-subnet-1
+    EcsSubnetRouteTable:
+        Type: AWS::EC2::RouteTable
+        Properties:
+            VpcId: !Ref OnlineStoreVPC
+    EcsSubnetRouteTableRoute:
+        Type: AWS::EC2::Route
+        Properties:
+            RouteTableId: !Ref EcsSubnetRouteTable
+            DestinationCidrBlock: 0.0.0.0/0
+            GatewayId: !Ref InternetGateway
+    EcsSubnetRouteTableAssociation:
+        Type: AWS::EC2::SubnetRouteTableAssociation
+        Properties:
+            RouteTableId: !Ref EcsSubnetRouteTable
+            SubnetId: !Ref EcsSubnet1
+    AlbSubnet1:
+        Type: AWS::EC2::Subnet
+        Properties:
+            VpcId: !Ref OnlineStoreVPC
+            CidrBlock: 10.0.5.0/24
+            MapPublicIpOnLaunch: false
+            AvailabilityZone: !Select [0, !GetAZs '']
+            Tags:
+                - Key: Name
+                  Value: alb-subnet-1
+    AlbSubnet2:
+        Type: AWS::EC2::Subnet
+        Properties:
+            VpcId: !Ref OnlineStoreVPC
+            CidrBlock: 10.0.6.0/24
+            MapPublicIpOnLaunch: false
+            AvailabilityZone: !Select [1, !GetAZs '']
+            Tags:
+                - Key: Name
+                  Value: alb-subnet-2
+    AlbSubnet3:
+        Type: AWS::EC2::Subnet
+        Properties:
+            VpcId: !Ref OnlineStoreVPC
+            CidrBlock: 10.0.7.0/24
+            MapPublicIpOnLaunch: false
+            AvailabilityZone: !Select [2, !GetAZs '']
+            Tags:
+                - Key: Name
+                  Value: alb-subnet-3
+    AlbSubnetRouteTable:
+        Type: AWS::EC2::RouteTable
+        Properties:
+            VpcId: !Ref OnlineStoreVPC
+    AlbSubnetRouteTableRoute:
+        Type: AWS::EC2::Route
+        Properties:
+            RouteTableId: !Ref AlbSubnetRouteTable
+            DestinationCidrBlock: 0.0.0.0/0
+            GatewayId: !Ref InternetGateway
+    AlbSubnet1RouteTableAssociation:
+        Type: AWS::EC2::SubnetRouteTableAssociation
+        Properties:
+            RouteTableId: !Ref AlbSubnetRouteTable
+            SubnetId: !Ref AlbSubnet1
+    AlbSubnet2RouteTableAssociation:
+        Type: AWS::EC2::SubnetRouteTableAssociation
+        Properties:
+            RouteTableId: !Ref AlbSubnetRouteTable
+            SubnetId: !Ref AlbSubnet2
+    AlbSubnet3RouteTableAssociation:
+        Type: AWS::EC2::SubnetRouteTableAssociation
+        Properties:
+            RouteTableId: !Ref AlbSubnetRouteTable
+            SubnetId: !Ref AlbSubnet3
+    DBSubnetGroup: # specifies which subnets will be allocated for the RDS instance
+        Type: AWS::RDS::DBSubnetGroup
+        Properties:
+            DBSubnetGroupName: onlinestore-subnet-group
+            DBSubnetGroupDescription: Subnet group for RDS instance
+            SubnetIds:
+                - !Ref RdsSubnet1
+                - !Ref RdsSubnet2
+    RdsInstanceSecurityGroup:
+        Type: AWS::EC2::SecurityGroup
+        Properties:
+            GroupDescription: Allows TCP traffic on port 5432
+            GroupName: onlinestore-rds-sg
+            VpcId: !Ref OnlineStoreVPC
+            SecurityGroupIngress:
+                - IpProtocol: tcp
+                  CidrIp: 0.0.0.0/0
+                  FromPort: 5432
+                  ToPort: 5432
+    RdsInstanceParameterGroup:
+        Type: AWS::RDS::DBParameterGroup
+        Properties:
+            DBParameterGroupName: onlinestore-rds-parameter-group
+            Description: Custom parameter group for the RDS instance
+            Family: postgres16
+            Parameters:
+                rds.force_ssl: false
+                log_statement: all
+                log_duration: 1
+    RdsInstance:
+        Type: AWS::RDS::DBInstance
+        Properties:
+            DBInstanceIdentifier: onlinestore-rds-postgres-instance
+            StorageType: gp2
+            AllocatedStorage: 20
+            MaxAllocatedStorage: 20
+            NetworkType: IPV4
+            DBInstanceClass: db.t3.micro
+            Engine: postgres
+            EngineVersion: 16.4
+            EngineLifecycleSupport: open-source-rds-extended-support-disabled
+            EnablePerformanceInsights: false
+            EnableCloudwatchLogsExports:
+                - postgresql
+            MultiAZ: false
+            DBSubnetGroupName: !Ref DBSubnetGroup
+            MasterUsername: postgres
+            MasterUserPassword: !Ref DBPassword
+            DBName: online_store
+            BackupRetentionPeriod: 0 # don't perform automated backups
+            VPCSecurityGroups:
+                - !Ref RdsInstanceSecurityGroup
+            DBParameterGroupName: !Ref RdsInstanceParameterGroup
+            # PubliclyAccessible: true
+            PubliclyAccessible: false
+    ElastiCacheSubnetGroup:
+        Type: AWS::ElastiCache::SubnetGroup
+        Properties:
+            Description: Subnet group for Redis
+            SubnetIds:
+                - !Ref RedisSubnet1
+    RedisSecurityGroup:
+        Type: AWS::EC2::SecurityGroup
+        Properties:
+            GroupDescription: Security group for ElastiCache Redis
+            VpcId: !Ref OnlineStoreVPC
+            SecurityGroupIngress:
+                - IpProtocol: tcp
+                  FromPort: 6379
+                  ToPort: 6379
+                  CidrIp: 0.0.0.0/0
+    RedisCluster:
+        Type: AWS::ElastiCache::CacheCluster
+        Properties:
+            Engine: redis
+            ClusterName: onlinestore-redis-cluster
+            CacheNodeType: cache.t2.micro
+            NumCacheNodes: 1 # 1 node to stay within the free tier
+            CacheSubnetGroupName: !Ref ElastiCacheSubnetGroup
+            AZMode: single-az
+            VpcSecurityGroupIds:
+                - !Ref RedisSecurityGroup
+            Tags:
+                - Key: Name
+                  Value: onlinestore-redis-cluster
+    OpenSearchSecurityGroup:
+        Type: AWS::EC2::SecurityGroup
+        Properties:
+            GroupDescription: Allows TCP traffic on port 443
+            GroupName: onlinestore-opensearch-sg
+            VpcId: !Ref OnlineStoreVPC
+            SecurityGroupIngress:
+                - IpProtocol: tcp
+                  CidrIp: 0.0.0.0/0
+                  FromPort: 443
+                  ToPort: 443
+                - IpProtocol: tcp
+                  CidrIp: 0.0.0.0/0
+                  FromPort: 80
+                  ToPort: 80
+    OpenSearchCluster:
+        Type: AWS::OpenSearchService::Domain
+        Properties:
+            DomainName: onlinestore-opensearch
+            EngineVersion: OpenSearch_2.5
+            ClusterConfig:
+                InstanceType: t3.small.search
+                InstanceCount: 1
+                MultiAZWithStandbyEnabled: false
+            EBSOptions:
+                EBSEnabled: true
+                VolumeSize: 10
+                VolumeType: gp2
+            DomainEndpointOptions:
+                EnforceHTTPS: true
+            EncryptionAtRestOptions:
+                Enabled: true
+            NodeToNodeEncryptionOptions:
+                Enabled: true
+            VPCOptions:
+                SubnetIds:
+                    - !Ref OpenSearchSubnet1
+                SecurityGroupIds:
+                    - !Ref OpenSearchSecurityGroup
+            AdvancedSecurityOptions:
+                Enabled: true
+                InternalUserDatabaseEnabled: true
+                MasterUserOptions:
+                    MasterUserName: !Ref OpenSearchMasterUsername
+                    MasterUserPassword: !Ref OpenSearchMasterPassword
+            AccessPolicies:
+                Version: 2012-10-17
+                Statement:
+                    - Effect: Allow
+                      Principal: '*'
+                      Action: 'es:*'
+    EcrRepository:
+        Type: AWS::ECR::Repository
+        Properties:
+            RepositoryName: onlinestore/api
+            EmtpyOnDelete: false # the repository must be empty before attempting to delete it
+            EncryptionConfiguration:
+                EncryptionType: KMS
+    SecretsManagerSecret:
+        Type: AWS::SecretsManager::Secret
+        Properties:
+            Description: Environment variables for the ECS Node.js app, stored in JSON
+            Name: onlinestore/express-api
+            SecretString: !Ref SecretsManagerSecretValue
+    EcsCluster:
+        Type: AWS::ECS::Cluster
+        Properties:
+            ClusterName: onlinestore-ecs-cluster
+    AccessSecretManagedPolicy:
+        Type: AWS::IAM::ManagedPolicy
+        Properties:
+            ManagedPolicyName: OnlinestoreSecretsManagerReadOnly
+            Description: Allows to read the created secret with Secrets Manager
+            PolicyDocument:
+                Version: 2012-10-17
+                Statement:
+                    - Effect: Allow
+                      Action:
+                        - secretsmanager:GetSecretValue
+                        - secretsmanager:BatchGetSecretValue
+                        - secretsmanager:DescribeSecret
+                      Resource: !Ref SecretsManagerSecret
+    EcsTaskExecutionRole:
+        Type: AWS::IAM::Role
+        Properties:
+            AssumeRolePolicyDocument:
+                Statement:
+                    - Effect: Allow # allowing the ECS service to assume this role
+                      Principal:
+                        Service: ecs-tasks.amazonaws.com
+                      Action:
+                        - sts:AssumeRole
+            ManagedPolicyArns:
+                - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy # basic permissions for ECS tasks
+                - !Ref AccessSecretManagedPolicy
+    EcsCloudWatchLogGroup: # logs from ECS tasks will go to this log group
+        Type: AWS::Logs::LogGroup
+        Properties:
+            LogGroupName: onlinestore-api-log-group
+            LogGroupClass: STANDARD
+            RetentionInDays: 1
+    EcsTaskDefinition:
+        Type: AWS::ECS::TaskDefinition
+        Properties:
+            RequiresCompatibilities:
+              - FARGATE
+            Cpu: 256 # 0.25 vCPU
+            Memory: 512 # 0.5 GB
+            NetworkMode: awsvpc
+            ExecutionRoleArn: !GetAtt EcsTaskExecutionRole.Arn
+            ContainerDefinitions:
+                - Name: onlinestore-api
+                  Image: 941377122569.dkr.ecr.eu-central-1.amazonaws.com/onlinestore/api:latest
+                  Essential: true # if the container fails or stops for any reason, all other containers that are part of the task are stopped
+                  PortMappings:
+                    - ContainerPort: 3000
+                      Protocol: tcp
+                  LogConfiguration:
+                    LogDriver: awslogs
+                    Options:
+                        awslogs-region: eu-central-1
+                        awslogs-group: !Ref EcsCloudWatchLogGroup
+                        awslogs-stream-prefix: onlinestore-api
+                  Secrets:
+                    - Name: NODE_ENV
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "NODE_ENV", '::'] ]
+                    - Name: COOKIE_SECRET
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "COOKIE_SECRET", '::'] ]
+                    - Name: PRODUCTS_PER_PAGE
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "PRODUCTS_PER_PAGE", '::'] ]
+                    - Name: REACT_APP_URL
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "REACT_APP_URL", '::'] ]
+                    - Name: DB_SEEDING_ADMIN_EMAIL
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "DB_SEEDING_ADMIN_EMAIL", '::'] ]
+                    - Name: DB_SEEDING_ADMIN_FIRST_NAME
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "DB_SEEDING_ADMIN_FIRST_NAME", '::'] ]
+                    - Name: DB_SEEDING_ADMIN_LAST_NAME
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "DB_SEEDING_ADMIN_LAST_NAME", '::'] ]
+                    - Name: DB_SEEDING_ADMIN_PASSWORD
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "DB_SEEDING_ADMIN_PASSWORD", '::'] ]
+                    - Name: DB_SEEDING_ADMIN_PHONE_NUMBER
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "DB_SEEDING_ADMIN_PHONE_NUMBER", '::'] ]
+                    - Name: HASHING_NUMBER_OF_SALT_ROUNDS
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "HASHING_NUMBER_OF_SALT_ROUNDS", '::'] ]
+                    - Name: ACTIVATION_TOKEN_EXPIRATION_IN_SECONDS
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "ACTIVATION_TOKEN_EXPIRATION_IN_SECONDS", '::'] ]
+                    - Name: RESET_TOKEN_EXPIRATION_IN_SECONDS
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "RESET_TOKEN_EXPIRATION_IN_SECONDS", '::'] ]
+                    - Name: REFRESH_TOKEN_EXPIRATION_IN_SECONDS
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "REFRESH_TOKEN_EXPIRATION_IN_SECONDS", '::'] ]
+                    - Name: ACCESS_TOKEN_SECRET
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "ACCESS_TOKEN_SECRET", '::'] ]
+                    - Name: ACCESS_TOKEN_EXPIRES_IN
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "ACCESS_TOKEN_EXPIRES_IN", '::'] ]
+                    - Name: GOOGLE_CLIENT_ID
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "GOOGLE_CLIENT_ID", '::'] ]
+                    - Name: GOOGLE_CLIENT_SECRET
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "GOOGLE_CLIENT_SECRET", '::'] ]
+                    - Name: FACEBOOK_CLIENT_ID
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "FACEBOOK_CLIENT_ID", '::'] ]
+                    - Name: FACEBOOK_CLIENT_SECRET
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "FACEBOOK_CLIENT_SECRET", '::'] ]
+                    - Name: OAUTH_REDIRECT_URI
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "OAUTH_REDIRECT_URI", '::'] ]
+                    - Name: PGHOST
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "PGHOST", '::'] ]
+                    - Name: PGPORT
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "PGPORT", '::'] ]
+                    - Name: PGUSER
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "PGUSER", '::'] ]
+                    - Name: PGPASSWORD
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "PGPASSWORD", '::'] ]
+                    - Name: PGDATABASE
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "PGDATABASE", '::'] ]
+                    - Name: RECAPTCHA_SITE_KEY
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "RECAPTCHA_SITE_KEY", '::'] ]
+                    - Name: RECAPTCHA_SECRET_KEY
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "RECAPTCHA_SECRET_KEY", '::'] ]
+                    - Name: REDIS_PORT
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "REDIS_PORT", '::'] ]
+                    - Name: REDIS_HOST
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "REDIS_HOST", '::'] ]
+                    - Name: REDIS_USERNAME
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "REDIS_USERNAME", '::'] ]
+                    - Name: REDIS_PASSWORD
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "REDIS_PASSWORD", '::'] ]
+                    - Name: REDIS_COMMAND_TIMEOUT
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "REDIS_COMMAND_TIMEOUT", '::'] ]
+                    - Name: REDIS_CART_EXPIRATION
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "REDIS_CART_EXPIRATION", '::'] ]
+                    - Name: SENDGRID_API_KEY
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "SENDGRID_API_KEY", '::'] ]
+                    - Name: SENDGRID_FROM_EMAIL
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "SENDGRID_FROM_EMAIL", '::'] ]
+                    - Name: OPENSEARCH_USERNAME
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "OPENSEARCH_USERNAME", '::'] ]
+                    - Name: OPENSEARCH_PASSWORD
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "OPENSEARCH_PASSWORD", '::'] ]
+                    - Name: OPENSEARCH_NODE
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "OPENSEARCH_NODE", '::'] ]
+                    - Name: LIQPAY_PUBLIC_KEY
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "LIQPAY_PUBLIC_KEY", '::'] ]
+                    - Name: LIQPAY_PRIVATE_KEY
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "LIQPAY_PRIVATE_KEY", '::'] ]
+                    - Name: TELEGRAM_NOTIFICATION_BOT_API_KEY
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "TELEGRAM_NOTIFICATION_BOT_API_KEY", '::'] ]
+                    - Name: TELEGRAM_CHAT_ID
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "TELEGRAM_CHAT_ID", '::'] ]
+                    - Name: MAX_PRODUCTS_IN_CART
+                      ValueFrom: !Join ["", [!Ref SecretsManagerSecret, ":", "MAX_PRODUCTS_IN_CART", '::'] ]
+    EcsServiceSecurityGroup:
+        Type: AWS::EC2::SecurityGroup
+        Properties:
+            GroupDescription: Allows HTTP traffic on port 3000
+            GroupName: onlinestore-ecs-api-sg
+            VpcId: !Ref OnlineStoreVPC
+            SecurityGroupIngress:
+                - IpProtocol: tcp
+                  CidrIp: 0.0.0.0/0
+                  FromPort: 3000
+                  ToPort: 3000
+    EcsRESTfulApiService:
+        Type: AWS::ECS::Service
+        DependsOn:
+            - ApiAlbHttpListener
+            - ApiAlbHttpsListener
+        Properties:
+            Cluster: !Ref EcsCluster
+            TaskDefinition: !Ref EcsTaskDefinition
+            LaunchType: FARGATE
+            DesiredCount: 1
+            HealthCheckGracePeriodSeconds: 180 # The period of time, in seconds, that the Amazon ECS service scheduler ignores unhealthy Elastic Load Balancing target health checks after a task has first started
+            NetworkConfiguration:
+                AwsvpcConfiguration:
+                    AssignPublicIp: ENABLED
+                    SecurityGroups:
+                        - !Ref EcsServiceSecurityGroup
+                    Subnets:
+                        - !Ref EcsSubnet1
+            LoadBalancers:
+                - ContainerName: onlinestore-api
+                  ContainerPort: 3000
+                  TargetGroupArn: !Ref AlbTargetGroup
+    Route53HostedZone:
+        Type: AWS::Route53::HostedZone
+        Properties:
+            Name: onlinestore-potapchuk.click
+    AcmCertificate:
+        Type: AWS::CertificateManager::Certificate
+        Properties:
+            DomainName: api.onlinestore-potapchuk.click
+            CertificateTransparencyLoggingPreference: ENABLED
+            ValidationMethod: DNS
+    AlbSecurityGroup:
+        Type: AWS::EC2::SecurityGroup
+        Properties:
+            GroupDescription: Allows TCP traffic on port 443 and 80
+            GroupName: onlinestore-alb-sg
+            VpcId: !Ref OnlineStoreVPC
+            SecurityGroupIngress:
+                - IpProtocol: tcp
+                  CidrIp: 0.0.0.0/0
+                  FromPort: 443
+                  ToPort: 443
+                - IpProtocol: tcp
+                  CidrIp: 0.0.0.0/0
+                  FromPort: 80
+                  ToPort: 80
+    AlbTargetGroup:
+        Type: AWS::ElasticLoadBalancingV2::TargetGroup
+        Properties:
+            Name: onlinestore-ecs-tg
+            Port: 3000
+            Protocol: HTTP
+            ProtocolVersion: HTTP1
+            TargetType: ip
+            VpcId: !Ref OnlineStoreVPC
+            HealthCheckEnabled: true
+            HealthCheckPath: /health
+            HealthCheckPort: 3000
+            HealthCheckProtocol: HTTP
+            HealthCheckTimeoutSeconds: 10
+    ApiApplicationLoadBalancer:
+        Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+        Properties:
+            Name: onlinestore-api-alb
+            Type: application
+            IpAddressType: ipv4
+            LoadBalancerAttributes:
+                - Key: load_balancing.cross_zone.enabled
+                  Value: true
+            Scheme: internet-facing
+            SecurityGroups:
+                - !Ref AlbSecurityGroup
+            Subnets:
+                - !Ref AlbSubnet1
+                - !Ref AlbSubnet2
+    ApiAlbHttpsListener:
+        Type: AWS::ElasticLoadBalancingV2::Listener
+        Properties:
+            LoadBalancerArn: !Ref ApiApplicationLoadBalancer
+            Port: 443
+            Protocol: HTTPS
+            Certificates:
+                - CertificateArn: !Ref AcmCertificate
+            DefaultActions:
+                - Type: forward
+                  TargetGroupArn: !Ref AlbTargetGroup
+    ApiAlbHttpListener:
+        Type: AWS::ElasticLoadBalancingV2::Listener
+        Properties:
+            LoadBalancerArn: !Ref ApiApplicationLoadBalancer
+            Port: 80
+            Protocol: HTTP
+            DefaultActions:
+                - Type: redirect
+                  RedirectConfig:
+                    Protocol: HTTPS
+                    Port: 443
+                    StatusCode: HTTP_301
+    ApiAlbRoute53Record:
+        Type: AWS::Route53::RecordSet
+        Properties:
+            HostedZoneId: !Ref Route53HostedZone
+            Name: api.onlinestore-potapchuk.click
+            Type: A
+            AliasTarget:
+                DNSName: !GetAtt ApiApplicationLoadBalancer.DNSName
+                HostedZoneId: !GetAtt ApiApplicationLoadBalancer.CanonicalHostedZoneID
+    AdminSNSTopic:
+        Type: AWS::SNS::Topic
+        Properties:
+            DisplayName: Admin Notification Topic
+            TopicName: ecs-cpu-alarms-topic
+            FifoTopic: false
+    AdminSNSTopicSubscription:
+        Type: AWS::SNS::Subscription
+        Properties:
+            Protocol: email
+            Endpoint: !Ref AdminEmail
+            TopicArn: !Ref AdminSNSTopic
+    # ECSHighCPUAlarm:
+    #     Type: AWS::CloudWatch::Alarm
+    #     Properties:
+    #         AlarmName: "ECS-High-CPU-Utilization"
+    #         MetricName: CPUUtilization
+    #         Namespace: "AWS/ECS"
+    #         Statistic: Average
+    #         Period: 60
+    #         EvaluationPeriods: 1
+    #         Threshold: 50
+    #         ComparisonOperator: GreaterThanThreshold
+    #         AlarmActions:
+    #             - !Ref AdminSNSTopic
+    #         Dimensions:
+    #             - Name: ClusterName
+    #               Value: !Ref EcsCluster
+    #             - Name: ServiceName
+    #               Value: !GetAtt EcsRESTfulApiService.Name
+
+Parameters:
+    DBPassword:
+        Description: The Postgres database admin password
+        Type: String
+        NoEcho: true # ensures the password is not displayed in CloudFormation logs
+        MinLength: 10
+        MaxLength: 30
+        ConstraintDescription: Must be between 10 and 30 characters
+    OpenSearchMasterUsername:
+        Description: The OpenSearch cluster master username
+        Type: String
+        NoEcho: true # ensures the password is not displayed in CloudFormation logs
+        MinLength: 4
+        MaxLength: 30
+        ConstraintDescription: Must be between 4 and 30 characters
+    OpenSearchMasterPassword:
+        Description: The OpenSearch cluster master password
+        Type: String
+        NoEcho: true # ensures the password is not displayed in CloudFormation logs
+        MinLength: 10
+        MaxLength: 30
+        ConstraintDescription: Must be between 10 and 30 characters
+    SecretsManagerSecretValue:
+        Description: Environment variables for the ECS Node.js app, stored in JSON
+        Type: String
+        NoEcho: true # ensures the password is not displayed in CloudFormation logs
+        ConstraintDescription: Should be specified in JSON
+    AdminEmail:
+        Description: Admin email address that will be used to send system notifications using an SNS topic
+        Type: String
+        NoEcho: true
+        ConstraintDescription: Must be an email address
+
+Outputs:
+    OpenSearchSubnetId:
+        Description: OpenSearch Subnet ID
+        Value: !Ref OpenSearchSubnet1

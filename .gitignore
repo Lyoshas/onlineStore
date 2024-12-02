@@ -6,6 +6,7 @@ server/src/config/
 client/node_modules/
 # graphql-codegen generates files to __generated__ to ensure type safety while using GraphQL on the client side
 client/src/__generated__
+client/dist
 redis/redis.conf
 aws/lambda-functions/**/node_modules
 aws/lambda-functions/**/dist
@@ -18,3 +19,4 @@ server-nest/**/*.env
 server-nest/ormconfig.js
 server-nest/ormconfig.ts
 server-nest/src/graphql-types.ts
+aws/cloudformation/parameters.cfn

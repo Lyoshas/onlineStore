@@ -128,7 +128,6 @@ async function getFeaturedProducts(
         .limit(12);
 
     const sqlQuery: string = formatSqlQuery(queryBuilder.toString());
-    console.log(sqlQuery);
 
     const { rows: products } = await dbPool.query(sqlQuery);
 

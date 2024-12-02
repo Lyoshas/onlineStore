@@ -4,7 +4,7 @@ import checkProductExistence from '../validators/checkProductExistence.js';
 import checkReviewMessage from '../validators/checkReviewMessage.js';
 import checkStarRating from '../validators/checkStarRating.js';
 import checkPreviousProductReview from '../validators/checkPreviousProductReview.js';
-import { addProductReview } from '../../models/product-review.js';
+import { addProductReview as addProductReviewToDB } from '../../models/product-review.js';
 
 interface GraphqlAddProductReviewArgs {
     productId: number;
@@ -12,7 +12,7 @@ interface GraphqlAddProductReviewArgs {
     starRating: number;
 }
 
-async function getProductReviews(
+async function addProductReview(
     _: any,
     args: GraphqlAddProductReviewArgs,
     context: ApolloServerContext
@@ -32,14 +32,9 @@ async function getProductReviews(
     checkReviewMessage(reviewMessage);
     checkStarRating(starRating);
 
-    try {
-        await addProductReview(productId, userId, reviewMessage, starRating);
+    await addProductReviewToDB(productId, userId, reviewMessage, starRating);
 
-        return { productId, userId };
-    } catch (error) {
-        console.log(error);
-        throw error;
-    }
+    return { productId, userId };
 }
 
-export default getProductReviews;
+export default addProductReview;
