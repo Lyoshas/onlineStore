@@ -28,7 +28,6 @@ import ApolloServerContext from './interfaces/ApolloServerContext.js';
 import errorHandler from './middlewares/error-handler.js';
 import notFoundHandler from './middlewares/not-found-handler.js';
 import productCategoriesRoutes from './routes/product-category.js';
-import s3Routes from './routes/file-upload.js';
 import shippingRoutes from './routes/shipping.js';
 import userRoutes from './routes/user.js';
 import warrantyRequestRoutes from './routes/warranty-request.js';
@@ -64,8 +63,6 @@ app.use('/user', [
 app.use('/', fundraisingCampaignRoutes);
 
 app.use('/product', productCategoriesRoutes);
-
-app.use('/s3', s3Routes);
 
 app.use('/shipping', shippingRoutes);
 
